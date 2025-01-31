@@ -138,4 +138,76 @@
 \subsection{量子线路}
 量子线路是量子计算中的一个重要概念，它描述了量子比特之间的相互作用关系。量子线路由量子门（Quantum Gate）组成，量子门是用来操作量子比特的基本单元，类似于经典计算中的逻辑门。量子门是一个幺正算符，它作用在量子比特上，改变量子比特的状态。
 
-最简单的一类门是单比特量子门，
+最简单的一类门是单比特量子门，常见的单比特量子门有Pauli门、Hadamard门、相位门、T门等。Pauli门是一组三个单比特门，分别是$X$门、$Y$门和$Z$门，它们的矩阵表示分别为
+\begin{equation}
+    X = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}, \quad Y = \begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix}, \quad Z = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}.
+\end{equation}
+Hadamard门是一个单比特门，常用于产生均匀叠加态，它常简记为H门，其矩阵表示为
+\begin{equation}
+    H = \frac{1}{\sqrt{2}}\begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix}.
+\end{equation}
+上述的门矩阵表示既是幺正也是厄米的，因此既可以作为量子门，也可以作为测量算符。
+另外还有两个常用的单比特门，分别是相位门（简记为$S$），还有T门，其矩阵表示分别为
+\begin{equation}
+    S = \begin{pmatrix} 1 & 0 \\ 0 & i \end{pmatrix}, \quad T = \begin{pmatrix} 1 & 0 \\ 0 & e^{i\pi/4} \end{pmatrix}.
+\end{equation}
+
+此外还有一类常用的含参数的单比特门，称为单比特旋转门，它们的矩阵表示为
+\begin{equation}
+    \begin{aligned}
+        &R_X(\theta) =e^{-i\frac{\theta}{2}X} = \begin{pmatrix} \cos\frac{\theta}{2} & -i\sin\frac{\theta}{2} \\ -i\sin\frac{\theta}{2} & \cos\frac{\theta}{2} \end{pmatrix}, \\ &R_Y(\theta)=e^{-i\frac{\theta}{2}Y} = \begin{pmatrix} \cos\frac{\theta}{2} & -\sin\frac{\theta}{2} \\ \sin\frac{\theta}{2} & \cos\frac{\theta}{2} \end{pmatrix},\\ &R_Z(\theta)=e^{-i\frac{\theta}{2}Z} = \begin{pmatrix} e^{-i\theta/2} & 0 \\ 0 & e^{i\theta/2} \end{pmatrix}.
+    \end{aligned}
+\end{equation}
+这些门可以通过旋转Bloch球来实现，从几何的角度，他们分别是将量子比特绕Bloch球的X轴、Y轴、Z轴旋转一个角度$\theta$。实际上，任意的单比特门都可以视为在Bloch球上的一个旋转操作，有如下的表示
+\begin{equation}
+    U = e^{i\alpha}R_n(\theta),
+\end{equation}
+其中$e^{i\alpha}$是一个全局相位，$R_n(\theta)$是绕Bloch球上的一个单位向量$n$旋转一个角度$\theta$，满足
+\begin{equation}
+    R_n(\theta) = \cos\frac{\theta}{2}I - i\sin\frac{\theta}{2}n\cdot\vec{\sigma},
+\end{equation}
+其中$\vec{\sigma} = (\sigma_x, \sigma_y, \sigma_z)$是Pauli矩阵向量，$n$是一个单位向量，满足$n\cdot n = 1$。
+通过欧拉角分解，任意的旋转都可以表示为三个旋转门的乘积，即
+\begin{equation}
+    R_n(\theta) = R_Z(\beta)R_Y(\gamma)R_Z(\delta).
+\end{equation}
+因此，只使用两种轴的旋转门就可以实现任意的单比特门。
+
+除了单比特门之外，还有多比特门，常见的多比特门有CNOT门。CNOT门是一个两比特门，它的矩阵表示为
+\begin{equation}
+    \text{CNOT} = \ketbra{0}{0}\otimes I + \ketbra{1}{1}\otimes X=\begin{pmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 0 & 1 \\ 0 & 0 & 1 & 0 \end{pmatrix}.
+\end{equation}
+
+单比特旋转门的推广是多比特旋转门。为了介绍多比特旋转门，我们首先介绍Pauli word的概念。Pauli word是由Pauli算符$X$、$Y$、$Z$以及单位算符$I$进行张量积组成的一个算符，例如$XIY$、$ZZI$等。形式化地，一个长度为n的Pauli word可以表示为
+\begin{equation}
+    P = \bigotimes_{i=1}^n P_i,
+\end{equation}
+其中$P_i \in \{I, X, Y, Z\}$。
+一个n-qubit的多比特旋转门是Pauli word的指数函数，即
+\begin{equation}
+    R_P(\theta) = e^{-i\frac{\theta}{2} P},
+\end{equation}
+其中$P$是一个长度为n的Pauli word，$\theta$是旋转角度。
+多比特旋转门在一大类被称为变分量子算法（Variational Quantum Algorithm，VQA）中扮演着重要的角色。
+多比特旋转门的实现略显复杂，但是可以通过一系列的单比特门和CNOT门来实现。
+
+在一个量子系统中，如果能够实现任意的单比特门和CNOT门，那么这个量子系统就是通用量子计算机，可以实现任意的幺正操作。在一些特定的量子计算系统中，旋转门的实现可能会受到限制，并且旋转门的实现可能使得量子纠错变得更加困难。因此，还有一种常见的办法是使用一组固定的门集合，使得这个门集合可以实现任意的幺正操作，这样的门集合称为通用量子门集合。
+
+常见的通用量子门集合有Clifford+T门集合。
+Clifford门是一类幺正门，它们保持Pauli算符的对易关系，即对于任意的Pauli算符$P$和Clifford门$C$，有$CPC^\dagger = P'$，其中$P'$也是一个Pauli算符。Clifford门的特点是它们可以通过Hadamard门、相位门、CNOT门来构造。
+
+将量子门按照一定的顺序组合起来，就构成了一个量子线路。量子线路是量子计算中的一个重要概念，它描述了量子比特之间的相互作用关系。量子线路由量子门组成，量子门是用来操作量子比特的基本单元，类似于经典计算中的逻辑门。量子线路的输入是一个初始的量子态，输出是一个最终的量子态。量子线路的运行过程是一个量子态在量子门作用下的演化过程，它描述了量子比特之间的相互作用关系。图~\ref{fig:quantum-circuit}展示了一个量子线路的示意图，其中包含两个被初始化为$|0\rangle$的量子比特，通过Hadamard门和CNOT门的作用，最终的量子态会被测量。
+
+\begin{figure}[h]
+    \centering
+    \begin{quantikz}
+        \lstick{$|0\rangle$} & \gate{H} & \ctrl{1} & \meter{} \\
+        \lstick{$|0\rangle$} & \qw & \targ{} & \meter{} \\
+    \end{quantikz}
+    \caption{量子线路示意图}\label{fig:quantum-circuit}
+\end{figure}
+
+\section{本章小结}
+本章介绍了量子信息科学的基本概念，包括量子信息科学的研究背景、量子力学的基本知识、量子计算的基本概念等。介绍了表示量子系统状态的纯态、混合态、密度矩阵的概念，接着介绍了量子态的演化、量子测量的概念。最后介绍了量子计算的基本概念，包括量子比特、量子线路、量子门等。本章的内容为后续章节的内容打下了基础。
+
+在后面的章节中，我们将介绍#TODO
