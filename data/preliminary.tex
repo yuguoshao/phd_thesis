@@ -207,6 +207,142 @@ Clifford门是一类幺正门，它们保持Pauli算符的对易关系，即对�
     \caption{量子线路示意图}\label{fig:quantum-circuit}
 \end{figure}
 
+\section{张量网络图}
+
+
+张量网络图记号作为一种直观的数学工具，通过几何拓扑结构将复杂的张量运算转化为可视化的图形操作。其核心思想是将张量的每个自由度（指标）表示为连接节点的“腿”（leg），张量间的缩并操作则通过腿的连接实现。
+
+张量网络图记号的发展与量子多体物理和量子信息科学密切相关。20世纪90年代，White提出的密度矩阵重整化群（DMRG）方法首次隐式地使用了张量网络的拓扑结构。2003年，F. Verstraete等人明确提出矩阵乘积态（MPS）的图表示，标志着张量网络图记号的形式化。
+
+
+在张量网络图记法中，向量作为一阶张量，可通过单个节点及其左侧延伸的线段表示：
+\begin{equation}
+  \ket{v}
+  =
+  \begin{tikzpicture}[baseline=(current bounding box.center)]
+    \node[draw] (s0) at (0,0) {$v$};
+    \draw [thick] (-0.5,0)--(s0);
+  \end{tikzpicture},
+\end{equation}
+其中$v=\begin{pmatrix} v_1 \\ v_2 \\ \vdots \\ v_n \end{pmatrix}$。
+当给腿赋予指定的指标时，可以获得所表示向量的分量：
+\begin{equation}
+  \braket{i}{v}
+  =v_i=\begin{tikzpicture}
+    \node[draw] (s0) at (0,0) {$v$};
+    \draw [thick] (-0.5,0)--(s0);
+    \node[above] at (-0.5,0) {$i$};
+  \end{tikzpicture}
+\end{equation}
+
+
+矩阵在张量网络图中作为二阶张量，可以被表示为具有左右两侧连线的节点：
+\begin{equation}
+  A
+  =
+  \begin{tikzpicture}[baseline=(current bounding box.center)]
+    \node[draw] (s0) at (0,0) {$A$};
+    \draw [thick] (-0.5,0)--(s0) (s0)--(0.5,0);
+  \end{tikzpicture},
+\end{equation}
+其中$A=\begin{pmatrix} a_{11} & a_{12} \cdots \\ a_{21} & a_{22} \cdots \\ \vdots & \vdots \end{pmatrix}$。
+矩阵的元素可通过指定连接的腿的指标获得：
+\begin{equation}
+  a_{ij}=
+  \begin{tikzpicture}[baseline=(current bounding box.center)]
+    \node[draw] (s0) at (0,0) {$A$};
+    \draw [thick] (-0.5,0)--(s0) (s0)--(0.5,0);
+    \node[above] at (-0.5,0) {$i$};
+    \node[above] at (0.5,0) {$j$};
+  \end{tikzpicture}
+\end{equation}
+
+
+由矩阵的张量网络图表示，矩阵的转置操作可通过旋转张量对应的连接方向实现：
+\begin{equation}
+  \begin{tikzpicture}[baseline=(current bounding box.center)]
+    \node[draw] (s0) at (0,0) {$A^T$};
+    \draw [thick] (-0.5,0)--(s0) (s0)--(0.5,0);
+  \end{tikzpicture}
+  =
+  \begin{tikzpicture}[baseline=(current bounding box.center)]
+    \node[draw] (s0) at (0,0) {$A$};
+    \draw[thick] (-0.5,0)--(s0) (s0)--(0.5,0);
+    \draw[thick] (-0.5,0.5) arc(90:270:0.25);
+    \draw[thick] (0.5,-0.5) arc(-90:90:0.25);
+    \draw[thick] (-0.5,0.5)--(1,0.5) (0.5,-0.5)--(-1,-0.5);
+  \end{tikzpicture}
+\end{equation}
+
+对于矩阵的乘法操作，在张量网络图中是由连接相邻张量的对应边实现指标收缩来表示：
+\begin{equation}
+  \begin{tikzpicture}[baseline=(current bounding box.center)]
+    \node[draw] (s1) at (0,0) {$AB$};
+    \draw [thick] (-0.75,0)--(s1) (s1)--(0.75,0);
+  \end{tikzpicture}
+  =
+  \begin{tikzpicture}[baseline=(current bounding box.center)]
+    \node[draw] (s0) at (0,0) {$A$};
+    \node[draw] (s1) at (0.75,0) {$B$};
+    \draw [thick] (-0.5,0)--(s0) (s0)--(s1) (s1)--(1.25,0);
+  \end{tikzpicture}
+\end{equation}
+这是因为矩阵乘法的元素表达式为
+\begin{equation}
+  (AB)_{ij}=\sum_k A_{ik}B_{kj}=\sum_k
+  \begin{tikzpicture}[baseline=(current bounding box.center)]
+    \node[draw] (s0) at (0,0) {$A$};
+    \node[draw] (s1) at (1.5,0) {$B$};
+    \draw [thick] (-0.5,0)--(s0) (s0)--(0.5,0) (s1)--(2,0) (s1)--(1,0);
+    \node[above] at (-0.5,0) {$i$};
+    \node[above] at (0.5,0) {$k$};
+    \node[above] at (1,0) {$k$};
+    \node[above] at (2,0) {$j$};
+    \end{tikzpicture}=
+    \begin{tikzpicture}[baseline=(current bounding box.center)]
+        \node[draw] (s0) at (0,0) {$A$};
+        \node[draw] (s1) at (0.75,0) {$B$};
+        \draw [thick] (-0.5,0)--(s0) (s0)--(s1) (s1)--(1.25,0);
+        \node[above] at (-0.5,0) {$i$};
+        \node[above] at (1.25,0) {$j$};
+    \end{tikzpicture}
+\end{equation}
+
+
+
+
+
+除了矩阵的乘法，另一种常见的张量积操作，在张量网络图中被表示为为张量的垂直堆叠：
+\begin{equation}
+  \begin{tikzpicture}[baseline=(current bounding box.center)]
+    \node[draw,minimum height=1.25cm] (s1) at (0,0) {$A\otimes B$};
+    \draw [thick] (-0.75,0.375)-|(s1.west) (-0.75,-0.375)-|(s1.west) (s1.east)|-(0.75,0.375) (s1.east)|-(0.75,-0.375);
+  \end{tikzpicture}
+  =
+  \begin{tikzpicture}[baseline=(current bounding box.center)]
+    \node[draw] (s0) at (0,0) {$A$};
+    \node[draw] (s1) at (0,-0.75) {$B$};
+    \draw [thick] (-0.5,0)--(s0)--(0.5,0)  (-0.5,-0.75)--(s1)--(0.5,-0.75);
+  \end{tikzpicture}
+\end{equation}
+
+
+矩阵的迹运算可以通过将张量的对应边连接并收缩来表示：
+\begin{equation}
+  \Tr{A}
+  =
+  \begin{tikzpicture}[baseline=(current bounding box.center)]
+    \node[draw] (s0) at (0,0) {$A$};
+    \draw [thick] (-0.5,0)--(s0) (s0)--(0.5,0);
+    \draw[thick] (-0.5,0.5) arc(90:270:0.25);
+    \draw[thick] (0.5,0) arc(-90:90:0.25);
+    \draw [thick] (-0.5,0.5)--(0.5,0.5);
+  \end{tikzpicture}
+\end{equation}
+
+上述图记号通过几何拓扑直观反映了张量运算的代数结构，特别在处理高维张量收缩时，能有效降低传统指标记法的复杂性。后续章节将基于此记号体系，介绍Pauli路径积分算法的张量网络图表示。
+
+
 \section{本章小结}
 本章介绍了量子信息科学的基本概念，包括量子信息科学的研究背景、量子力学的基本知识、量子计算的基本概念等。介绍了表示量子系统状态的纯态、混合态、密度矩阵的概念，接着介绍了量子态的演化、量子测量的概念。最后介绍了量子计算的基本概念，包括量子比特、量子线路、量子门等。本章的内容为后续章节的内容打下了基础。
 
