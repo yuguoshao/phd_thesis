@@ -107,6 +107,60 @@
     \langle O \rangle = \Tr(O\rho)=\sum_i \lambda_i \Tr(E_i\rho E_i^\dagger)=\sum_i \lambda_i \Tr(E_i\rho E_i^\dagger).
 \end{equation}
 
+
+\subsection{量子信道}
+量子信道是量子信息科学中的一个重要概念，它描述了量子态在开放系统中的演化过程。
+对于一个量子系统$A$，如果它与另一个量子系统$B$之间存在相互作用，那么系统$A$的状态会发生演化，这个相互作用可以用一个量子信道来描述。
+
+假设联合系统$AB$的初始状态是$\rho_{AB} = \rho_A \otimes |\psi_0\rangle \langle \psi_0|$，系统$A$的初始状态是$\rho_A = \Tr_B(\rho_{AB})$，系统$B$的初始状态是$\rho_B = \Tr_A(\rho_{AB})=|\psi_0\rangle \langle \psi_0|$。
+其中$\Tr_B$表示对系统$B$求偏迹，即对系统$B$的态矢量进行求和，得到系统$A$的密度矩阵；类似的$\Tr_A$表示对系统$A$求偏迹:
+\begin{equation}
+    \rho_A = \Tr_B(\rho_{AB}) = \sum_i \prescript{}{B}{\langle} \psi_i|\rho_{AB}|\psi_i\rangle_B, \quad \rho_B = \Tr_A(\rho_{AB}) = \sum_j \prescript{}{A}{\langle} \phi_j|\rho_{AB}|\phi_j\rangle_A,
+\end{equation}
+其中$\{|\psi_i\rangle_B\}$和$\{|\phi_j\rangle_A\}$分别是系统$B$和系统$A$的正交归一基矢。
+
+假设系统$A$和系统$B$之间的相互作用可以用一个幺正算符$U$来描述，系统$A$的状态在相互作用后的状态可以表示为
+\begin{equation}
+    \rho_A' = \Tr_B(U\rho_{AB}U^\dagger) = \sum_i \prescript{}{B}{\langle} \psi_i|U\rho_{AB}U^\dagger|\psi_i\rangle_B.
+\end{equation}
+
+定义 Kraus 算符 $K_i = \prescript{}{B}{\langle} \psi_i|U|\psi_0\rangle_B$，则系统 $A$ 的最终状态可以表示为：
+\begin{equation}
+    \rho_A' = \sum_i K_i \rho_A K_i^\dagger.
+\end{equation}
+以上定义的 $K_i$ 满足 $\sum_i K_i^\dagger K_i = \sum_i \prescript{}{B}{\langle} \psi_i|U^\dagger U|\psi_0\rangle_B = I$.
+
+对于一般的量子信道$\mathcal{T}$，可以用一组 Kraus 算符来描述，即
+\begin{equation}
+    \mathcal{T}(\rho) = \sum_i K_i \rho K_i^\dagger,
+\end{equation}
+其中 $\sum_i K_i^\dagger K_i = I$。量子信道的作用是将输入态 $\rho$ 映射到输出态 $\mathcal{T}(\rho)$。
+
+Kraus算符保证了量子信道是完全正的，即保证了$\mathcal{T}\otimes I$是正映射，其中$I$是一个恒等算符。假设$\mathcal{T}$有Kraus表示$\mathcal{T}(\rho) = \sum_i K_i \rho K_i^\dagger$，则$\mathcal{T}\otimes I$作用在量子态$\rho=\sum_j \lambda_j \ketbra{\phi_j}$上，有:
+\begin{equation}
+        \mathcal{T}\otimes I(\rho) = \sum_i (K_i \otimes I)(\rho)(K_i \otimes I)^\dagger = \sum_i (K_i \otimes I)(\sum_j \lambda_j \ketbra{\phi_j})(K_i \otimes I)^\dagger.
+\end{equation}
+则对于任意的态$\ket{\psi}$，有
+\begin{equation}
+    \begin{aligned}
+        \bra{\psi}(\mathcal{T}\otimes I)(\rho)\ket{\psi} &= \sum_{i,j} \lambda_j \bra{\psi}(K_i \otimes I)\ket{\phi_j}\bra{\phi_j}(K_i \otimes I)^\dagger\ket{\psi} \\
+        &= \sum_{i,j} \lambda_j \bra{\psi}(K_i \otimes I)\ket{\phi_j}\bra{\phi_j}(K_i^\dagger \otimes I)\ket{\psi} \\
+        &= \sum_{i,j} \lambda_j |\bra{\psi}(K_i \otimes I)\ket{\phi_j}|^2 \geq 0.
+    \end{aligned}
+\end{equation}
+因此，$\mathcal{T}\otimes I$是正的，即$\mathcal{T}$是完全正的。
+
+此外$\sum_i K_i^\dagger K_i = I$保证了量子信道是保迹的，即保证了$\Tr(\mathcal{T}(\rho)) = \Tr(\rho)$。这是因为
+\begin{equation}
+    \begin{aligned}
+        \Tr(\mathcal{T}(\rho)) &= \Tr(\sum_i K_i \rho K_i^\dagger) = \sum_i \Tr(K_i \rho K_i^\dagger) = \sum_i \Tr(\rho K_i^\dagger K_i) \\
+        &= \Tr(\rho I) = \Tr(\rho).
+    \end{aligned}
+\end{equation}
+
+这样完全正的保迹（Completely Positive and Trace-Preserving, CPTP）映射刻画了一般的量子信道的性质，它描述了量子态在开放系统中的演化过程。
+
+
 \section{量子计算简介}
 
 量子计算是一种基于量子力学原理的计算模型，它利用量子力学的特性来处理和传输信息。
@@ -206,6 +260,9 @@ Clifford门是一类幺正门，它们保持Pauli算符的对易关系，即对�
     \end{quantikz}
     \caption{量子线路示意图}\label{fig:quantum-circuit}
 \end{figure}
+
+
+
 
 \section{张量网络图}
 
