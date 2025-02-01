@@ -185,6 +185,34 @@ Kraus算符保证了量子信道是完全正的，即保证了$\mathcal{T}\otime
 \end{equation}
 其中$\theta$和$\phi$是两个角度，$\gamma$是一个全局相位，满足$0 \leq \theta \leq \pi$，$0 \leq \phi < 2\pi$，$0 \leq \gamma < 2\pi$。 量子比特的状态可以用Bloch球来表示，Bloch球是一个单位球，它的表面上的点对应于量子比特的状态。
 
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}
+      % Draw the Bloch sphere
+      \shade[ball color=white] (0,0) circle (2cm);
+      \draw (0,0) circle (2cm);
+      \draw[dashed] (0,0) circle (2cm and 0.6cm);
+      \draw[dashed] (0,0) circle (0.6cm and 2cm);
+      
+      % Draw axes
+      \draw[->] (0,0) -- (2.2,0) node[right] {$x$};
+      \draw[->] (0,0) -- (0,2.2) node[above] {$z$};
+      \draw[->] (0,0) -- (-0.9,-0.9) node[left] {$y$};
+      
+      % Draw state vector
+      \draw[->,thick] (0,0) -- (-1.4,1.4,1.4) node[above right] {$|\psi\rangle$};
+      
+      % Draw angles
+      \draw[dashed] (0,0) -- (1.4,1.4,0);
+      \draw[dashed] (1.4,1.4,0) -- (1.4,1.4,1.4);
+      \draw[->] (0.6,0) arc (0:45:0.6) node[midway, below right] {$\phi$};
+      \draw[->] (0,0.6) arc (90:45:0.6) node[midway, above left] {$\theta$};
+  \end{tikzpicture}
+  \caption{Bloch球表示}
+  \label{fig:bloch_sphere}
+\end{figure}
+
 一个由n个量子比特组成的量子系统有$2^n$个本征态，它的状态可以用长度为n的二进制串来表示，即$|x_1x_2\cdots x_n\rangle$，其中$x_i \in \{0, 1\}$。一个n量子比特的量子系统的状态可以表示为
 \begin{equation}
     |\psi\rangle = \sum_{x=0}^{2^n-1} \alpha_x |x_1x_2\cdots x_n\rangle,
@@ -267,6 +295,13 @@ Clifford门是一类幺正门，它们保持Pauli算符的对易关系，即对�
 
 \subsection{量子噪声}
 在实际的量子计算中，量子比特会受到噪声的影响，这会导致量子计算的结果出现误差。量子噪声是量子计算中的一个重要问题，可以通过量子信道来描述。常见的噪声分为两类，一类是保持最大混合态的噪声，称为Unital 噪声，另一类是不保持最大混合态的噪声，称为Non-unital 噪声。
+
+常见的一类Unital噪声是单比特Pauli噪声，它是由Pauli算符$X$、$Y$、$Z$以及单位算符$I$的概率混合而成的，即
+\begin{equation}
+    \mathcal{N}(\rho) = (1-p_x-p_y-p_z)\rho + p_x X\rho X + p_y Y\rho Y + p_z Z\rho Z,
+\end{equation}
+其中$\rho\in \mathcal{H}_2$是一个单比特量子态，$X$、$Y$、$Z$是Pauli算符，$I$是单位算符，$p_x$、$p_y$、$p_z$是三个概率，满足$p_x+p_y+p_z \leq 1$。单比特Pauli噪声是一种Unital噪声，它保持最大混合态不变，即$\mathcal{N}(I/2) = I/2$。
+
 
 \section{张量网络图}
 
