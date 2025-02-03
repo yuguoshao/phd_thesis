@@ -60,15 +60,15 @@
 
 
 这些算符的集合被称为  $|\psi\rangle $ 的稳定子群（Stabilizer Group），记作 $ \mathcal{S}$ 。由于这些算符是对易的，因此  $\mathcal{S}$  是泡利群的一个阿贝尔子群。
-同样的，$n$个对易的泡利算符的集合也可以生成一个稳定子群，且该该稳定子群唯一地对应一个量子态满足$S\ket{\psi_S}=\ket{\psi_S}$对任意$S\in\mathcal{S}$成立。因此，稳定子态的表示是唯一的。
+同样的，$n$个对易的泡利算符的集合也可以生成一个稳定子群，且该该稳定子群唯一地对应一个量子态满足$S\ket{\psi_S}=\ket{\psi_S}$对任意$S\in\mathcal{S}$成立。
 
 
 例如，对于单比特态  $|0\rangle$ ，有：
 
 \begin{equation}
-    Z |0\rangle = |0\rangle
+    Z |0\rangle = |0\rangle.
 \end{equation}
-因此，  $|0\rangle$  的稳定子群是由Z生成的。
+$|0\rangle$的稳定子群是 $\mathcal{S} = \{I,Z\}$ 。
 
 
 一个Pauli算符可以用两个boolean值向量和一个相位因子表示：
@@ -77,4 +77,4 @@
 \end{equation}
 其中，$\alpha\in\{0,1\}$是相位因子，  $x_i, z_i\in\{0,1\}$  是boolean值向量。这意味着，一个Pauli算符可以用一个长度为  $2n+1$  的boolean值向量表示。因此，一个$n\times (2n+1)$的boolean值矩阵可以表示一个稳定子群的完整信息。
 
-因为Pauli算符在Clifford门作用下是闭的，任何的Clifford门构成的量子线路可以通过在作用Clifford门之后更新稳定子群的表格模拟。已知的算法可以实现以$\order{n^2}$的计算复杂度更新一次表格。
+同时，因为Pauli算符在Clifford门作用下是闭的，任何的Clifford门构成的量子线路可以通过在作用Clifford门之后更新稳定子群的表格模拟。已知的算法可以实现以$\order{n^2}$的计算复杂度更新一次表格~\cite{bravyi2005efficient}。
