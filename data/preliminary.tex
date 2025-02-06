@@ -319,7 +319,7 @@ Clifford门是一类幺正门，它们保持Pauli算符的对易关系，即对�
 其中$\vec{r}'$和$\vec{t}$是三维实向量,M是一个$3\times 3$的实矩阵。满足$\vec{r}'= M\vec{r}+\vec{t}$。因此，任意的单比特CPTP映射$\mathcal{N}$都可以视为是一个三维实向量$\vec{r}$的线性变换，即$\vec{r}' = M\vec{r}+\vec{t}$。
 
 常见的一类Unital噪声是单比特Pauli噪声，它是由Pauli算符$X$、$Y$、$Z$以及单位算符$I$的概率混合而成的，即
-\begin{equation}
+\begin{equation}\label{eq:pauli_noise}
     \mathcal{N}(\rho) = (1-p_x-p_y-p_z)\rho + p_x X\rho X + p_y Y\rho Y + p_z Z\rho Z,
 \end{equation}
 其中$\rho\in \mathcal{L}(\mathbb{C}^2)$是一个单比特量子态，$X$、$Y$、$Z$是Pauli算符，$I$是单位算符，$p_x$、$p_y$、$p_z$是三个概率，满足$p_x+p_y+p_z \leq 1$。
