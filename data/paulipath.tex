@@ -77,4 +77,24 @@ $|0\rangle$的稳定子群是 $\mathcal{S} = \{I,Z\}$ 。
 \end{equation}
 其中，$\alpha\in\{0,1\}$是相位因子，  $x_i, z_i\in\{0,1\}$  是boolean值向量。这意味着，一个Pauli算符可以用一个长度为  $2n+1$  的boolean值向量表示。因此，一个$n\times (2n+1)$的boolean值矩阵可以表示一个稳定子群的完整信息。
 
-同时，因为Pauli算符在Clifford门作用下是闭的，任何的Clifford门构成的量子线路可以通过在作用Clifford门之后更新稳定子群的表格模拟。已知的算法可以实现以$\order{n^2}$的计算复杂度更新一次表格~\cite{bravyi2005efficient}。
+同时，因为Pauli算符在Clifford门作用下是闭的，任何的Clifford门构成的量子线路可以通过在作用Clifford门之后更新稳定子群的表格模拟。已知的算法可以实现以$\order{n^2}$的计算复杂度更新一次表格~\cite{PhysRevA.70.052328}。
+
+\section{Pauli路径积分模拟}
+在这一节中，我们将介绍一种高效的量子计算经典模拟方法，使用Feynman路径积分的思想，将量子线路的演化结果表示为以Pauli算符为基的路径积分。在本节中，我们将介绍Pauli路径积分模拟方法的基本原理和实现细节。
+
+为了方便，我们假设量子线路$\mathcal{U}$包含$L$层量子门，每一层包含软干个量子门。同一层的量子门作用在不同的量子比特上，因此可以并行作用。对于真实的量子硬件，每一个门能够作用的量子比特数目是有限的，如果限制一个量子门只能作用到至多$k$个量子比特上，我们称为$k$-local量子门。对于常见的量子硬件，如超导量子比特，通常$k=2$。在本章中，我们暂不考虑$k$-local量子门的限制，即我们可以任意选择量子门作用的量子比特，将会在后续复杂度和误差分析中讨论这一问题。为了方便，我们记$\mathcal{U} = \mathcal{U}_L\circ \mathcal{U}_{L-1} \cdots \mathcal{U}_1$，其中$\mathcal{U}_i$表示第$i$层的量子门复合的幺正算符。
+假设$\mathcal{U}_i$包含$k_i$个量子门，则第$i$层的幺正算符$\mathcal{U}_i$可以表示为：
+\begin{equation}
+    \mathcal{U}_i = U_{i,1} \otimes U_{i,2} \otimes \cdots \otimes U_{i,k_i}\otimes I_{\{\supp(U_{i,1})\cup \cdots \cup \supp(U_{i,k_i})\}^c},
+\end{equation}
+其中$U_{i,j}$表示第$i$层第$j$个量子门，$\supp(U_{i,j})$表示$U_{i,j}$作用的量子比特集合，$I_{\{\supp(U_{i,1})\cup \cdots \cup \supp(U_{i,k_i})\}^c}$表示作用在没有被$U_{i,j}$作用的量子比特上的恒等算符。
+
+假设量子线路$\mathcal{U}$作用在初始量子态$\rho$上，并在演化后在可观测量$O$上进行测量，我们的目标是计算量子线路$\mathcal{U}$的期望值：
+\begin{equation}
+    \langle O \rangle = \Tr(O \mathcal{U} \rho \mathcal{U}^\dagger).
+\end{equation}
+为了计算$\langle O \rangle$，我们引入Feynman路径积分的思想，将$\langle O \rangle$表示为以Pauli算符为基的路径积分：
+\begin{equation}
+    \langle O \rangle = \sum_{\bm{p}} f(\bm{p}),
+\end{equation}
+其中$\bm{p} = (p_1, p_2, \cdots, p_L)$表示路径，$p_i$表示第$i$层的Pauli算符。我们将在后续章节中详细介绍Pauli算符的表示和性质。
