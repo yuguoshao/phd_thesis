@@ -409,7 +409,7 @@ Clifford门是一类幺正门，它们保持Pauli算符的对易关系，即对�
 
 
 由矩阵的张量网络图表示，矩阵的转置操作可通过旋转张量对应的连接方向实现：
-\begin{equation}
+\begin{equation}\label{eq:tn:matrix_transpose}
   \begin{tikzpicture}[baseline=(current bounding box.center)]
     \node[draw] (s0) at (0,0) {$A^T$};
     \draw [thick] (-0.5,0)--(s0) (s0)--(0.5,0);
@@ -425,7 +425,7 @@ Clifford门是一类幺正门，它们保持Pauli算符的对易关系，即对�
 \end{equation}
 
 对于矩阵的乘法操作，在张量网络图中是由连接相邻张量的对应边实现指标收缩来表示：
-\begin{equation}
+\begin{equation}\label{eq:tn:matrix_product}
   \begin{tikzpicture}[baseline=(current bounding box.center)]
     \node[draw] (s1) at (0,0) {$AB$};
     \draw [thick] (-0.75,0)--(s1) (s1)--(0.75,0);
@@ -463,7 +463,7 @@ Clifford门是一类幺正门，它们保持Pauli算符的对易关系，即对�
 
 
 除了矩阵的乘法，另一种常见的张量积操作，在张量网络图中被表示为为张量的垂直堆叠：
-\begin{equation}
+\begin{equation}\label{eq:tn:tensor_product}
   \begin{tikzpicture}[baseline=(current bounding box.center)]
     \node[draw,minimum height=1.25cm] (s1) at (0,0) {$A\otimes B$};
     \draw [thick] (-0.75,0.375)-|(s1.west) (-0.75,-0.375)-|(s1.west) (s1.east)|-(0.75,0.375) (s1.east)|-(0.75,-0.375);
@@ -478,7 +478,7 @@ Clifford门是一类幺正门，它们保持Pauli算符的对易关系，即对�
 
 
 矩阵的迹运算可以通过将张量的对应边连接并收缩来表示：
-\begin{equation}
+\begin{equation}\label{eq:tn:trace}
   \Tr{A}
   =
   \begin{tikzpicture}[baseline=(current bounding box.center)]
