@@ -82,7 +82,9 @@ $|0\rangle$的稳定子群是 $\mathcal{S} = \{I,Z\}$ 。
 \section{Pauli路径积分模拟}
 在这一节中，我们将介绍一种高效的量子计算经典模拟方法，使用Feynman路径积分的思想，将量子线路的演化结果表示为以Pauli算符为基的路径积分。在本节中，我们将介绍Pauli路径积分模拟方法的基本原理和实现细节。
 
-为了方便，我们假设量子线路$\mathcal{U}$包含$L$层量子门，每一层包含软干个量子门。同一层的量子门作用在不同的量子比特上，因此可以并行作用。对于真实的量子硬件，每一个门能够作用的量子比特数目是有限的，如果限制一个量子门只能作用到至多$k$个量子比特上，我们称为$k$-local量子门。对于常见的量子硬件，如超导量子比特，通常$k=2$。在本章中，我们暂不考虑$k$-local量子门的限制，即我们可以任意选择量子门作用的量子比特，将会在后续复杂度和误差分析中讨论这一问题。为了方便，我们记$\mathcal{U} = \mathcal{U}_L\circ \mathcal{U}_{L-1} \cdots \mathcal{U}_1$，其中$\mathcal{U}_i$表示第$i$层的量子门复合的幺正算符。
+为了方便，我们假设量子线路$\mathcal{U}$包含$L$层量子门，每一层包含若干个量子门。同一层的量子门作用在不同的量子比特上，因此可以并行作用。对于真实的量子硬件，每一个门能够作用的量子比特数目是有限的，如果限制一个量子门只能作用到至多$k$个量子比特上，我们称为$k$-local量子门。对于常见的量子硬件，如超导量子比特，通常$k=2$。
+%在本章中，我们暂不考虑$k$-local量子门的限制，即我们可以任意选择量子门作用的量子比特，将会在后续复杂度和误差分析中讨论这一问题。
+为了方便，我们记$\mathcal{U} = \mathcal{U}_L\circ \mathcal{U}_{L-1} \cdots \mathcal{U}_1$，其中$\mathcal{U}_i$表示第$i$层的量子门复合的幺正算符。
 假设$\mathcal{U}_i$包含$k_i$个量子门，则第$i$层的幺正算符$\mathcal{U}_i$可以表示为：
 \begin{equation}
     \mathcal{U}_i = U_{i,1} \otimes U_{i,2} \otimes \cdots \otimes U_{i,k_i}\otimes I_{\{\supp(U_{i,1})\cup \cdots \cup \supp(U_{i,k_i})\}^c},
@@ -95,6 +97,376 @@ $|0\rangle$的稳定子群是 $\mathcal{S} = \{I,Z\}$ 。
 \end{equation}
 为了计算$\langle O \rangle$，我们引入Feynman路径积分的思想，将$\langle O \rangle$表示为以Pauli算符为基的路径积分：
 \begin{equation}
-    \langle O \rangle = \sum_{\bm{p}} f(\bm{p}),
+    \langle O \rangle = \sum_{\bm{s}} f(\mathcal{U},\bm{s},O,\rho),
 \end{equation}
-其中$\bm{p} = (p_1, p_2, \cdots, p_L)$表示路径，$p_i$表示第$i$层的Pauli算符。我们将在后续章节中详细介绍Pauli算符的表示和性质。
+其中$\bm{s} = (s_0, s_1, \cdots, s_L)$表示Pauli路径。
+在后续的内容中，我们将介绍Pauli路径的定义和计算方法，以及如何通过Pauli路径计算$\langle O \rangle$。
+
+\subsection{Pauli路径}
+为了高效的计算量子线路的期望值，对于给定的目标线路$\mathcal{U}$，我们引入Pauli路径的概念。
+Pauli路径的定义如下：
+
+\begin{definition}
+    对于一个深度为$L$的量子线路$\mathcal{U}$，其对应的Pauli路径
+    \begin{equation}
+        \bm{s} = (s_0, s_1, \cdots, s_L)
+    \end{equation}
+    是一个长度为$L+1$的序列，其中$s_i$是一个$n$比特的归一化后Pauli算符，$s_i \in \bm{P}_n=\{\frac{\mathbb{I}}{\sqrt{2}},\frac{X}{\sqrt{2}},\frac{Y}{\sqrt{2}},\frac{Z}{\sqrt{2}}\}^{\otimes n}$。
+\end{definition}
+
+
+
+
+我们的目标是计算$\langle O \rangle$，由式~\eqref{eq:tn:trace}，我们可以将$\langle O \rangle=\Tr(O \mathcal{U} \rho \mathcal{U}^\dagger)$表示为张量网络图：
+\begin{equation}
+    \langle O \rangle = \Tr(O \mathcal{U} \rho \mathcal{U}^\dagger)=
+    \begin{tikzpicture}[baseline=(current bounding box.center)]
+        \coordinate(l)at(-0.3,0.5){};\coordinate(r)at(2.7,0.5){};
+        \node[rectangle,draw] (H) at (0,0) {$O$};
+        \node[rectangle,draw] (U) at (0.75,0) {$\mathcal{U}$};
+        \node[rectangle,draw] (rho) at (1.5,0) {$\rho$};
+        \node[rectangle,draw] (Ud) at (2.25,0) {$\mathcal{U}^\dagger$};
+        \draw [thick] (H)--(U)--(rho)--(Ud) (l) -- (r);
+        \draw[thick] (-0.3,0.5) arc(90:270:0.25);
+        \draw[thick] (2.7,0) arc(-90:90:0.25);
+    \end{tikzpicture}.
+\end{equation}
+因为$\mathcal{U}=\mathcal{U}_L\circ \mathcal{U}_{L-1} \cdots \mathcal{U}_1$，通过式~\eqref{eq:tn:matrix_product}，我们有：
+\begin{equation}
+    \begin{aligned}
+        \langle O \rangle = &
+    \begin{tikzpicture}[baseline=(current bounding box.center)]
+        \coordinate(l)at(-0.45,0.75){};\coordinate(r)at(7.15,0.75){};
+        \node[rectangle,draw] (H) at (-0.15,0) {$O$};
+        \node[rectangle,draw] (Ul) at (0.75,0) {$\mathcal{U}_L$};
+        \node[rectangle,draw] (Ujt) at (6.75,0) {${\mathcal{U}}_L^\dagger$};
+        \node[rectangle,draw] (U1) at (3,0) {$\mathcal{U}_1$};
+        \node[rectangle,draw] (U1t) at (4.65,0) {${\mathcal{U}}_1^\dagger$};
+        \node[] (cdots_down) at (2,0) {$\cdots$};
+        \node[] (cdots_up) at (5.75,0) {$\cdots$};
+        \node[rectangle,draw] (rho) at (3.8,0) {$\rho$};
+        \draw [thick] (H) -- (Ul)-- (cdots_down)--(U1)--(rho)-- (U1t) -- (cdots_up)--(Ujt) (l)--(r);
+        \draw[thick] (-0.45,0.75) arc(90:270:0.75/2);
+        \draw[thick] (7.15,0) arc(-90:90:0.75/2);
+    \end{tikzpicture}\\
+    = &
+    \begin{tikzpicture}[baseline=(current bounding box.center)]
+        \coordinate(l)at(-0.45,0.75){};\coordinate(r)at(4.05,0.75){};
+        \node[rectangle,draw] (H) at (-0.15,0) {$O$};
+        \node[rectangle,draw] (Ul) at (0.75,0) {$\mathcal{U}_L$};
+        \node[rectangle,draw] (Ujt) at (0.75,0.75) {$\overline{\mathcal{U}}_L$};
+        \node[rectangle,draw] (U1) at (3,0) {$\mathcal{U}_1$};
+        \node[rectangle,draw] (U1t) at (3,0.75) {$\overline{\mathcal{U}}_1$};
+        \node[] (cdots_down) at (2,0) {$\cdots$};
+        \node[] (cdots_up) at (2,0.75) {$\cdots$};
+        \node[rectangle,draw] (rho) at (3.8,0) {$\rho$};
+        \draw [thick] (H) -- (Ul)-- (cdots_down)--(U1)--(rho) (l) -- (Ujt) -- (cdots_up)--(U1t)--(r);
+        \draw[thick] (-0.45,0.75) arc(90:270:0.75/2);
+        \draw[thick] (4.05,0) arc(-90:90:0.75/2);
+    \end{tikzpicture},
+    \end{aligned}
+\end{equation}
+其中最后一个等号是因为转秩的张量网络图表示（式~\eqref{eq:tn:matrix_transpose}）。
+
+
+另一方面，因为$\bm{P}_n=\{\frac{\mathbb{I}}{\sqrt{2}},\frac{X}{\sqrt{2}},\frac{Y}{\sqrt{2}},\frac{Z}{\sqrt{2}}\}^{\otimes n}$构成了$n$比特的Hilbert空间的一组正交基，因此对任意的算符$T\in \mathcal{L}(\mathbb{C}^{2^n})$，我们有：
+\begin{equation}
+    T = \sum_{s\in \bm{P}_n} \Tr{Ts} s.
+\end{equation}
+表示为张量网络图：
+\begin{equation}
+    \sum_{s\in\bm{P}_n}
+    \begin{tikzpicture}[baseline=(current bounding box.center)]
+      \node[draw,shape=circle,inner sep=1pt] (s1) at (1.75,0) {$s$};
+      \node[draw,shape=circle,inner sep=1pt] (s0) at (0.5,0) {$s$};
+      \node[rectangle,draw,inner sep=2pt] (O) at (0,0) {$T$};
+      \draw[thick] (-0.25,0.5) arc(90:270:0.25);
+      \draw [thick] (O)--(s0) (-0.25,0.5)--(0.75,0.5);
+      \draw [thick] (2.25,0)--(s1) (1.5,0.5)--(2.25,0.5);
+      \draw[thick] (1.5,0.5) arc(90:270:0.25);
+      \draw[thick] (0.75,0) arc(-90:90:0.25);
+    \end{tikzpicture}
+    =
+    \begin{tikzpicture}[baseline=(current bounding box.center)]
+      \draw [thick] (O)--(1,0) (-0.25,0.5)--(1,0.5);
+      \node[rectangle,draw,inner sep=2pt] (O) at (0,0) {$T$};
+      \draw[thick] (-0.25,0.5) arc(90:270:0.25);
+      \node[] at (1.2,0){$.$};
+    \end{tikzpicture}
+\end{equation}
+通过多次使用上述等式，我们可以将$\langle O \rangle$表示为Pauli路径贡献的和：
+\begin{equation}
+    \begin{aligned}
+        \langle O \rangle &= \begin{tikzpicture}[baseline=(current bounding box.center)]
+            \coordinate(l)at(-0.45,0.75){};\coordinate(r)at(4.05,0.75){};
+            \node[rectangle,draw] (H) at (-0.15,0) {$O$};
+            \node[rectangle,draw] (Ul) at (0.75,0) {$\mathcal{U}_L$};
+            \node[rectangle,draw] (Ujt) at (0.75,0.75) {$\overline{\mathcal{U}}_L$};
+            \node[rectangle,draw] (U1) at (3,0) {$\mathcal{U}_1$};
+            \node[rectangle,draw] (U1t) at (3,0.75) {$\overline{\mathcal{U}}_1$};
+            \node[] (cdots_down) at (2,0) {$\cdots$};
+            \node[] (cdots_up) at (2,0.75) {$\cdots$};
+            \node[rectangle,draw] (rho) at (3.8,0) {$\rho$};
+            \draw [thick] (H) -- (Ul)-- (cdots_down)--(U1)--(rho) (l) -- (Ujt) -- (cdots_up)--(U1t)--(r);
+            \draw[thick] (-0.45,0.75) arc(90:270:0.75/2);
+            \draw[thick] (4.05,0) arc(-90:90:0.75/2);
+        \end{tikzpicture}\\
+        & = \sum_{s_L \in \bm{P}_n} \begin{tikzpicture}[baseline=(current bounding box.center)]
+            \coordinate(l)at(-0.25,0.5){};\coordinate(r)at(1,0.5){};
+            \node[rectangle,draw] (H) at (0,0) {$O$};
+            \node[draw,shape=circle,inner sep=1pt] (sL) at (0.75,0) {$s_L$};
+            \draw [thick] (H) -- (sL) (l) -- (r);
+            \draw[thick] (-0.25,0.5) arc(90:270:0.25);
+            \draw[thick] (1,0) arc(-90:90:0.25);
+            \end{tikzpicture}
+            \begin{tikzpicture}[baseline=(current bounding box.center)]
+                \coordinate(l)at(-0.45,0.75){};\coordinate(r)at(4.05,0.75){};
+                \node[draw,shape=circle,inner sep=1pt] (H) at (-0.15,0) {$s_L$};
+                \node[rectangle,draw] (Ul) at (0.75,0) {$\mathcal{U}_L$};
+                \node[rectangle,draw] (Ujt) at (0.75,0.75) {$\overline{\mathcal{U}}_L$};
+                \node[rectangle,draw] (U1) at (3,0) {$\mathcal{U}_1$};
+                \node[rectangle,draw] (U1t) at (3,0.75) {$\overline{\mathcal{U}}_1$};
+                \node[] (cdots_down) at (2,0) {$\cdots$};
+                \node[] (cdots_up) at (2,0.75) {$\cdots$};
+                \node[rectangle,draw] (rho) at (3.8,0) {$\rho$};
+                \draw [thick] (H) -- (Ul)-- (cdots_down)--(U1)--(rho) (l) -- (Ujt) -- (cdots_up)--(U1t)--(r);
+                \draw[thick] (-0.45,0.75) arc(90:270:0.75/2);
+                \draw[thick] (4.05,0) arc(-90:90:0.75/2);
+            \end{tikzpicture}\\
+            & = \sum_{s_L,s_{L-1} \in \bm{P}_n} \begin{tikzpicture}[baseline=(current bounding box.center)]
+                \coordinate(l)at(-0.25,0.5){};\coordinate(r)at(1,0.5){};
+                \node[rectangle,draw] (H) at (0,0) {$O$};
+                \node[draw,shape=circle,inner sep=1pt] (sL) at (0.75,0) {$s_L$};
+                \draw [thick] (H) -- (sL) (l) -- (r);
+                \draw[thick] (-0.25,0.5) arc(90:270:0.25);
+                \draw[thick] (1,0) arc(-90:90:0.25);
+                \end{tikzpicture}
+                \begin{tikzpicture}[baseline=(current bounding box.center)]
+                    \coordinate(l)at(-0.25,0.5){};\coordinate(r)at(1.8,0.5){};
+                    \node[draw,shape=circle,inner sep=1pt] (sj) at (0.,0) {$s_L$};
+                    \node[rectangle,draw] (Uj) at (0.75,0) {$\mathcal{U}_L$};
+                    \node[draw,shape=circle,inner sep=-1pt] (sj1) at (1.5,0) {\scriptsize $s_{L-1}$};
+                    \node[rectangle,draw] (Ujt) at (0.75,0.75) {$\overline{\mathcal{U}}_L$};
+                    \draw [thick] (sj) -- (Uj) --(sj1) (l) --(Ujt)-- (r);
+                    \draw[thick] (-0.25,0.5) arc(90:270:0.25);
+                    \draw[thick] (1.8,0) arc(-90:90:0.25);
+                  \end{tikzpicture}
+                \begin{tikzpicture}[baseline=(current bounding box.center)]
+                    \coordinate(l)at(-0.6,0.75){};\coordinate(r)at(4.05,0.75){};
+                    \node[draw,shape=circle,inner sep=1pt] (H) at (-0.3,0) {\scriptsize $s_{L-1}$};
+                    \node[rectangle,draw] (Ul) at (0.75,0) {$\mathcal{U}_{L-1}$};
+                    \node[rectangle,draw] (Ujt) at (0.75,0.75) {$\overline{\mathcal{U}}_{L-1}$};
+                    \node[rectangle,draw] (U1) at (3,0) {$\mathcal{U}_1$};
+                    \node[rectangle,draw] (U1t) at (3,0.75) {$\overline{\mathcal{U}}_1$};
+                    \node[] (cdots_down) at (2,0) {$\cdots$};
+                    \node[] (cdots_up) at (2,0.75) {$\cdots$};
+                    \node[rectangle,draw] (rho) at (3.8,0) {$\rho$};
+                    \draw [thick] (H) -- (Ul)-- (cdots_down)--(U1)--(rho) (l) -- (Ujt) -- (cdots_up)--(U1t)--(r);
+                    \draw[thick] (-0.6,0.75) arc(90:270:0.75/2);
+                    \draw[thick] (4.05,0) arc(-90:90:0.75/2);
+                \end{tikzpicture}\\
+                &\vdotswithin{=}\\
+                &=\sum_{s_0,\cdots,s_L \in \bm{P}_n}
+      \begin{tikzpicture}[baseline=(current bounding box.center)]
+        \coordinate(l)at(-0.25,0.5){};\coordinate(r)at(1,0.5){};
+        \node[rectangle,draw] (H) at (0,0) {$O$};
+        \node[draw,shape=circle,inner sep=1pt] (sL) at (0.75,0) {$s_L$};
+        \draw [thick] (H) -- (sL) (l) -- (r);
+        \draw[thick] (-0.25,0.5) arc(90:270:0.25);
+        \draw[thick] (1,0) arc(-90:90:0.25);
+        \end{tikzpicture}\;
+      \begin{tikzpicture}[baseline=(current bounding box.center)]
+        \coordinate(l)at(-0.25,0.5){};\coordinate(r)at(1.8,0.5){};
+        \node[draw,shape=circle,inner sep=1pt] (sj) at (0.,0) {$s_L$};
+        \node[rectangle,draw] (Uj) at (0.75,0) {$\mathcal{U}_L$};
+        \node[draw,shape=circle,inner sep=-1pt] (sj1) at (1.5,0) {\scriptsize $s_{L-1}$};
+        \node[rectangle,draw] (Ujt) at (0.75,0.75) {$\overline{\mathcal{U}}_L$};
+        \draw [thick] (sj) -- (Uj) --(sj1) (l) --(Ujt)-- (r);
+        \draw[thick] (-0.25,0.5) arc(90:270:0.25);
+        \draw[thick] (1.8,0) arc(-90:90:0.25);
+      \end{tikzpicture}
+    \cdots
+      \begin{tikzpicture}[baseline=(current bounding box.center)]
+        \coordinate(l)at(-0.25,0.5){};\coordinate(r)at(1.8,0.5){};
+        \node[draw,shape=circle,inner sep=1pt] (sj) at (0.,0) {$s_1$};
+        \node[rectangle,draw] (Uj) at (0.75,0) {$\mathcal{U}_1$};
+        \node[draw,shape=circle,inner sep=1.5pt] (sj1) at (1.5,0) {$s_{0}$};
+        \node[rectangle,draw] (Ujt) at (0.75,0.75) {$\overline{\mathcal{U}}_1$};
+        \draw [thick] (sj) -- (Uj) --(sj1) (l) --(Ujt)-- (r);
+        \draw[thick] (-0.25,0.5) arc(90:270:0.25);
+        \draw[thick] (1.8,0) arc(-90:90:0.25);
+      \end{tikzpicture}\;
+      \begin{tikzpicture}[baseline=(current bounding box.center)]
+        \coordinate(l)at(-0.25,0.5){};\coordinate(r)at(1,0.5){};
+        \node[rectangle,draw] (rho) at (0.75,0) {$\rho$};
+        \node[draw,shape=circle,inner sep=1pt] (s0) at (0.,0) {$s_0$};
+        \draw [thick] (rho) -- (s0) (l) -- (r);
+        \draw[thick] (-0.25,0.5) arc(90:270:0.25);
+        \draw[thick] (1,0) arc(-90:90:0.25);
+      \end{tikzpicture}\\
+        &=\sum_{s_0,\cdots,s_L \in \bm{P}_n} \Tr{Os_L}\left(\prod_{i=1}^{L}\Tr{s_i\mathcal{U}_i s_{i-1}\mathcal{U}_i^\dagger}\right)\Tr{s_0\rho}.
+    \end{aligned}
+\end{equation}
+
+
+
+对于每个具体的Pauli路径，我们可以定义该Pauli路径对应的贡献函数：
+
+\begin{definition}
+    对于一个深度为$L$的量子线路$\mathcal{U}$，和某个对应的Pauli路径$\bm{s}= (s_0, s_1, \cdots, s_L)$，初始量子态$\rho$和可观测量$O$，其贡献函数$f(\mathcal{U},\bm{s},O,\rho)$定义为：
+    \begin{equation}
+        f(\mathcal{U},\bm{s},O,\rho)=\Tr{Os_L}\left(\prod_{i=1}^{L}\Tr{s_i\mathcal{U}_i s_{i-1}\mathcal{U}_i^\dagger}\right)\Tr{s_0\rho}.
+    \end{equation}
+\end{definition}
+
+因此我们有：
+\begin{equation}
+    \langle O \rangle = \sum_{\bm{s}} f(\mathcal{U},\bm{s},O,\rho).
+\end{equation}
+
+
+\subsection{噪声对Pauli路径的效应}
+在实际的量子计算中，由于噪声的存在，量子线路的演化会受到噪声的影响。在Pauli路径积分模拟中，我们可以通过引入噪声模型来模拟噪声对量子线路的影响。
+
+在先前的章节中，我们已经介绍了量子信道的Kraus算符表示。对于一个量子信道$\mathcal{E}$，其Kraus算符表示为$\{K_i\}$，我们可以将量子信道$\mathcal{E}$作用在量子态$\rho$上表示为：
+\begin{equation}
+    \mathcal{E}(\rho) = \sum_i K_i \rho K_i^\dagger.
+\end{equation}
+
+为了方便我们可以通过张量网络图表示量子信道$\mathcal{E}$：
+\begin{equation}
+    \begin{tikzpicture}[baseline=(current bounding box.center)]
+        \node[draw,minimum height=1.25cm,minimum width=1cm] (s1) at (0,0) {$S_{\mathcal{E}}$};
+        \draw [thick] (-1,0.375)-|(s1.west) (-1,-0.375)-|(s1.west) (s1.east)|-(1,0.375) (s1.east)|-(1,-0.375);
+      \end{tikzpicture}
+      \triangleq
+      \sum_i
+      \begin{tikzpicture}[baseline=(current bounding box.center)]
+        \node[draw] (s0) at (0,0) {$\overline{K_i}$};
+        \node[draw] (s1) at (0,-0.75) {$K_i$};
+        \draw [thick] (-0.5,0)--(s0)--(0.5,0)  (-0.5,-0.75)--(s1)--(0.5,-0.75);
+      \end{tikzpicture}.
+\end{equation}
+算符号$S_{\mathcal{E}}$被称为量子信道Super Operator的表示~\cite{wood2011tensor}，公式化地，我们有：
+\begin{equation}
+    S_{\mathcal{E}} = \sum_i \overline{K_i} \otimes K_i.
+\end{equation}
+
+信道$\mathcal{E}$作用在量子态$\rho$上的张量网络表示为：
+\begin{equation}
+    \begin{tikzpicture}[baseline=(current bounding box.center)]
+        \node[draw] (rho) at (0.75,-0.75) {$\mathcal{E}(\rho)$};
+        \draw [thick] (-0.5,0)--(1.25,0)  (-0.5,-0.75)--(rho);
+        \draw[thick] (1.25,-0.75) arc(-90:90:0.75/2);
+      \end{tikzpicture}
+    =
+    \sum_i
+      \begin{tikzpicture}[baseline=(current bounding box.center)]
+        \node[draw] (rho) at (0.5,-0.75) {$K_i \rho K_i^\dagger$};
+        \draw [thick] (-0.5,0)--(1.25,0)  (-0.5,-0.75)--(rho);
+        \draw[thick] (1.25,-0.75) arc(-90:90:0.75/2);
+      \end{tikzpicture}
+      =
+      \sum_i
+      \begin{tikzpicture}[baseline=(current bounding box.center)]
+        \node[draw] (s0) at (0,0) {$\overline{K_i}$};
+        \node[draw] (s1) at (0,-0.75) {$K_i$};
+        \node[draw] (rho) at (1,-0.75) {$\rho$};
+        \draw [thick] (-0.5,0)--(s0)--(1.25,0)  (-0.5,-0.75)--(s1)--(rho);
+        \draw[thick] (1.25,-0.75) arc(-90:90:0.75/2);
+      \end{tikzpicture}
+      =
+      \begin{tikzpicture}[baseline=(current bounding box.center)]
+        \node[rectangle,draw] (rho) at (0,-0.375) {$\rho$};
+        \draw[thick] (0.25,-0.375) arc(-90:90:0.75/2);
+        \node[draw,minimum height=1.25cm,minimum width=1cm] (s1) at (-1,0) {$S_{\mathcal{E}}$};
+        \draw [thick] (-2,0.375)-|(s1.west) (-2,-0.375)-|(s1.west) (s1.east)|-(0.25,0.375) (s1.east)|-(rho);
+      \end{tikzpicture}.
+\end{equation}
+在后续的讨论中，为了方便将Super Operator $S_{\mathcal{E}}$简记为$\mathcal{E}$。
+
+我们假设量子线路$\mathcal{U}$受到噪声的影响，假设在每一层的量子门$\mathcal{U}_i$作用前和最后的测量算符$O$测量前，每个Qubit都受到噪声信道$\mathcal{N}$的作用。我们可以将受到噪声影响的量子线路表示为：
+\begin{equation}
+    \widehat{\mathcal{U}}(\bullet)=\mathcal{N}^{\otimes n}(\mathcal{U}_L \mathcal{N}^{\otimes n}(\cdots\mathcal{U}_1\mathcal{N}^{\otimes n}(\bullet) \mathcal{U}_1^\dagger\cdots) \mathcal{U}_L^\dagger),
+\end{equation}
+其中$\mathcal{N}^{\otimes n}$表示单比特的噪声信道$\mathcal{N}$作用在$n$个比特上。记$\widehat{\langle O \rangle}=\Tr(O \widehat{\mathcal{U}}(\rho))$，为含有噪声的量子线路的期望值。我们有：
+\begin{equation}
+    \begin{aligned}
+        \widehat{\langle O \rangle}&= \Tr{ O \mathcal{N}^{\otimes n}(\mathcal{U}_L \mathcal{N}^{\otimes n}(\cdots\mathcal{U}_1\mathcal{N}^{\otimes n}(\rho) \mathcal{U}_1^\dagger\cdots) \mathcal{U}_L^\dagger)}\\
+        &=\;\begin{tikzpicture}[baseline=(current bounding box.center)]
+          \coordinate(l)at(-0.25,0.75){};\coordinate(r)at(8.25,0.75){};
+          \node[rectangle,draw] (H) at (0,0) {$O$};
+          \node[rectangle,draw,minimum height=40] (Nl) at (1,0.4) {$\mathcal{N}^{\otimes n}$};
+          \node[rectangle,draw] (Ul) at (2,0) {$\mathcal{U}_L$};
+          \node[rectangle,draw] (Ujt) at (2,0.75) {$\overline{\mathcal{U}}_L$};
+          \node[rectangle,draw,minimum height=40] (Nl1) at (3,0.4) {$\mathcal{N}^{\otimes n}$};
+          \node[rectangle,draw,minimum height=40] (N1) at (5,0.4) {$\mathcal{N}^{\otimes n}$};
+          \node[rectangle,draw,minimum height=40] (N0) at (7,0.4) {$\mathcal{N}^{\otimes n}$};
+          \node[rectangle,draw] (U1) at (6,0) {$\mathcal{U}_1$};
+          \node[rectangle,draw] (U1t) at (6,0.75) {$\overline{\mathcal{U}}_1$};
+          \node[] (cdots_down) at (4,0) {$\cdots$};
+          \node[] (cdots_up) at (4,0.75) {$\cdots$};
+          \node[rectangle,draw] (rho) at (8,0) {$\rho$};
+          \draw [thick] (H)--(H-| Nl.west) (Ul-|Nl.east)--(Ul)--(Ul-| Nl1.west) (cdots_down-|Nl1.east)--(cdots_down)--(cdots_down-| N1.west) (U1-|N1.east)--(U1)--(U1-| N0.west) (rho-|N0.east)--(rho) (l)--(l-| Nl.west) (Ujt-| Nl.east)--(Ujt)--(Ujt-| Nl1.west) (cdots_up-|Nl1.east)-- (cdots_up)--(cdots_up-| N1.west) (U1t-|N1.east)--(U1t)--(U1t-| N0.west) (r-|N0.east)--(r);
+          \draw[thick] (-0.25,0.75) arc(90:270:0.75/2);
+          \draw[thick] (8.25,0) arc(-90:90:0.75/2);
+          \end{tikzpicture}\\
+          &=\sum_{s_0,\cdots,s_L \in \bm{P}_n}
+          \begin{tikzpicture}[baseline=(current bounding box.center)]
+            \coordinate(l)at(-0.25,0.5){};\coordinate(r)at(2.25,0.5){};
+            \node[rectangle,draw] (H) at (0,0) {$O$};
+            \node[rectangle,draw,minimum height=40] (N) at (1,0.4) {$\mathcal{N}^{\otimes n}$};
+            \node[draw,shape=circle,inner sep=1pt] (sL) at (2,0) {$s_L$};
+            \draw [thick] (H)--(H-| N.west) (sL-|N.east)--(sL) (l)--(l-| N.west) (r-|N.east)--(r);
+            \draw[thick] (-0.25,0.5) arc(90:270:0.25);
+            \draw[thick] (2.25,0) arc(-90:90:0.25);
+            \end{tikzpicture}\;
+          \begin{tikzpicture}[baseline=(current bounding box.center)]
+            \coordinate(l)at(-0.25,0.5){};\coordinate(r)at(3.05,0.5){};
+            \node[draw,shape=circle,inner sep=1pt] (sj) at (0.,0) {$s_L$};
+            \node[rectangle,draw] (Uj) at (0.75,0) {$\mathcal{U}_L$};
+            \node[draw,shape=circle,inner sep=-1pt] (sj1) at (2.75,0) {\scriptsize $s_{L-1}$};
+            \node[rectangle,draw] (Ujt) at (0.75,0.75) {$\overline{\mathcal{U}}_L$};
+            \node[rectangle,draw,minimum height=40] (N) at (1.75,0.4) {$\mathcal{N}^{\otimes n}$};
+            \draw [thick] (sj)--(Uj)--(Uj-| N.west) (sj1-|N.east)--(sj1) (l) --(l-|Ujt.west) (Ujt)--(Ujt-| N.west) (r-|N.east)-- (r);
+            \draw[thick] (-0.25,0.5) arc(90:270:0.25);
+            \draw[thick] (3.05,0) arc(-90:90:0.25);
+          \end{tikzpicture}
+        \cdots
+          \begin{tikzpicture}[baseline=(current bounding box.center)]
+            \coordinate(l)at(-0.25,0.5){};\coordinate(r)at(3,0.5){};
+            \node[draw,shape=circle,inner sep=1pt] (sj) at (0.,0) {$s_1$};
+            \node[rectangle,draw] (Uj) at (0.75,0) {$\mathcal{U}_1$};
+            \node[draw,shape=circle,inner sep=1.5pt] (sj1) at (2.75,0) {$s_{0}$};
+            \node[rectangle,draw] (Ujt) at (0.75,0.75) {$\overline{\mathcal{U}}_1$};
+            \node[rectangle,draw,minimum height=40] (N) at (1.75,0.4) {$\mathcal{N}^{\otimes n}$};
+            \draw [thick] (sj)--(Uj)--(Uj-| N.west) (sj1-|N.east)--(sj1) (l) --(l-|Ujt.west) (Ujt)--(Ujt-| N.west) (r-|N.east)-- (r);
+            \draw[thick] (-0.25,0.5) arc(90:270:0.25);
+            \draw[thick] (3,0) arc(-90:90:0.25);
+          \end{tikzpicture}\;
+          \begin{tikzpicture}[baseline=(current bounding box.center)]
+            \coordinate(l)at(-0.25,0.5){};\coordinate(r)at(1.25,0.5){};
+            \node[rectangle,draw] (rho) at (1,0) {$\rho$};
+            \node[rectangle,draw,minimum height=40,opacity=0] (N) at (1,0.4) {$\mathcal{N}^{\otimes n}$};
+            \node[draw,shape=circle,inner sep=1pt] (s0) at (0.,0) {$s_0$};
+            \draw [thick] (rho)--(s0) (l)--(r);
+            \draw[thick] (-0.25,0.5) arc(90:270:0.25);
+            \draw[thick] (1.25,0) arc(-90:90:0.25);
+          \end{tikzpicture}\\
+          &=\Tr{O\mathcal{N}^{\otimes n}(s_L)}\Tr{s_L\mathcal{U}_L \mathcal{N}^{\otimes n}(s_{L-1})\mathcal{U}_L^\dagger}\cdots\Tr{s_1\mathcal{U}_1 \mathcal{N}^{\otimes n}(s_{0})\mathcal{U}_1^\dagger}\Tr{s_0\rho}.
+    \end{aligned}
+\end{equation}
+于是我们可以定义含有噪声的Pauli路径的贡献函数：
+
+\begin{definition}
+    对于一个深度为$L$的含噪量子线路$\widehat{\mathcal{U}}$，和某个对应的Pauli路径$\bm{s}= (s_0, s_1, \cdots, s_L)$，初始量子态$\rho$和可观测量$O$，其贡献函数$f(\mathcal{U},\bm{s},O,\rho)$定义为：
+    \begin{equation}
+        \hat{f}(\mathcal{U},\bm{s},O,\rho)=\Tr{O\mathcal{N}^{\otimes n}(s_L)}
+        \left(\prod_{i=1}^{L}\Tr{s_i\mathcal{U}_i \mathcal{N}^{\otimes n}(s_{i-1})\mathcal{U}_i^\dagger}\right)\Tr{s_0\rho},
+    \end{equation}
+    其中$\mathcal{U}$表示含噪声的量子线路$\widehat{\mathcal{U}}$的理想（无噪声）部分。
+\end{definition}
+
+
+
+\subsection{复杂度分析}
