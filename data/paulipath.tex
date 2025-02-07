@@ -385,7 +385,16 @@ Pauli路径的定义如下：
 \end{equation}
 在后续的讨论中，为了方便将Super Operator $S_{\mathcal{E}}$简记为$\mathcal{E}$。
 
-我们假设量子线路$\mathcal{U}$受到噪声的影响，假设在每一层的量子门$\mathcal{U}_i$作用前和最后的测量算符$O$测量前，每个Qubit都受到噪声信道$\mathcal{N}$的作用。我们可以将受到噪声影响的量子线路表示为：
+我们假设量子线路$\mathcal{U}$受到噪声的影响，假设在每一层的量子门$\mathcal{U}_i$作用前和最后的测量算符$O$测量前，每个Qubit都受到噪声信道$\mathcal{N}$的作用，如图~\ref{fig:noise}所示。
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{figures/Circuit_comb.pdf}
+    \caption{（a）理想的量子线路，色块代表量子门；（b）受到噪声影响的量子线路，红色的点表示噪声信道$\mathcal{N}$的作用。}
+    \label{fig:noise}
+\end{figure}
+
+我们可以将受到噪声影响的量子线路表示为：
 \begin{equation}
     \widehat{\mathcal{U}}(\bullet)=\mathcal{N}^{\otimes n}(\mathcal{U}_L \mathcal{N}^{\otimes n}(\cdots\mathcal{U}_1\mathcal{N}^{\otimes n}(\bullet) \mathcal{U}_1^\dagger\cdots) \mathcal{U}_L^\dagger),
 \end{equation}
@@ -500,7 +509,7 @@ Pauli路径的定义如下：
 由引理~\ref{lemma:noise}，可以根据噪声的类型定义与噪声相关的Pauli路径的Hamming Weight如下：
 \begin{definition}
     对于一个深度为$L$的含噪声量子线路$\widehat{\mathcal{U}}$，和某个对应的Pauli路径$\bm{s}= (s_0, s_1, \cdots, s_L)$，在由概率$p_x,p_y,p_z$定义的单比特Pauli噪声信道$\mathcal{N}$下，其与噪声关联的Hamming Weight定义为：
-    \begin{equation}
+    \begin{equation}\label{eq:noise_hamming_weight}
         \abs{\bm{s}}_{\mathcal{N}} = \begin{cases} 
             \abs{\bm{s}}_Y+\abs{\bm{s}}_Z, & \text{如果$\{p_x,p_y,p_z\}$中只有$p_x\neq 0$} \\
             \abs{\bm{s}}_X+\abs{\bm{s}}_Z, & \text{如果$\{p_x,p_y,p_z\}$中只有$p_y\neq 0$} \\
@@ -533,4 +542,115 @@ Pauli路径的定义如下：
 $\widetilde{\langle O \rangle}$给出了含有噪声的量子线路的期望值$\widehat{\langle O \rangle}$的一个近似值。
 
 \subsection{OBPPP算法}
-在本节中，我们将介绍一种基于Pauli路径积分模拟的量子线路期望值计算算法——可观测量在Pauli路径下的反向传播算法（Observable's Back-Propagation on Pauli Path，OBPPP）。OBPPP算法通过计算Pauli路径的贡献函数，实现了对含有噪声的量子线路的期望值的高效计算。
+在本节中，我们将介绍一种基于Pauli路径积分模拟的量子线路期望值计算算法——可观测量在Pauli路径下的反向传播算法（Observable's Back-Propagation on Pauli Path，OBPPP）。OBPPP算法通过计算低weight的Pauli路径的贡献函数，实现了对含有噪声的量子线路的期望值的高效计算。
+
+算法的计算复杂度包含两个部分：Pauli路径的枚举和每个Pauli路径的贡献函数的计算，分别记为$C_s$和$C_f$。假设一共有$N_M$个Pauli路径的Hamming Weight小于等于$M$且拥有非平凡的贡献函数，则OBPPP算法的计算复杂度为$O(C_s+N_M(C_f))$。
+
+其中$C_f$是计算一个Pauli路径的贡献函数的计算复杂度也包含三个部分：和初态相关的$\tr(\rho s_0)$的计算、和观测量相关的$\tr(Os_L)$的计算和中间量子门的计算$\prod\tr(s_i\mathcal{U}_i s_{i-1}\mathcal{U}_i^\dagger)$。这三部分的计算复杂度分别记为$C_{f\rho}$、$C_{fO}$和$C_{f\mathcal{U}}$。
+因此$C_f = C_{f\rho}+C_{fO}+C_{f\mathcal{U}}$。
+
+在后续的章节中，我们将详细介绍在一些具体的线路模型中$C_{f\mathcal{U}}$的计算复杂度。在本章中，我们将重点介绍$C_{f\rho}$、$C_{fO}$和$C_s$的计算复杂度，以及$N_M$的估计。
+
+\subsubsection{$C_{f\rho}$的估计}
+为了能高效的将初态$\rho$存储在计算机中，我们需要对初态$\rho$添加一些合理的假设。否则存储一个$n$量子比特的初态$\rho$需要$2^{2n}$个复数，这是不可行的。一个合理的假设是初态$\rho$是一个稀疏的密度矩阵，即：
+\begin{definition}
+    一个$n$量子比特的密度矩阵$\rho$是一个稀疏的密度矩阵，如果它的非零元素的数量是多项式级别的，即
+    \begin{equation}
+        \rho=\sum_{a,b} \rho_{a,b}\ketbra{a}{b},
+    \end{equation}
+    其中$\rho_{a,b}$是复数，$\ket{a}$和$\ket{b}$是$n$量子比特计算基态，$a,b\in \{0,1\}^n$。
+    且$\rho_{a,b}$中非零元素的数量是多项式级别的，即$\abs{\{(\rho_{a,b},a,b)\mid \rho_{a,b}\neq 0\}}=\poly(n)$。
+\end{definition}
+对于许多常见的量子算法，如量子变分算法~\cite{peruzzo2014variational}、量子近似优化算法~\cite{farhi2014quantum}、Shor算法~\cite{shor1994algorithms}、Grover算法~\cite{grover1996fast}等，它们的初态都是计算基态，因此是稀疏的密度矩阵假设是合理的。对于这种稀疏的密度矩阵，我们可以通过存储非零元素的位置和值来高效的存储初态$\rho$。
+
+在稀疏的密度矩阵假设下，$C_{f\rho}=O(\poly(n))$。这是因为：
+对于$\rho$中的每个元素$\rho_{a,b}\ketbra{a}{b}$，$\Tr{s_0  (\rho_{a,b}\ketbra{a}{b})}$可以通过以下公式计算：
+\begin{equation}\label{ap:eq:component_of_input}
+\Tr{s_0  (\rho_{a,b}\ketbra{a}{b})}=\rho_{a,b} \bra{b}s_0 \ket{a}=\rho_{a,b} \prod_{j=1}^n \bra{b}_j (s_0)|_j \ket{a}_j,
+\end{equation}
+其中$|_j$表示限制算符在第$j$个量子比特上的限制，$\ket{\cdot}_j$表示$\ket{\cdot}$的第$j$个分量。
+
+通过式~\eqref{ap:eq:component_of_input}，$\Tr{s_0  (\rho_{a,b}\ketbra{a}{b})}$可以在时间（空间）复杂度为$\order{n}$的情况下计算。通过稀疏性假设，$\Tr{s_0 \rho}$可以在时间（空间）复杂度为$\mathrm{Poly}(n)$的情况下计算。因此，$C_{f\rho}=O(\poly(n))$。
+ 
+
+算法的核心是如何高效的枚举出与噪声关联的Hamming Weight小于等于$M$的Pauli路径。对于每个给定的Pauli路径$\bm{s}$，其贡献函数$\hat{f}(\mathcal{U},\bm{s},O,\rho)$可以通过式~\eqref{eq:pp:contribution}计算。
+
+\subsubsection{$C_{fO}$的估计}
+对于和观测量$O$相关的$\Tr(Os_L)$的计算，同样的为了使得观测量$O$能够被高效的输入计算机，我们需要对观测量$O$添加一些合理的假设。在常见的量子算法中，观测量$O$通常是一些Pauli算符的线性组合，即：
+\begin{equation}
+    O = \sum_{i=1}^{N_O} c_i P_i,
+\end{equation}
+其中$c_i$是实数，$P_i$是n比特的Pauli算符。
+一个合理的假设是观测量$O$是一个Pauli稀疏的观测量，即：
+\begin{definition}
+    一个$n$量子比特的观测量$O$是一个Pauli稀疏的观测量，如果它的非零元素的数量是多项式级别的，即
+    \begin{equation}
+        O=\sum_{i=1}^{N_O} c_i P_i,
+    \end{equation}
+    其中$c_i$是实数，$P_i$是n比特的Pauli算符。
+    且$N_O$是多项式级别的，即$N_O=\poly(n)$。
+\end{definition}
+对于Pauli稀疏的观测量$O$，我们可以通过使用一个树状结构来存储观测量$O$中的Pauli算符和其对应的系数。
+树中的每个节点分配一个Pauli算符。树的叶节点对应一个唯一的Pauli串，并存储$O$的相应系数值。
+例如，考虑观测量$O=1 X_0+1 Z_1+0.5 X_0X_1$，它可以表示为图~\ref{fig:trie}所示的树。
+
+\begin{figure}[htbp]
+    \centering
+\begin{tikzpicture}
+  [level distance=10mm,
+   every node/.style={fill=red!60,circle,inner sep=1pt},
+   level 1/.style={sibling distance=20mm,nodes={fill=red!45}},
+   level 2/.style={sibling distance=10mm,nodes={fill=red!30}},
+   level 3/.style={dashed,sibling distance=5mm,nodes={fill=red!0}}],
+  \node[minimum size=0.01cm] { }
+     child {node {$I_0$}
+       child {node {$Z_1$}
+       child {node {$1$}}
+       }
+     }
+     child {node {$X_0$}
+       child {node {$I_1$}
+       child {node {$1$}}}
+       child {node {$X_1$}
+       child {node {$0.5$}}}
+     };
+\end{tikzpicture}
+\caption{观测量$O=1 X_0+1 Z_1+0.5 X_0X_1$的树表示。}\label{fig:trie}
+\end{figure}
+
+因此，我们可以利用树状数据结构以时间复杂度$\order{n}$计算$\Tr{O s_L}$，并以空间复杂度$\mathrm{Poly}(n)$存储树。
+在观测量Pauli稀疏的假设下，可以得到$C_{fO}=O(\poly(n))$。
+
+
+
+\subsubsection{$C_s$和$N_M$的估计}
+
+在本节中，我们将介绍如何高效的枚举出与噪声关联的Hamming Weight小于等于$M$且拥有非平凡贡献函数的Pauli路径，并估计满足条件的Pauli路径的个数$N_M$。具体的讲，需要枚举出以下集合：
+\begin{equation}
+    \mathcal{S}_M = \left\{ \bm{s} \mid \abs{\bm{s}}_{\mathcal{N}}\leq M, \hat{f}(\mathcal{U},\bm{s},O,\rho)\neq 0 \right\}.
+\end{equation}
+$N_M$是$\mathcal{S}_M$的元素个数。
+
+
+在此，为了方便的估计，定义在量子线路中$\mathcal{U}$中每个门的最大可分裂的Pauli算符的数量为$N_{\text{max}}$：
+\begin{definition}
+    对于一个深度为$L$的量子线路$\mathcal{U}$，假设其门集合为$\{\mathcal{U}_{i,j}\}$。定义$\mathcal{U}$的门最大可分裂的Pauli算符的数量为$N_{\text{max}}$：
+    \begin{equation}
+        N_{\text{max}} = \max_{i,j,s}\abs{ \left\{ s'\mid \tr(s' U^\dagger_{i,j}s U_{i,j})\neq 0 \right\}},
+    \end{equation}
+    其中$s$和$s'$是Pauli算符，$\tr$表示Pauli算符的迹。 
+\end{definition}
+在后续的章节中，将估计对一些具体的线路模型中$N_{\text{max}}$的值。在本章中，将假设$N_{\text{max}}$是一个变量。
+
+因为对于含有$n$个qubits，深度为$L$的量子线路$\mathcal{U}$，其Pauli路径的数量是$4^{L(n+1)}$。因此先枚举再筛选的方法会带来指数级的计算复杂度，在实际应用中是不可行的。因此，我们需要设计一种高效的枚举方法。
+
+可观测量在Pauli路径下的反向传播算法正是我们对此问题的解决方案。与一般模拟算法随时间进程从初始态开始模拟的方式不同，OBPPP算法在Heisenberg图景下模拟量子线路的演化。OBPPP算法的核心思想是从观测量$O$开始，逆向的模拟量子线路的演化，直到初态$\rho$。在这个过程中，OBPPP算法会维护一个Pauli路径的集合，这个集合包含了与噪声关联的Hamming Weight小于等于$M$且拥有非平凡贡献函数的Pauli路径。OBPPP算法的示意图如图~\ref{fig:obppp}所示，左侧包含$O$的方块表示观测量$O$，算法从观测量$O$开始，逆向的模拟量子线路的演化，每个连线表示着一个Pauli路径，连线的颜色表示着Pauli路径的与噪声关联的Hamming Weight，更深的颜色表示更大的Hamming Weight。在逆向演化的过程中，Pauli算符随着Pauli路径反向传播，直到初态$\rho$。在传播的过程中，Pauli路径会发生分裂，生成更多的Pauli路径，Hamming Weight也会随着演化的过程而逐渐增加。随着传播的深入，算法会截断与噪声关联的Hamming Weight大于$M$的Pauli路径，用虚线表示。
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/obppp.png}
+    \caption{OBPPP算法的示意图。}
+    \label{fig:obppp}
+\end{figure}
+
+首先回顾与噪声关联的Hamming Weight的定义，由式~\eqref{eq:noise_hamming_weight}给出。
