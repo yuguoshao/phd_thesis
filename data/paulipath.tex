@@ -544,7 +544,7 @@ $\widetilde{\langle O \rangle}$给出了含有噪声的量子线路的期望值$
 \subsection{OBPPP算法}
 在本节中，我们将介绍一种基于Pauli路径积分模拟的量子线路期望值计算算法——可观测量在Pauli路径下的反向传播算法（Observable's Back-Propagation on Pauli Path，OBPPP）。OBPPP算法通过计算低weight的Pauli路径的贡献函数，实现了对含有噪声的量子线路的期望值的高效计算。
 
-算法的计算复杂度包含两个部分：Pauli路径的枚举和每个Pauli路径的贡献函数的计算，分别记为$C_s$和$C_f$。假设一共有$N_M$个Pauli路径的Hamming Weight小于等于$M$且拥有非平凡的贡献函数，则OBPPP算法的计算复杂度为$O(C_s+N_M(C_f))$。
+算法的计算复杂度包含两个部分：Pauli路径的枚举和每个Pauli路径的贡献函数的计算，分别记为$C_s$和$C_f$。假设一共有$N_M$个Pauli路径的Hamming Weight小于等于$M$且拥有非平凡的贡献函数，则OBPPP算法的计算复杂度为$C_s+N_MC_f$。
 
 其中$C_f$是计算一个Pauli路径的贡献函数的计算复杂度也包含三个部分：和初态相关的$\Tr{\rho s_0}$的计算、和观测量相关的$\Tr{Os_L}$的计算和中间量子门的计算$\prod\Tr{s_i\mathcal{U}_i s_{i-1}\mathcal{U}_i^\dagger}$。这三部分的计算复杂度分别记为$C_{f\rho}$、$C_{fO}$和$C_{f\mathcal{U}}$。
 因此$C_f = C_{f\rho}+C_{fO}+C_{f\mathcal{U}}$。
@@ -696,7 +696,7 @@ $N_M$是$\mathcal{S}_M$的元素个数。
 
 模拟算法的全过程总结在算法~\ref{ALGORITHM_HS}中。
 \begin{algorithm}[H]
-    \caption{可观测量在Pauli路径下的反向传播算法}
+    \caption{可观测量在Pauli路径下的反向传播算法（情况1）}
     \label{ALGORITHM_HS}
     \begin{algorithmic}[1]
         \REQUIRE 量子线路$\mathcal{U}$，初态$\rho$，观测量$O$，噪声模型$\mathcal{N}$。
@@ -725,11 +725,11 @@ $N_M$是$\mathcal{S}_M$的元素个数。
     \end{algorithmic}
 \end{algorithm}
 
-在上述过程中，给定$s_L$，输出的不同Pauli路径的数量最多为$N_{\text{max}}^{\abs{s_1}_H+\cdots+\abs{s_L}_H}\leq N_{\text{max}}^{M}$。或者，对于给定的$s_L$，我们考虑所有以$s_L$为终点元素、$\abs{\bm{s}}_H\leq M$且$f(\mathcal{U},\bm{s},O,\rho)\neq 0$的Pauli路径。可以将其视为从$s_L$开始的树，新的分支仅在$s_{i}|_{\supp(U_{i,j})}$不是单位时产生。由于$\{s_{i}|_{\supp(U_{i,j})}\}$中的非单位元素最多为$M$，且每个分支最多有$N_{\text{max}}$个可能的情况，因此叶子节点数量最多为$N_{\text{max}}^{M}$。因此，为了计算$\abs{\bm{s}}_H\leq M$的Pauli路径的所有贡献，我们需要计算最多$\mathrm{Poly}(n) N_{\text{max}}^{M}$个不同的Pauli路径。
+在上述枚举过程中，给定$s_L$，输出的不同Pauli路径的数量最多为$N_{\text{max}}^{\abs{s_1}_H+\cdots+\abs{s_L}_H}\leq N_{\text{max}}^{M}$。或者，对于给定的$s_L$，我们考虑所有以$s_L$为终点元素、$\abs{\bm{s}}_H\leq M$且$f(\mathcal{U},\bm{s},O,\rho)\neq 0$的Pauli路径。可以将其视为从$s_L$开始的树，新的分支仅在$s_{i}|_{\supp(U_{i,j})}$不是单位时产生。由于$\{s_{i}|_{\supp(U_{i,j})}\}$中的非单位元素最多为$M$，且每个分支最多有$N_{\text{max}}$个可能的情况，因此叶子节点数量最多为$N_{\text{max}}^{M}$。因此，为了计算$\abs{\bm{s}}_H\leq M$的Pauli路径的所有贡献，我们需要计算最多$\mathrm{Poly}(n) N_{\text{max}}^{M}$个不同的Pauli路径。
 
-在步骤(1)中，时间复杂度为$\order{\mathrm{Poly}(n)}$。在步骤(2)中，考虑所有$s_L$的情况，时间成本为$\order{\sum_{s_L}nC_{\text{split}} N_{\text{max}}^{\abs{s_L}_H}}$。在步骤(3)中，考虑所有$s_{L-1}$的情况，时间复杂度为$\order{\sum_{s_L}\sum_{s_{L-1}(s_L)}nC_{\text{split}} N_{\text{max}}^{\abs{s_{L-1}}_H}}$，其中$s_{L-1}(s_L)$表示步骤(2)中对应给定$s_L$的输出。类似的结果适用于$s_{L-2},\cdots,s_{0}$。
+在枚举步骤(1)中，时间复杂度为$\order{\mathrm{Poly}(n)}$。在枚举步骤(2)中，考虑所有$s_L$的情况，时间成本为$\order{\sum_{s_L}nC_{\text{split}} N_{\text{max}}^{\abs{s_L}_H}}$。在枚举步骤(3)中，考虑所有$s_{L-1}$的情况，时间复杂度为$\order{\sum_{s_L}\sum_{s_{L-1}(s_L)}nC_{\text{split}} N_{\text{max}}^{\abs{s_{L-1}}_H}}$，其中$s_{L-1}(s_L)$表示枚举步骤(2)中对应给定$s_L$的输出。类似的结果适用于$s_{L-2},\cdots,s_{0}$。
 
-因此，上述过程的时间复杂度为：
+因此，上述枚举过程的时间复杂度为：
 \begin{equation}
     \begin{aligned}
         \order{\mathrm{Poly}(n)+\sum_{s_L}nC_{\text{split}} N_{\text{max}}^{\abs{s_L}_H}+\sum_{s_L}\sum_{s_{L-1}(s_L)}nC_{\text{split}} N_{\text{max}}^{\abs{s_{L-1}}_H} + \cdots} \\
@@ -757,31 +757,17 @@ $N_M$是$\mathcal{S}_M$的元素个数。
     \order{\mathrm{Poly}(n)}+\sum_{i=1}^{L}\left(\order{S_{\text{split}}n}\right)\leq\order{\mathrm{Poly}(n)+nS_{\text{split}}L}.
 \end{equation}
 
+综上所述，对于\textbf{情况1}，枚举所有与噪声关联的Hamming Weight小于等于$M$且具有非平凡贡献函数的Pauli路径的计算复杂度为$C_s=\mathrm{Poly}(n) \order{L} C_{\text{split}} N_{\text{max}}^{M}$，满足条件的Pauli路径的数量$N_M$最多为$\mathrm{Poly}(n) N_{\text{max}}^{M}$。
 
-\begin{comment}
 
-在步骤(1)中，时间成本为$\order{\mathrm{Poly}(n)}$。在步骤(2)中，考虑所有$s_L$的情况，时间成本为$\sum_{s_L}n2^{\abs{s_L}H}$。在步骤(3)中，考虑所有$s{L-1}$的情况，时间成本为$\sum_{s_L}\sum_{s_{L-1}(s_L)}n2^{\abs{s_{L-1}(s_L)}H}$，其中$s{L-1}(s_L)$表示步骤(2)中对应给定$s_L$的输出。类似的结果适用于$s_{L-2},\cdots,s_{0}$。
+在\textbf{情况2}中假设${p_x,p_y,p_z}$中只有$p_x$是非零的。此情况下的策略是截断$Y$、$Z$算符的数量小于$M$，形式化为$\abs{\bm{s}}_Y+\abs{\bm{s}}_Z=\abs{s_L}_Y+\abs{s_L}_Z+\cdots+\abs{s_0}_Y+\abs{s_0}_Z\leq M$。
 
-因此，上述过程的时间复杂度为 \begin{equation} \begin{aligned} \order{\mathrm{Poly}(n)+\sum_{s_L}n2^{\abs{s_L}H}+\sum{s_L}\sum_{s_{L-1}(s_L)}n2^{\abs{s_{L-1}(s_L)}H} +\sum{s_L}\sum_{s_{L-1}(s_L)}\sum_{s_{L-2}(s_L,s_{L-1})}n2^{\abs{s_{L-2}(s_L,s_{L-1})}H}+ \cdots} \ \leq \order{\mathrm{Poly}(n)n L 2^{M}}=\mathrm{Poly}(n) \order{L} 2^{M}。 \end{aligned} \end{equation} 这里不等式成立，因为 \begin{equation} \begin{aligned} \sum{s_L}\cdots\sum_{s_{i-1}(s_L,\cdots,s_i)}n2^{\abs{s_{i-1}(s_L,\cdots,s_i)}H} &=\sum{s_L}\cdots\sum_{s_{i}(s_L,\cdots,s_{i+1})}\sum_{s_{i-1}(s_L,\cdots,s_i)}n2^{\abs{s_{i-1}(s_L,\cdots,s_i)}H}\ (\mathrm{By} ; \abs{s{i-1}}H+\cdots +\abs{s_L}H\leq M)\qquad &\leq \sum{s_L}\cdots\sum{s_{i}(s_L,\cdots,s_{i+1})}\sum_{s_{i-1}(s_L,\cdots,s_i)}n2^{M-(\abs{s_{i}(s_L,\cdots,s_{i+1})}H+\cdots+\abs{s_L}H)}\ (\mathrm{By} ; #s{i-1}\leq 2^{\abs{s_i}H})\qquad\qquad\quad &\leq \sum{s_L}\cdots\sum{s_{i}(s_L,\cdots,s_{i+1})}n2^{M+\abs{s_{i}(s_L,\cdots,s_{i+1})}-\left(\abs{s_{i}(s_L,\cdots,s_{i+1})}H+\cdots+\abs{s_L}H\right)}\ &=\sum{s_L}\cdots\sum{s_{i}(s_L,\cdots,s_{i+1})}n2^{M-(\abs{s_{i+1}(s_L,\cdots,s_{i+2})}H+\cdots+\abs{s_L}H)}\ &\qquad\vdots\ &\leq \sum{s_L}\sum{s_{L-1}(s_L)} n2^{M-\abs{s_L}H}\ &\leq \sum{s_L} n2^M=\mathrm{Poly}(n)n2^M。 \end{aligned} \end{equation}
-
-上述过程的空间复杂度为 \begin{equation}\label{ap:eq:space_cost} \order{\mathrm{Poly}(n)}+\sum_{i=1}^{L}\left(\order{n}\right)\leq\order{\mathrm{Poly}(n)+nL}。 \end{equation}
-
-在获得Pauli路径$s=(s_0,\cdots,s_L)$的候选者后，下一步是计算其贡献$\hat{f}(\bm{\theta},s,O,\rho)$。对于每个Pauli路径$s$，可以使用Eq.<del>\eqref{ap:eq:f}和命题</del>\ref{prop:f_ele}在时间复杂度$\order{nL}+\mathrm{Poly}(n)$内确定$f(\mathcal{U},\bm{s},O,\rho)$。因此，在\textbf{情况1}中计算$\widetilde{\mathcal{L}}$的总体时间成本约为
-
-\begin{equation}\label{ap:eq:T} \left( \order{nL} + \mathrm{Poly}(n) \right) \mathrm{Poly}(n) 2^{M}+\mathrm{Poly}(n) \order{L} 2^{M} = \mathrm{Poly}(n) \order{L} 2^{M}。 \end{equation}
-
-我们的算法过程总结在算法~\ref{ALGORITHM_HS}中。
-
-\begin{algorithm}[H] \caption{用于估计情况1中截断成本函数的OBPPP算法}\label{ALGORITHM_HS} \begin{algorithmic} \State 设置$\widetilde{\mathcal{L}}=0$。 \State 枚举$s_L$为$O$中具有非零系数的所有Pauli词 \For{$s_{L}$的候选者} \State{根据电路的第$L$层，生成$s_{L-1}$的候选者。} \State{消除$\abs{s_{L}}H+\abs{s{L-1}}H > M-(L-1)$的情况。} \For{$s{L-1}$的候选者} \State{根据电路的第$(L-1)$层，生成$s_{L-2}$的候选者。} \State{消除$\abs{s_{L}}H+\abs{s{L-1}}H+\abs{s{L-2}}H> M-(L-2)$的情况。} \State{\vdots} \For{$s_1$的候选者} \State{根据电路的第1层，生成$s{0}$的候选者。} \State{消除$\abs{s_{L}}H+\cdots+\abs{s{0}}H> M$的情况。} \For{$s{0}$的候选者} \State{设置Pauli路径$s=(s_0,\cdots,s_L)$} \State 更新$\widetilde{\mathcal{L}}=\widetilde{\mathcal{L}}+(1-2(p_y+p_z))^{\abs{\bm{s}}_X}(1-2(p_x+p_z))^{\abs{\bm{s}}_Y}(1-2(p_x+p_y))^{\abs{\bm{s}}_Z}f(\mathcal{U},\bm{s},O,\rho)$ \EndFor \EndFor \EndFor \EndFor
-
-\State 输出近似成本函数$\widetilde{\mathcal{L}}$。 \end{algorithmic} \end{algorithm}
-
-算法分析 \textbf{情况2}
-假设${p_x,p_y,p_z}$中只有$p_x$是非零因子。此情况下的策略是截断其他操作符的数量小于$M$，形式化为$\abs{\bm{s}}_Y+\abs{\bm{s}}_Z=\abs{s_L}_Y+\abs{s_L}_Z+\cdots+\abs{s_0}_Y+\abs{s_0}_Z\leq M$。
-
-\textbf{情况2}的算法类似于\textbf{情况1}的算法。不同之处在于在第$(i+1)$步中消除的情况是$\abs{s_{L}}Y+\abs{s{L}}Z+\abs{s{L-1}}Y+\abs{s{L-1}}Z \cdots \abs{s{L-i}}Y+\abs{s{L-i}}_Z > M$。
+\textbf{情况2}的算法类似于\textbf{情况1}的算法。不同之处在于在第$(i+1)$步中丢弃的情况是$\abs{s_{L}}_Y+\abs{s_{L}}_Z+\abs{s_{L-1}}_Y+\abs{s_{L-1}}_Z \cdots \abs{s_{L-i}}_Y+\abs{s_{L-i}}_Z > M$。
 
 对于每种$s_L$的情况，${s_{L}|{\sigma{L,j}}} \cup {s_{L}|{V{L,k}}} \cup {s_{L}|{I{L}}}$中最多有$\abs{s_L}$个非身份元素，对应于${s_{L-1}|{\sigma{L,j}}} \cup {s_{L-1}|{V{L,k}}} \cup {s_{L-1}|{I{L}}}$中最多$\abs{s_L}$个非身份元素。此外，每个元素最多有两个潜在候选者，导致$s_{L-1}$最多有$2^\abs{s_L}$种情况。这个反向传播过程可以表示为从$s_L$开始的树，新的分支仅在$s_{i}|{\sigma{i,j}}$不是身份且$\sigma_{i,j} \in AC(i,s_{i})$时发生，如图<del>\ref{fig:bp_tree}所示。分叉点如图</del>\ref{fig:bp_tree_ele}所示，其中$s_i|{g(\sigma{i,j})}$表示反向传播到第$i$层第$j$个门的$s_i$候选者，$s_{i-1}|{g(\sigma{i,j})}$和$s'{i-1}|{g(\sigma_{i,j})}$分别表示$s_{i-1}$的两个候选者，等于$s_i|{g(\sigma{i,j})}$和$i\sigma_{i,j}s_i|{g(\sigma{i,j})}$。
 
 注意，分叉点的三部分不能都由$X$和$I$的张量组成，否则$s_{i}|{\sigma{i,j}}$与$\sigma_{i,j}$对易。这意味着$\abs{s_{i-1}}Y+\abs{s{i-1}}Z$和$\abs{s'{i-1}}_Y+\abs{s'_{i-1}}_Z$不能同时为0。
+
+\begin{comment}
+
 \end{comment}
