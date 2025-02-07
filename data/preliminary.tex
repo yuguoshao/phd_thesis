@@ -278,16 +278,16 @@ Hadamard门是一个单比特门，常用于产生均匀叠加态，它常简记
     \text{CNOT} = \ketbra{0}{0}\otimes I + \ketbra{1}{1}\otimes X=\begin{pmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 0 & 1 \\ 0 & 0 & 1 & 0 \end{pmatrix}.
 \end{equation}
 
-单比特旋转门的推广是多比特旋转门。为了介绍多比特旋转门，我们首先介绍Pauli word的概念。Pauli word是由Pauli算符$X$、$Y$、$Z$以及单位算符$I$进行张量积组成的一个算符，例如$XIY$、$ZZI$等。形式化地，一个长度为n的Pauli word可以表示为
+单比特旋转门的推广是多比特旋转门。为了介绍多比特旋转门，我们首先介绍多比特Pauli算符的概念。多比特Pauli算符是由Pauli算符$X$、$Y$、$Z$以及单位算符$I$进行张量积组成的一个算符，例如$XIY$、$ZZI$等。形式化地，n个比特的Pauli算符可以表示为
 \begin{equation}
     P = \bigotimes_{i=1}^n P_i,
 \end{equation}
 其中$P_i \in \{I, X, Y, Z\}$。
-一个n-qubit的多比特旋转门是Pauli word的指数函数，即
+一个n-qubit的多比特旋转门是Pauli算符的指数函数，即
 \begin{equation}
     R_P(\theta) = e^{-i\frac{\theta}{2} P},
 \end{equation}
-其中$P$是一个长度为n的Pauli word，$\theta$是旋转角度。
+其中$P$是一个长度为n的Pauli算符，$\theta$是旋转角度。
 多比特旋转门在一大类被称为变分量子算法（Variational Quantum Algorithm，VQA）中扮演着重要的角色。
 多比特旋转门的实现略显复杂，但是可以通过一系列的单比特门和CNOT门来实现。
 
