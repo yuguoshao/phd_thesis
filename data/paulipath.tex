@@ -686,7 +686,7 @@ $N_M$是$\mathcal{S}_M$的元素个数。
     \item 对于每个$s_L$，接下来的步骤是枚举所有可能的$s_{L-1}$，使得$\Tr{s_L \mathcal{U}_L s_{L-1} \mathcal{U}_L^\dagger}\neq 0$。
     由于$\cup_j\{s_L|_{\supp(U_{L,j})}\} \cup \{s_L|_{I_L}\}$中至多有$\abs{s_L}_H$个非单位元素，其中$\supp(U_{L,j})$是第$L$层$\mathcal{U}_L$的第$j$个门$U_{L,j}$所作用的量子比特的集合；${I_L}$是第$L$层中没有门作用的量子比特的集合。
     若$s_i|_{\supp(U_{i,j})}$是单位，则有$\Tr{s_{i+1} \mathcal{U}_{i+1} s_i \mathcal{U}_{i+1}^\dagger}=\Tr{s_{i+1} s_i}$，为避免零贡献则$s_{i-1}|_{\supp(U_{i,j})}$也是单位。
-    因策这些非单位元对应于$\cup_j\{s_{L-1}|_\supp(U_{L,j})\}\cup \{s_{L-1}|_{I_L}\}$中至多有$\abs{s_L}_H$个非单位元素。
+    因策这些非单位元对应于$\cup_j\{s_{L-1}|_{\supp(U_{L,j})}\}\cup \{s_{L-1}|_{I_L}\}$中至多有$\abs{s_L}_H$个非单位元素。
 
     此外，每个元素最多有$N_\text{max}$潜在候选者，导致$s_{L-1}$最多有$N_{\text{max}}^{\abs{s_L}_H}$种情况。根据先前的讨论，算法还需要丢弃$\abs{s_L}_H+\abs{s_{L-1}}_H> M-L$的情况。
     在给定$s_L$的情况下，枚举$s_{L-1}$的时间复杂度为为$\order{nC_{\text{split}} N_{\text{max}}^{\abs{s_L}_H}}$，空间复杂度为$\order{S_{\text{split}}n}$。
@@ -761,13 +761,94 @@ $N_M$是$\mathcal{S}_M$的元素个数。
 
 
 在\textbf{情况2}中假设${p_x,p_y,p_z}$中只有$p_x$是非零的。此情况下的策略是截断$Y$、$Z$算符的数量小于$M$，形式化为$\abs{\bm{s}}_Y+\abs{\bm{s}}_Z=\abs{s_L}_Y+\abs{s_L}_Z+\cdots+\abs{s_0}_Y+\abs{s_0}_Z\leq M$。
+为讨论在该噪声情形下的反向传播，定义以下的条件：
+\begin{definition}
+    对于一个量子线路$\mathcal{U}$，假设其门集合为$\{\mathcal{U}_{i,j}\}$。称$\mathcal{U}$是关于噪声关联的Hamming Weight $\abs{\bullet}_{\mathcal{N}}$单调增的，如果对于任意的$i,j,s$，有$\abs{\left\{s'\mid \Tr{sU_{i,j}s' U_{i,j}^\dagger}\neq 0,\ \abs{s'}_{\mathcal{N}}=0\right\}}\leq 1$，其中$s$和$s'$是Pauli算符。
+\end{definition}
+并非所有的量子线路都满足该条件。但是，对于一些特定的量子线路模型，例如由Clifford和Pauli旋转门组成的线路，这个定义是成立的。我们将讨论满足该定义的线路模型在噪声\textbf{情况2}的反向传播算法。
 
 \textbf{情况2}的算法类似于\textbf{情况1}的算法。不同之处在于在第$(i+1)$步中丢弃的情况是$\abs{s_{L}}_Y+\abs{s_{L}}_Z+\abs{s_{L-1}}_Y+\abs{s_{L-1}}_Z \cdots \abs{s_{L-i}}_Y+\abs{s_{L-i}}_Z > M$。
 
-对于每种$s_L$的情况，${s_{L}|{\sigma{L,j}}} \cup {s_{L}|{V{L,k}}} \cup {s_{L}|{I{L}}}$中最多有$\abs{s_L}$个非身份元素，对应于${s_{L-1}|{\sigma{L,j}}} \cup {s_{L-1}|{V{L,k}}} \cup {s_{L-1}|{I{L}}}$中最多$\abs{s_L}$个非身份元素。此外，每个元素最多有两个潜在候选者，导致$s_{L-1}$最多有$2^\abs{s_L}$种情况。这个反向传播过程可以表示为从$s_L$开始的树，新的分支仅在$s_{i}|{\sigma{i,j}}$不是身份且$\sigma_{i,j} \in AC(i,s_{i})$时发生，如图<del>\ref{fig:bp_tree}所示。分叉点如图</del>\ref{fig:bp_tree_ele}所示，其中$s_i|{g(\sigma{i,j})}$表示反向传播到第$i$层第$j$个门的$s_i$候选者，$s_{i-1}|{g(\sigma{i,j})}$和$s'{i-1}|{g(\sigma_{i,j})}$分别表示$s_{i-1}$的两个候选者，等于$s_i|{g(\sigma{i,j})}$和$i\sigma_{i,j}s_i|{g(\sigma{i,j})}$。
+对于每种$s_L$的情况，$\cup_j\{s_L|_{\supp(U_{L,j})}\} \cup \{s_L|_{I_L}\}$中最多有$\abs{s_L}_H$个非单位元素，对应于$\cup_j\{s_{L-1}|_{\supp(U_{L,j})}\}\cup \{s_{L-1}|_{I_L}\}$中最多$\abs{s_L}_H$个非单位元素。此外，每个元素最多有$N_{\text{max}}$个潜在候选者，导致$s_{L-1}$最多有$N_{\text{max}}^{\abs{s_L}_H}$种情况。
 
-注意，分叉点的三部分不能都由$X$和$I$的张量组成，否则$s_{i}|{\sigma{i,j}}$与$\sigma_{i,j}$对易。这意味着$\abs{s_{i-1}}Y+\abs{s{i-1}}Z$和$\abs{s'{i-1}}_Y+\abs{s'_{i-1}}_Z$不能同时为0。
+这个反向传播过程可以表示为从$s_L$开始的树，新的分支仅在$s_{i}|_{\supp(U_{i,j})}$不是单位且$\abs{\left\{s\mid \Tr{s_{i}|_{\supp(U_{i,j})}U_{i,j}s U_{i,j}^\dagger}\neq 0\right\}} \geq 2$时产生，如图~\ref{fig:bp_tree}所示。
+分叉点如图~\ref{fig:bp_tree_ele}所示，其中$s_i|_{\supp(U_{L,j})}$表示反向传播到第$i$层第$j$个门的某个$s_i$，$s_{i-1}|_{\supp(U_{L,j})}$和$s'_{i-1}|_{\supp(U_{L,j})}$分别表示$s_{i-1}$在${\supp(U_{L,j})}$可能出现的不同情况，在此为了方便只画出两种情况。
 
-\begin{comment}
+假设量子线路$\mathcal{U}$满足对噪声关联的Hamming Weight 单调增的条件。在这种情况下，$\abs{s_{i-1}}_Y+\abs{s_{i-1}}_Z$和$\abs{s'_{i-1}}_Y+\abs{s'_{i-1}}_Z$至多只能有一个为零。
 
-\end{comment}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}
+      [level distance=4mm,level/.style={sibling distance=480/2^#1}],
+      \node(a) {}
+        child{
+          child{
+            child{child{child{child{child} child{child}} child{child{child child}}} child{child{child child{child child}} child{child{child child} child{child child}}}} 
+            child{child{child{child{child} child} child{child{child child} child{child child}}} child{child{child{child child} child{child child}} child{child{child} child{child}}}}
+            } 
+          child{
+            child{child{child{child{child} child{child}} child{child{child} child{child}}} child{child{child{child child} child{child child}} child{child{child} child{child}}}} 
+            child{child{child{child{child child} child{child child}} child{child{child child} child{child child}}} child{child{child{child} child{child}} child{child{child} child{child}}}}
+            } 
+          };
+      \draw[dashed,red] ($(a)+(-5,-2.5mm)$)--($(a)+(5,-2.5mm)$);
+      \node at ($(a)+(5.5,-2.5mm)$) {$s_L$};
+      \draw[dashed,red] ($(a)+(-5,-18mm)$)--($(a)+(5,-18mm)$);
+      \node at ($(a)+(5.5,-18mm)$) {$s_{L-1}$};
+      \draw[dashed,red] ($(a)+(-5,-26mm)$)--($(a)+(5,-26mm)$);
+      \node at ($(a)+(5.5,-26mm)$) {$s_{L-2}$};
+      \node at ($(a)+(0,-30mm)$) {$\vdots$};
+      \node at ($(a)+(-3,-30mm)$) {$\vdots$};
+      \node at ($(a)+(3,-30mm)$) {$\vdots$};
+    \end{tikzpicture}
+    \caption{反向传播过程的树表示}\label{fig:bp_tree}
+    \end{figure}
+  
+  \begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[level distance=10mm,sibling distance=20mm,
+      %every node/.style={fill=red!60,circle,inner sep=1pt},
+      %level 1/.style={sibling distance=20mm,nodes={fill=red!45}},
+      %level 2/.style={},
+      level 3/.style={}],
+      \node(a){$s_i|_{\supp(U_{i,j})}$}
+         child {node[draw] {$U_{i,j}$}
+           child {node {$s_{i-1}|_{\supp(U_{i,j})}$} }
+           child {node {$s'_{i-1}|_{g(\sigma_{i,j})}$} }
+         };
+    \end{tikzpicture}
+    \caption{图~\ref{fig:bp_tree}中的分岔点解释}\label{fig:bp_tree_ele}
+\end{figure}
+
+接下来，我们使用归纳法对满足 $\abs{s}_Y+\abs{s}_Z\leq M$ 且具有非平凡贡献的 Pauli 路径的数量进行上界估计，假设路径以给定的Pauli算符 $s_L$ 开始：
+\begin{enumerate}
+    \item 如果我们限制 $\abs{s}_Y+\abs{s}_Z\leq 0$，那么在反向传播过程中没有产生分叉点。在该限制下，只会生成$s_L$ 开始的一条 Pauli 路径。此情况下的时间复杂度上界为 $\order{C_{\text{split}}nLN_{\text{max}}}$。
+    \item 如果我们限制 $\abs{s}_Y+\abs{s}_Z\leq 1$，并且在反向传播过程中在第 $i$ 层的第 $j$ 个门处存在一个分叉点，那么图~\ref{fig:bp_tree_ele} 中的元素 $s'_{i-1}$ 满足 $\abs{s'_{i-1}}_Y+\abs{s'_{i-1}}_Z\geq 1$。因此，$s'$ 被简化为 (1) 情况，满足 $\abs{s'_{i-2}}_Y+\abs{s'_{i-2}}_Z+\cdots \abs{s'_{0}}_Y+\abs{s'_{0}}_Z \leq 0$，并且在接下来的过程中没有分叉点，如图~\ref{fig:bp_tree_ele:2} 所示。除此之外，最多有 $nL$ 个分叉点位置。这种假设导致最多 $nLN_{\text{max}}$ 条从 $s_L$ 开始的 Pauli 路径。此情况下的时间复杂度上界为 $\order{C_{\text{split}}(nLN_{\text{max}})^2}$。
+    
+
+    \begin{figure}[htbp]
+        \centering
+        \begin{tikzpicture}
+          [level distance=4mm,level/.style={sibling distance=120/#1}],
+          \node(a) {}
+            child{
+              child{ child{child{child child} child{child}} child{child{child}}
+                } 
+                child{child{child{child}}}
+              };
+          \node at ($(a)+(0,-20mm)$) {$\vdots$};
+          \node at ($(a)+(-2.5,-20mm)$) {$\vdots$};
+          \node at ($(a)+(1.5,-20mm)$) {$\vdots$};
+        \end{tikzpicture}
+        \caption{当设定 $\abs{s}_Y+\abs{s}_Z\leq 1$时的反向传播过程。}\label{fig:bp_tree_ele:2}
+    \end{figure}
+
+    \item 如果我们限制 $\abs{s}_Y+\abs{s}_Z\leq 2$，并且在反向传播过程中在第 $i$ 层的第 $j$ 个门处存在一个分叉点，那么图~\ref{fig:bp_tree_ele} 中的元素 $s'_{i-1}$ 满足 $\abs{s'_{i-1}}_Y+\abs{s'_{i-1}}_Z\geq 1$。因此，$s'$ 被简化为 (2) 情况，满足 $\abs{s'_{i-2}}_Y+\abs{s'_{i-2}}_Z+\cdots \abs{s'_{0}}_Y+\abs{s'_{0}}_Z \leq 1$。根据 (2) 中的讨论，在接下来的过程中 $s'$ 最多有 $nLN_{\text{max}}$ 条路径。因此，从 $s_L$ 开始的 $s$ 最多有 $(nLN_{\text{max}})^2$ 条路径。此情况下的时间复杂度上界为 $\order{C_{\text{split}}(nLN_{\text{max}})^3}$。
+    \item 基于上述推广，对于 $\abs{s}_Y+\abs{s}_Z\leq M-1$ 的情况，假设从 $s_L$ 开始的 $s$ 最多有 $(nLN_{\text{max}})^{M-1}$ 条路径。且假设此情况下的时间复杂度上界为 $\order{C_{\text{split}}(nLN_{\text{max}})^M}$。
+    
+
+    那么对于 $\abs{s}_Y+\abs{s}_Z\leq M$ 的情况，如果在反向传播过程中在第 $i$ 层的第 $j$ 个门处存在一个分叉点，那么图~\ref{fig:bp_tree_ele} 中的元素 $s'_{i-1}$ 满足 $\abs{s'_{i-1}}_Y+\abs{s'_{i-1}}_Z\geq 1$。类似地，$s'$ 被简化为 $\abs{s'_{i-2}}_Y+\abs{s'_{i-2}}_Z+\cdots \abs{s'_{0}}_Y+\abs{s'_{0}}_Z \leq M-1$ 的情况。根据假设，在接下来的过程中 $s'$ 最多有 $(nLN_{\text{max}})^{M-1}$ 条路径。因此，从 $s_L$ 开始的 $s$ 最多有 $nLN_{\text{max}}*(nLN_{\text{max}})^{M-1}=(nLN_{\text{max}})^{M}$ 条路径。此情况下的时间复杂度上界为 $\order{(nLN_{\text{max}})^{M+1}}$。
+\end{enumerate}
+
+综上所述，对于\textbf{情况2}，枚举所有与噪声关联的Hamming Weight小于等于$M$且具有非平凡贡献函数的Pauli路径的计算复杂度为$C_s=\mathrm{Poly}(n) \order{(nL)^{M}} C_{\text{split}} N_{\text{max}}^{M}$，满足条件的Pauli路径的数量$N_M$最多为$\mathrm{Poly}(n) (nLN_{\text{max}})^{M}$。
