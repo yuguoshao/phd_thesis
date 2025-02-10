@@ -789,7 +789,7 @@ $N_M$是$\mathcal{S}_M$的元素个数。
 
 综上所述，对于\textbf{情况1}，枚举所有与噪声关联的Hamming Weight小于等于$M$且具有非平凡贡献函数的Pauli路径的时间复杂度为：
 \begin{equation}\label{eq:case1:cost_s}
-        C_s=\mathrm{Poly}(n) L C_{\text{split}} N_{\text{max}}^{M}. \quad (\text{情况1})
+        C_s=\mathrm{Poly}(n) \order{L} C_{\text{split}} N_{\text{max}}^{M}. \quad (\text{情况1})
 \end{equation}
 满足条件的Pauli路径的数量$N_M$最多为：
 \begin{equation}\label{eq:case1:N_M}
@@ -908,8 +908,9 @@ $N_M$是$\mathcal{S}_M$的元素个数。
 \end{equation}
 当噪声模型为Pauli类型噪声时，可以通过计算与噪声关联 Hamming Weight 较低的Pauli路径的贡献来高效近似计算量子线路的输出，如式~\eqref{eq:truncated_expectation}所示：
 \begin{equation}
-    \widetilde{\langle O \rangle} = \sum_{\abs{\bm{s}}_{\mathcal{N}}\leq M} \hat{f}(\mathcal{U},\bm{s},O,\rho).
+    \widetilde{\langle O \rangle} = \sum_{\abs{\bm{s}}_{\mathcal{N}}\leq M} \hat{f}(\mathcal{U},\bm{s},O,\rho),
 \end{equation}
+其中$M$是截断参数。
 
 为了高效枚举出所有与噪声关联 Hamming Weight小于等于$M$且具有非平凡贡献函数的Pauli路径，我们提出了OBPPP算法。OBPPP算法通过反向传播的方式，从观测量$O$开始，逐层向前传播，枚举所有可能的Pauli路径。在枚举的过程中，我们通过对Pauli路径的Hamming Weight进行限制，丢弃了一些不满足条件的Pauli路径。最后，我们分析了整个经典模拟算法的复杂度，如式~\eqref{eq:total_cost}和式~\eqref{eq:space_cost}所示：
 \begin{equation*}
@@ -942,7 +943,7 @@ $N_M$是$\mathcal{S}_M$的元素个数。
 若记$C_{\text{split}}$和$S_{\text{split}}$为对给定的Pauli算符$s$，得到集合$\left\{ s'\mid \Tr{s' U^\dagger_{i,j}s U_{i,j}}\neq 0 \right\}$的时间复杂度和空间复杂度。
 如式~\eqref{eq:case1:cost_s}，对于\textbf{情况1}，枚举所有与噪声关联的Hamming Weight小于等于$M$且具有非平凡贡献函数的Pauli路径的时间复杂度为：
 \begin{equation*}
-        C_s=\mathrm{Poly}(n) L C_{\text{split}} N_{\text{max}}^{M}.
+        C_s=\mathrm{Poly}(n) \order{L} C_{\text{split}} N_{\text{max}}^{M}.
 \end{equation*}
 如式~\eqref{eq:case1:N_M}所示，满足条件的Pauli路径的数量$N_M$最多为：
 \begin{equation*}
