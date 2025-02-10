@@ -655,7 +655,7 @@ $N_M$是$\mathcal{S}_M$的元素个数。
     其中$s$和$s'$是Pauli算符，$\tr$表示Pauli算符的迹。 
 \end{definition}
 除了$N_{\text{max}}$，在我们的算法中还需要对于给定的Pauli算符$s$计算出集合$\left\{ s'\mid \Tr{s' U^\dagger_{i,j}s U_{i,j}}\neq 0 \right\}$。这个集合的计算复杂度高度依赖于具体的量子线路模型，以及量子门$U_{i,j}$的具体存储形式。记这个集合的计算时间复杂度不超过$C_{\text{split}}$；空间复杂度不超过$S_{\text{split}}$。
-在后续的章节中，将估计对一些具体的线路模型中$N_{\text{max}}$、$C_{\text{split}}$、$S_{\text{split}}$的值。在本章中，将假设$N_{\text{max}}$、$C_{\text{split}}$、$S_{\text{split}}$是一个c常 量。
+在后续的章节中，将估计对一些具体的线路模型中$N_{\text{max}}$、$C_{\text{split}}$、$S_{\text{split}}$的值。在本章中，将假设$N_{\text{max}}$、$C_{\text{split}}$、$S_{\text{split}}$是一个常量。
 
 因为对于含有$n$个qubits，深度为$L$的量子线路$\mathcal{U}$，其Pauli路径的数量是$4^{L(n+1)}$。因此先枚举再筛选的方法会带来指数级的计算复杂度，在实际应用中是不可行的。因此，我们需要设计一种高效的枚举方法。
 
@@ -881,7 +881,7 @@ $N_M$是$\mathcal{S}_M$的元素个数。
     N_M=\mathrm{Poly}(n) N_{\text{max}}^{M}. \quad (\text{情况2})
 \end{equation}
 
-
+因为在\textbf{情况1}和\textbf{情况2}中，算法的差别仅有在枚举的过程中丢弃的情况不同，因此在空间复杂度上，\textbf{情况1}和\textbf{情况2}的空间复杂度是相同的，如式~\eqref{ap:eq:space_cost}所示。
     
 \section{本章小结}
 
@@ -933,5 +933,8 @@ $N_M$是$\mathcal{S}_M$的元素个数。
     N_M=\mathrm{Poly}(n) N_{\text{max}}^{M}.
 \end{equation*}
 
-\begin{comment}
-\end{comment}
+
+对于Pauli路径枚举过程空间复杂度，我们分析了\textbf{情况1}和\textbf{情况2}的空间复杂度是相同的，如式~\eqref{ap:eq:space_cost}所示为：
+$$
+\order{\mathrm{Poly}(n)+nS_{\text{split}}L}.
+$$
