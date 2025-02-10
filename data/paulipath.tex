@@ -469,7 +469,7 @@ Pauli路径的定义如下：
 
 \begin{definition}
     对于一个深度为$L$的含噪量子线路$\widehat{\mathcal{U}}$，和某个对应的Pauli路径$\bm{s}= (s_0, s_1, \cdots, s_L)$，初始量子态$\rho$和可观测量$O$，其贡献函数$f(\mathcal{U},\bm{s},O,\rho)$定义为：
-    \begin{equation}
+    \begin{equation}\label{eq:noise_contribution}
         \hat{f}(\mathcal{U},\bm{s},O,\rho)=\Tr{O\mathcal{N}^{\otimes n}(s_L)}
         \left(\prod_{i=1}^{L}\Tr{s_i\mathcal{U}_i \mathcal{N}^{\otimes n}(s_{i-1})\mathcal{U}_i^\dagger}\right)\Tr{s_0\rho},
     \end{equation}
@@ -907,13 +907,13 @@ $N_M$是$\mathcal{S}_M$的元素个数。
 
 
 本章介绍了使用经典计算机模拟量子计算机的意义与应用，并介绍了部分常用的模拟方法，包括全状态和稳定子模拟方法。在介绍了这些方法的基础上，我们介绍了一种新的模拟方法，即Pauli路径方法。Pauli路径方法通过枚举所有可能的Pauli路径，计算每个Pauli路径的贡献，从而计算量子线路的输出，如式~\eqref{eq:expectation}所示：
-\begin{equation}
+\begin{equation*}
     \langle O \rangle = \sum_{\bm{s}} f(\mathcal{U},\bm{s},O,\rho).
-\end{equation}
+\end{equation*}
 当噪声模型为Pauli类型噪声时，可以通过计算与噪声关联 Hamming Weight 较低的Pauli路径的贡献来高效近似计算量子线路的输出，如式~\eqref{eq:truncated_expectation}所示：
-\begin{equation}
+\begin{equation*}
     \widetilde{\langle O \rangle} = \sum_{\abs{\bm{s}}_{\mathcal{N}}\leq M} \hat{f}(\mathcal{U},\bm{s},O,\rho),
-\end{equation}
+\end{equation*}
 其中$M$是截断参数。
 
 为了高效枚举出所有与噪声关联 Hamming Weight小于等于$M$且具有非平凡贡献函数的Pauli路径，我们提出了OBPPP算法。OBPPP算法通过反向传播的方式，从观测量$O$开始，逐层向前传播，枚举所有可能的Pauli路径。在枚举的过程中，我们通过对Pauli路径的Hamming Weight进行限制，丢弃了一些不满足条件的Pauli路径。最后，我们分析了整个经典模拟算法的复杂度，如式~\eqref{eq:total_cost}和式~\eqref{eq:space_cost}所示：
