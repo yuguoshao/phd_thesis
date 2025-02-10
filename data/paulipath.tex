@@ -938,14 +938,17 @@ $N_M$是$\mathcal{S}_M$的元素个数。
 
 对于$C_s$、$S_s$和$N_M$，根据与噪声关联的Hamming Weight的定义，可以将Pauli路径的枚举过程分为两种情况：\textbf{情况1}和\textbf{情况2}。
 我们分别分析了\textbf{情况1}和\textbf{情况2}的计算复杂度。
-如式~\eqref{eq:case1:cost_s}和式~\eqref{eq:case1:N_M}所示，对于\textbf{情况1}，枚举所有与噪声关联的Hamming Weight小于等于$M$且具有非平凡贡献函数的Pauli路径的时间复杂度为：
+
+若记$C_{\text{split}}$和$S_{\text{split}}$为对给定的Pauli算符$s$，得到集合$\left\{ s'\mid \Tr{s' U^\dagger_{i,j}s U_{i,j}}\neq 0 \right\}$的时间复杂度和空间复杂度。
+如式~\eqref{eq:case1:cost_s}，对于\textbf{情况1}，枚举所有与噪声关联的Hamming Weight小于等于$M$且具有非平凡贡献函数的Pauli路径的时间复杂度为：
 \begin{equation*}
         C_s=\mathrm{Poly}(n) L C_{\text{split}} N_{\text{max}}^{M}.
 \end{equation*}
-满足条件的Pauli路径的数量$N_M$最多为：
+如式~\eqref{eq:case1:N_M}所示，满足条件的Pauli路径的数量$N_M$最多为：
 \begin{equation*}
     N_M=\mathrm{Poly}(n) N_{\text{max}}^{M}.
 \end{equation*}
+其中$N_{\text{max}}$是在量子线路中$\mathcal{U}$中每个门的最大可分裂的Pauli算符的数量。
 
 如式~\eqref{eq:case2:cost_s}和式~\eqref{eq:case2:N_M}所示，对于\textbf{情况2}，枚举所有与噪声关联的Hamming Weight小于等于$M$且具有非平凡贡献函数的Pauli路径的时间复杂度为：
 \begin{equation*}
@@ -961,3 +964,4 @@ $N_M$是$\mathcal{S}_M$的元素个数。
 \begin{equation*}
 S_s=\order{\mathrm{Poly}(n)+nS_{\text{split}}L}.
 \end{equation*}
+
