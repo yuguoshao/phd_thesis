@@ -4,12 +4,12 @@
 在如今NISQ时代，噪声难以避免的出现在量子线路中。这些噪声导致许多需要高保真度的量子算法难以实现。比如Shor算法需要使用到深层量子线路，因此对噪声的容忍度较低。为了在近期的量子设备中实现实用性的量子算法，变分量子算法作为最受欢迎的NISQ算法，普遍被认为是一个很好的解决方案。变分量子算法的核心思想是通过参数化的量子线路作为
 %#TODO
 
-在本节的讨论中，变分量子线路的每一层中的 $\mathcal{U}_i(\bm{\theta}_i)$ 由 $R_i$ 个旋转门和 $C_i$ 个 Clifford 门组成，这些门作用于相互不相交的量子比特上，$\bm{\theta}_i=(\theta_{i,1},\cdots,\theta_{i,R_i})$ 表示第 $i$ 层的参数向量。
-具体来说，第 $i$ 层中的第 $j$ 个旋转门表示为 $U_{i, j}(\theta_{i,j})=\exp{-i \frac{\theta_{i,j}}{2} \sigma_{i,j}}$，其中 $j \in \{1, \cdots , R_i\}$，$\theta_{i,j}$ 是变分参数，$\sigma_{i, j}\in \{\mathbb{I}, X,Y,Z\}^{\otimes n}$。
-类似地，第 $i$ 层中的第 $k$ 个 Clifford 门表示为 $V_{i,k}$，其中 $k \in \{1, \cdots , C_i\}$。$V_{i,k}\in\{\mathrm{H}(a),\mathrm{S}(a),\mathrm{CNOT}(a,b)\}$，其中 $a,b $ 指的是门作用的量子比特的索引。
+在本节的讨论中，变分量子线路的每一层 $\mathcal{U}_i(\bm{\theta}_i)$ 是由 $R_i$ 个旋转门和 $C_i$ 个 Clifford 门组成，这些门作用于相互不相交的量子比特上，$\bm{\theta}_i=(\theta_{i,1},\cdots,\theta_{i,R_i})$ 表示第 $i$ 层的参数向量。
+具体来说，第 $i$ 层中的第 $j$ 个旋转门表示为 $U_{i, j}(\theta_{i,j})=\exp{-i \frac{\theta_{i,j}}{2} \sigma_{i,j}}$，其中 $j \in \{1, \cdots , R_i\}$，$\theta_{i,j}$ 是旋转角度，$\sigma_{i, j}\in \{\mathbb{I}, X,Y,Z\}^{\otimes n}$为Pauli旋转门对应的Pauli算符。
+类似地，第 $i$ 层中的第 $k$ 个 Clifford 门表示为 $V_{i,k}$，其中 $k \in \{1, \cdots , C_i\}$。$V_{i,k}\in\{\mathrm{H}(a),\mathrm{S}(a),\mathrm{CNOT}(a,b)\}$，其中 $a,b $ 指的是门作用的量子比特的序号。
 
-所有Pauli旋转门 $U_{i,j}(\theta_{i,j})$ 的 Pauli 算符集合为 $\{\sigma_{i,j}\}$。
-我们将集合 $\{\overline{\sigma}_{i,j}\}$ 表示为经过 Clifford 门变换后的所有 $\sigma_{i,j}$，即 $\overline{\sigma}_{i,j}= \mathcal{V}_{L} \cdots \mathcal{V}_{i} \sigma_{i,j} \mathcal{V}_{i}^\dagger \cdots \mathcal{V}_{L}^\dagger$，其中 $\mathcal{V}_{i} = \prod_{k=1}^{C_i} V_{i,k}$ 是对应于第 $i$ 层中所有 Clifford 门的张量积的幺正变换。
+记所有Pauli旋转门 $U_{i,j}(\theta_{i,j})$ 的 Pauli 算符集合为 $\{\sigma_{i,j}\}$。
+我们将集合 $\{\overline{\sigma}_{i,j}\}$ 表示为经过后续 Clifford 门变换后的所有 $\sigma_{i,j}$，即 $\overline{\sigma}_{i,j}= \mathcal{V}_{L} \cdots \mathcal{V}_{i} \sigma_{i,j} \mathcal{V}_{i}^\dagger \cdots \mathcal{V}_{L}^\dagger$，其中 $\mathcal{V}_{i} = \prod_{k=1}^{C_i} V_{i,k}$ 是对应于第 $i$ 层中所有 Clifford 门的张量积的幺正变换。
 
 为了确保引理~\ref{lemma:MSE_l} 的有效性，我们需要一个容易实现的前提条件：集合 $\{\overline{\sigma}_{i,j}\}$ 可以生成 $\{\mathbb{I}, X, Y, Z\}^{\otimes n}$，其相位为 $\{e^{i\psi}|\psi=0,\frac{\pi}{2},\pi,\frac{3\pi}{2}\}$，其形式化表示为
 \begin{equation}\label{eq:generate}
@@ -20,48 +20,49 @@
 
 
 \subsubsection{计算复杂度分析}
-\begin{proposition}
-    计算 $f$ 中第 $i$ 层项的时间和空间复杂度为 $\order{n}$，其等式如下：
+\begin{proposition}\label{prop:layer_terms}
+    计算 $f$ 中第 $i$ 层项的时间和空间复杂度为 $\order{n}$，可通过如下等式计算：
     \begin{equation}\label{eq:i-layer_terms}
     \begin{aligned}
-    \Tr{s_i\mathcal{U}_i s_{i-1}\mathcal{U}_i^\dagger}&=\Tr{\left(s_i s_{i-1}\right)\big|_{I_i}}\prod_{k=1}^{C_i}\Tr{\left(s_iV_{i,k} s_{i-1}V_{i,k}^{\dagger}\right)\big|_\g{V_{i,k}}}\prod_{\sigma_{i,j}\in C(i,s_{i-1})}\Tr{\left(s_i s_{i-1}\right)\big|_\g{\sigma_{i,j}}}\\
-    &\prod_{\sigma_{i,j'}\in AC(i,s_{i-1})} \Bigg\{ \Tr{\left(s_i s_{i-1}\right)\big|_\g{\sigma_{i,j'}}}\cos{\theta_{i,j'}}- \Tr{\left(is_i \sigma_{i,j'}s_{i-1}\right)\big|_\g{\sigma_{i,j'}}}\sin{\theta_{i,j'}}  \Bigg\}.
+    \Tr{s_i\mathcal{U}_i s_{i-1}\mathcal{U}_i^\dagger}&=\Tr{\left(s_i s_{i-1}\right)\big|_{I_i}}\\
+    \prod_{k=1}^{C_i}&\Tr{\left(s_iV_{i,k} s_{i-1}V_{i,k}^{\dagger}\right)\big|_\g{V_{i,k}}}\prod_{\sigma_{i,j}\in C(i,s_{i-1})}\Tr{\left(s_i s_{i-1}\right)\big|_\g{\sigma_{i,j}}}\\
+    \prod_{\sigma_{i,j'}\in AC(i,s_{i-1})} &\Bigg\{ \Tr{\left(s_i s_{i-1}\right)\big|_\g{\sigma_{i,j'}}}\cos{\theta_{i,j'}}- \Tr{\left(is_i \sigma_{i,j'}s_{i-1}\right)\big|_\g{\sigma_{i,j'}}}\sin{\theta_{i,j'}}  \Bigg\},
     \end{aligned}
     \end{equation}
-    我们定义 $g:\{\mathbb{I}, X, Y, Z\}^{\otimes n}\cup\{\mathrm{CNOT}_{a,b},\mathrm{H}_a,\mathrm{S}_a\}\rightarrow2^{\{1,\cdots, n\}}$ 为从幺正算符到其作用的量子比特索引的映射。这里 $2^{\{1,\cdots, n\}}$ 表示 $\{1,\cdots, n\}$ 的所有子集。
-    为了简化，我们将 $i$ 层中 $n$ 个量子比特的索引根据所应用门的类型分为三组。这些组分别表示为符号 $\big|_{I_i}$、$\big|_\g{V_{i,k}}$ 和 $\big|_\g{\sigma_{i,j}}$，对应于单位门、Clifford 门和 Pauli 旋转门。此外，集合 $C(i,s_{i-1})$ 和 $AC(i,s_{i-1})$ 分别表示 $\{\sigma_{i,j}\}_{j=1}^{R_i}$ 中与 $s_{i-1}$ 对易和反对易的 Pauli 字集合。
+    其中$\supp:\{\mathbb{I}, X, Y, Z\}^{\otimes n}\cup\{\mathrm{CNOT}_{a,b},\mathrm{H}_a,\mathrm{S}_a\}\rightarrow2^{\{1,\cdots, n\}}$ 为从幺正算符到其非平凡作用的量子比特的映射。这里 $2^{\{1,\cdots, n\}}$ 表示 $\{1,\cdots, n\}$ 的所有子集。
+    为了简化，我们将 $i$ 层中 $n$ 个量子比特的索引根据所应用门的类型分为三组。这些组分别表示为符号 $\big|_{I_i}$、$\big|_\g{V_{i,k}}$ 和 $\big|_\g{\sigma_{i,j}}$，对应于没有门作用、Clifford 门作用和 Pauli 旋转门作用。此外，集合 $C(i,s_{i-1})$ 和 $AC(i,s_{i-1})$ 分别表示 $\{\sigma_{i,j}\}_{j=1}^{R_i}$ 中与 $s_{i-1}$ 对易和反对易的 Pauli 算符集合。
     
     \begin{proof}
     
-    在我们的设置中，$\mathcal{U}_i$ 由一系列门 $U_{i,1},\cdots,U_{i,R_i}$ 和 $V_{i,1},\cdots,V_{i,C_i}$ 组成，并且不会在每个量子比特上操作两次。
-    Pauli 旋转门 $U_{i,j}(\theta_{i,j})$ 的形式为
+    在变分量子线路中，$\mathcal{U}_i$ 由一系列门 $U_{i,1},\cdots,U_{i,R_i}$ 和 $V_{i,1},\cdots,V_{i,C_i}$ 组成，并且不会在每个量子比特上操作两次。
+    Pauli 旋转门 $U_{i,j}(\theta_{i,j})$ 的形式为：
     \begin{equation}
       U_{i,j}(\theta_{i,j})=\exp{-i \frac{\theta_{i,j}}{2} \sigma_{i,j}}.
     \end{equation}
     
     Clifford 门 $V_{i,k}$ 可以从 $\{\mathrm{H}(a),\mathrm{S}(a),\mathrm{CNOT}(a,b) \}_ {a\neq b}$ 中选择。
-    然后
+    因此，我们有：
     \begin{equation}
       \begin{aligned}
-        \Tr{s_i\mathcal{U}_i s_{i-1}\mathcal{U}_i^\dagger}=\Tr{\left(s_i s_{i-1}\right)\big|_{I_i}}
-        \prod_{k=1}^{C_i}\Tr{\left(s_iV_{i,k} s_{i-1}V_{i,k}^{\dagger}\right)\big|_\g{V_{i,k}}}
-        \prod_{j=1}^{R_i}\Tr{\left(s_i U_{i,j}(\theta_{i,j}) s_{i-1} U_{i,j}^\dagger(\theta_{i,j})\right) \big|_\g{\sigma_{i,j}}}.
+        \Tr{s_i\mathcal{U}_i s_{i-1}\mathcal{U}_i^\dagger}=&\Tr{\left(s_i s_{i-1}\right)\big|_{I_i}}
+        \prod_{k=1}^{C_i}\Tr{\left(s_iV_{i,k} s_{i-1}V_{i,k}^{\dagger}\right)\big|_\g{V_{i,k}}}\\
+        &\prod_{j=1}^{R_i}\Tr{\left(s_i U_{i,j}(\theta_{i,j}) s_{i-1} U_{i,j}^\dagger(\theta_{i,j})\right) \big|_\g{\sigma_{i,j}}}.
       \end{aligned}
     \end{equation}
     
-    Hermitian 操作 $X$ 的指数定义为 Taylar 展开 $\exp{X}=\sum_{k=0}^\infty\frac{X^k}{k!}$。在计算 Pauli 字的旋转时，任何 Pauli 字的平方都是单位 $\sigma^2=\mathbb{I}$，因此我们有
+    厄米 算符 $X$ 的指数定义为 $\exp{X}=\sum_{k=0}^\infty\frac{X^k}{k!}$。对于 Pauli 算符，任何 Pauli 算符号的满足自反性 $\sigma^2=\mathbb{I}$，因此我们有：
     \begin{equation}
       \exp{-i \frac{\theta}{2} \sigma}=\sum_{k=0}^\infty\frac{(-i \frac{\theta}{2}\sigma)^k}{k!}=\sum_{k=0}^\infty\frac{(-1)^k (\frac{\theta}{2})^{2k}}{(2k)!} \mathbb{I}- i\frac{(-1)^k (\frac{\theta}{2})^{2k+1}}{(2k+1)!}\sigma=\cos{\frac{\theta}{2}}\mathbb{I}-i \sin{\frac{\theta}{2}}\sigma.
     \end{equation}
     
-    因此，根据 $\sigma$ 和另一个 Pauli 字 $\sigma'$ 的交换关系，我们有
+    根据 Pauli算符$\sigma$ 和另一个 Pauli算符 $\sigma'$ 的对易/反对易关系，有：
     \begin{equation}
     \begin{aligned}
     &\sigma'\exp{-i \frac{\theta}{2} \sigma}=\exp{-i \frac{\theta}{2} \sigma}\sigma',\text{ 如果 }\sigma\text{ 与 }\sigma'\text{ 对易。}\\
     &\sigma'\exp{-i \frac{\theta}{2} \sigma}=\exp{i \frac{\theta}{2} \sigma}\sigma',\text{ 如果 }\sigma\text{ 与 }\sigma'\text{ 反对易。}\\
     \end{aligned}
     \end{equation}
-    所以我们可以将 $\{\sigma_{i,j}\}$ 分为两种情况。如果 $\sigma_{i,j}$ 与 $s_{i-1}$ 对易，我们有
+    因此可以将 $\{\sigma_{i,j}\}$ 分为两种情况。如果 $\sigma_{i,j}$ 与 $s_{i-1}$ 对易，有：
     
     \begin{equation}
       \begin{aligned}
@@ -71,23 +72,29 @@
       &=\Tr{(s_i s_{i-1})\big|_{\g{\sigma_{i,j}}}}.
     \end{aligned}
     \end{equation}
-    而 $\sigma_{i,j}$ 与 $s_{i-1}$ 反对易，我们有
+    而若 $\sigma_{i,j}$ 与 $s_{i-1}$ 反对易，则有：
     \begin{equation}
       \begin{aligned}
-      \Tr{\left(s_i U_{i,j}(\theta_{i,j}) s_{i-1} U_{i,j}^\dagger(\theta_{i,j})\right)\big|_\g{\sigma_{i,j}}}
+      &\Tr{\left(s_i U_{i,j}(\theta_{i,j}) s_{i-1} U_{i,j}^\dagger(\theta_{i,j})\right)\big|_\g{\sigma_{i,j}}}\\
       &=\Tr{ \left(s_i\exp{-i \frac{\theta_{i,j}}{2}\sigma_{i,j} } s_{i-1}\exp{i \frac{\theta_{i,j}}{2}\sigma_{i,j}}\right) \big|_\g{\sigma_{i,j}}}\\
       &=\Tr{\left( s_i  \exp{-i\theta_{i,j}\sigma_{i,j}} s_{i-1}\right) \big|_\g{\sigma_{i,j}}}\\
       &=\Tr{ \left(s_i (\cos{\theta_{i,j}}\mathbb{I}-i\sin{\theta_{i,j}}\sigma_{i,j}) s_{i-1} \right) \big|_\g{\sigma_{i,j}}}\\
       &=\Tr{\left(s_i s_{i-1}\right)\big|_\g{\sigma_{i,j}}}\cos{\theta_{i,j}}-\Tr{\left(i s_i \sigma_{i,j}s_{i-1}\right)\big|_\g{\sigma_{i,j}}}\sin{\theta_{i,j}}.
     \end{aligned}
     \end{equation}
-    这些完成了 Eq.~\eqref{ap:eq:gate_ele} 的证明。
+    以上完成了 式.~\eqref{eq:i-layer_terms} 的证明。
+
+    此外，对于计算复杂度，可以分类讨论。
+    对$\big|_{I_i}$项，需要比较$s_i$ 和 $s_{i-1}$ 在$\supp(I_i)$上是否相同。这一操作的时间和空间复杂度为 $\order{n}$。
+    对于$\big|_\g{V_{i,k}}$项，需要比较$s_i$ 和 $V_{i,k}s_{i-1}V_{i,k}^\dagger$ 在$\supp(V_{i,k})$上是否相同，因为 $V_{i,k}\in\{\mathrm{H}(a),\mathrm{S}(a),\mathrm{CNOT}(a,b)\}$，$V_{i,k}s_{i-1}V_{i,k}^\dagger$ 可以在 $\order{1}$ 的时间内计算。因此，对于所有$\big|_\g{V_{i,k}}$项，总的时间和空间复杂度为 $\order{n}$。
+    对于$\big|_\g{\sigma_{i,j}}$项，需要首先比较$s_{i-1}$ 和 $\sigma_{i,j}$ 在$\supp(\sigma_{i,j})$上的对易关系，然后再比较$s_i$ 和 $s_{i-1}$（或是$\sigma_{i,j'}s_{i-1}$） 在$\supp(\sigma_{i,j})$上是否相同。这两个操作的时间和空间复杂度为均为 $\order{\abs{\supp(\sigma_{i,j})}}$。因此，对于所有$\big|_\g{\sigma_{i,j}}$项，总的时间和空间复杂度为 $\order{n}$。
+
+    综上所述，计算 $f$ 中第 $i$ 层项的时间和空间复杂度为 $\order{n}$。
     \end{proof}
 \end{proposition}
 
 \begin{remark}\label{remark:f_ele}
-通过利用 Pauli 字的正交性，我们可以建立以下关于 $\Tr{s_i\mathcal{U}_i s_{i-1}\mathcal{U}_i^\dagger} \neq 0$ 的关系：
-
+通过利用不同 Pauli 算符的正交性，可以在 $\Tr{s_i\mathcal{U}_i s_{i-1}\mathcal{U}_i^\dagger} \neq 0$ 时，建立以下$s_i$ 和 $s_{i-1}$ 之间的关系：
 
 \begin{tabular}{|c|c|c|}
   \hline
@@ -105,5 +112,68 @@
   &$s_{i}|_\g{\sigma_{i,j}}=\pm i \sigma_{i,j} s_{i-1}|_\g{\sigma_{i,j}}$& $\mp \sin{\theta_{i,j}}$ \\
   \hline
 \end{tabular}
+
+以上表格中的关系可以帮助我们计算 $f$ 中的每一项。以$I_i$ 为例，该表格表面若$\bm{s}$有非平凡贡献$f(\mathcal{U},\bm{s},O,\rho) \neq 0$，则必有$s_{i-1}\big|_{I_i} = s_{i}\big|_{I_i}$。这意味着 $s_{i-1}$ 和 $s_{i}$ 在第 $i$ 层的第 $j$ 个旋转门上的作用是相同的。且这一关系为$f$带来了一个因子1。
+
+通过命题~\ref{prop:layer_terms}，可以得知对于变分量子线路中的每一层，计算 $f$ 中的每一项的时间和空间复杂度为 $\order{n}$。因此，计算 $f$ 中的所有项的时间复杂度为 $\order{L n}$，得到式~\eqref{eq:cost_f}中$C_{f\mathcal{U}}=\order{L n}$。式~\eqref{eq:space_f}中的$S_{f\mathcal{U}}=\order{n}$。
 \end{remark}
 
+结合式~\eqref{eq:cost_rho}和式~\eqref{eq:cost_O}，我们可以得到式~\eqref{eq:cost_f}对于变分量子线路取值为：
+\begin{equation}
+    C_f=\order{L n}+\order{n}+\order{\poly(n)}=\order{\poly(n)+L n}.
+\end{equation}
+式~\eqref{eq:space_f}对于变分量子线路取值为：
+\begin{equation}
+    S_f=\order{n}+\order{\poly(n)}+\order{\poly(n)}=\order{\poly(n)}.
+\end{equation}
+
+
+在OBPPP算法的复杂度的分析中，还涉及到对一个给定的Pauli算符$s$和构成线路$\mathcal{U}$的门集合$\{U_{i,j}\}$，求解以下集合：
+\begin{equation}
+    \left\{ s'\mid \Tr{s' U^\dagger_{i,j}s U_{i,j}}\neq 0 \right\}.
+\end{equation}
+为了估计整个算法的时间复杂度，我们需要考虑这一集合的最大元素数$N_{\text{max}}$、求解该集合所需要的时间$C_{\text{split}}$和空间复杂度$S_{\text{split}}$。
+
+对于在变分线路中，每个门可最大分裂的Pauli 算符数量$N_{\max}$：
+\begin{equation}
+    N_{\text{max}} = \max_{i,j,s}\abs{ \left\{ s'\mid \Tr{s' U^\dagger_{i,j}s U_{i,j}}\neq 0 \right\}}.
+\end{equation}
+注意到，当 $U_{i,j}$ 为Clifford 门时，因为Clifford 门作用于Pauli 算符后仍为Pauli 算符，因此Clifford门不会增加Pauli 算符的数量。而当 $U_{i,j}$ 为Pauli 旋转门时，假设旋转的Pauli算符为$\sigma$。根据注释~\ref{remark:f_ele}当$s$与$\sigma$对易时，$s'=s$，因此最大分裂个数为1。当$s$与$\sigma$反对易时，$s'=s$ 或 $s'=\pm i \sigma s$，因此最大分裂个数为2。因此，$N_{\text{max}}=2$。
+
+对于求解该集合所需要的时间$C_{\text{split}}$和空间复杂度$S_{\text{split}}$，对于Clifford门可以以$\order{1}$的时间和空间复杂度求解。对于Pauli 旋转门，需要比较$s$和$s'$的对易关系，并输出$s'$。这一操作的时间和空间复杂度为 $\order{n}$。因此，$C_{\text{split}}=\order{n}$，$S_{\text{split}}=\order{n}$。
+
+因此，对于变分量子线路，对于\textbf{情况1}根据式~\eqref{eq:case1:N_M}和式~\eqref{eq:case1:cost_s}，Pauli路径枚举过程的时间复杂度为：
+\begin{equation}
+    C_{s}=\mathrm{Poly}(n) \order{L} C_{\text{split}} N_{\text{max}}^{M}= \mathrm{Poly}(n) \order{L} 2^M.
+\end{equation}
+满足$\abs{\bm{s}}\leq M$的Pauli路径数量最多为：
+\begin{equation}
+    N_M=\poly(n) N_{\text{max}}^{M}=\poly(n) 2^M.
+\end{equation}
+
+对于\textbf{情况2}，根据式~\eqref{eq:case2:N_M}和式~\eqref{eq:case2:cost_s}，Pauli路径枚举过程的时间复杂度为：
+\begin{equation}
+    C_{s}=\mathrm{Poly}(n) \order{(nL)^M} C_{\text{split}} N_{\text{max}}^{M}= \mathrm{Poly}(n) \order{(nL)^M} 2^M.
+\end{equation}
+满足$\abs{\bm{s}}\leq M$的Pauli路径数量最多为：
+\begin{equation}
+    N_M=\poly(n)(nLN_{\text{max}})^{M+1}= \poly(n)(2nL)^{M+1}.
+\end{equation}
+
+对于枚举过程的空间复杂度，根据式~\eqref{eq:path:space_cost}：
+\begin{equation}
+    S_{s}=\order{\mathrm{Poly}(n)+\max\{S_{\text{split}},n\}L}=\order{\mathrm{Poly}(n)+nL}.
+\end{equation}
+
+
+综上所述，对于变分量子线路，根据式~\eqref{eq:total_cost}和式~\eqref{eq:space_cost}，在给定截断参数$M$的情况下，含噪声期望值模拟的时间复杂度$C$和空间复杂度$S$分别为：
+\begin{equation}
+    \begin{aligned}
+        C&=\begin{cases}
+            \mathrm{Poly}(n) \order{L} 2^M, & \text{如果$\abs{\bullet}_{\mathcal{N}}$属于\textbf{情况1}} \\
+           \mathrm{Poly}(n) \order{(2nL)^{M+1}}, & \text{如果$\abs{\bullet}_{\mathcal{N}}$属于\textbf{情况2}}
+        \end{cases}\\
+        S&=\mathrm{Poly}(n)+nL,
+    \end{aligned}
+\end{equation}
+其中$n$为量子比特数，$L$为线路深度，$\mathcal{N}$为噪声模型。
