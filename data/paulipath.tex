@@ -385,13 +385,13 @@ Pauli路径的定义如下：
 \end{equation}
 在后续的讨论中，为了方便将Super Operator $S_{\mathcal{E}}$简记为$\mathcal{E}$。
 
-我们假设量子线路$\mathcal{U}$受到噪声的影响，假设在每一层的量子门$\mathcal{U}_i$作用前和最后的测量算符$O$测量前，每个Qubit都受到噪声信道$\mathcal{N}$的作用，如图~\ref{fig:noise}所示。
+我们假设量子线路$\mathcal{U}$受到噪声的影响，假设在每一层的量子门$\mathcal{U}_i$作用前和最后的测量算符$O$测量前，每个Qubit都受到噪声信道$\mathcal{N}$的作用，如图~\ref{fig:noise_Circuit}所示。
 
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{figures/Circuit_comb.pdf}
     \caption{（a）理想的量子线路，色块代表量子门；（b）受到噪声影响的量子线路，红色的点表示噪声信道$\mathcal{N}$的作用。}
-    \label{fig:noise}
+    \label{fig:noise_Circuit}
 \end{figure}
 
 我们可以将受到噪声影响的量子线路表示为：
@@ -462,7 +462,7 @@ Pauli路径的定义如下：
             \draw[thick] (-0.25,0.5) arc(90:270:0.25);
             \draw[thick] (1.25,0) arc(-90:90:0.25);
           \end{tikzpicture}\\
-          &=\Tr{O\mathcal{N}^{\otimes n}(s_L)}\Tr{s_L\mathcal{U}_L \mathcal{N}^{\otimes n}(s_{L-1})\mathcal{U}_L^\dagger}\cdots\Tr{s_1\mathcal{U}_1 \mathcal{N}^{\otimes n}(s_{0})\mathcal{U}_1^\dagger}\Tr{s_0\rho}.
+          &=\sum_{\bm{s}}\Tr{O\mathcal{N}^{\otimes n}(s_L)}\Tr{s_L\mathcal{U}_L \mathcal{N}^{\otimes n}(s_{L-1})\mathcal{U}_L^\dagger}\cdots\Tr{s_1\mathcal{U}_1 \mathcal{N}^{\otimes n}(s_{0})\mathcal{U}_1^\dagger}\Tr{s_0\rho}.
     \end{aligned}
 \end{equation}
 于是我们可以定义含有噪声的Pauli路径的贡献函数：
@@ -476,6 +476,10 @@ Pauli路径的定义如下：
     其中$\mathcal{U}$表示含噪声的量子线路$\widehat{\mathcal{U}}$的理想（无噪声）部分。
 \end{definition}
 
+因此，含噪声的量子线路的期望值可以表示为：
+\begin{equation}\label{eq:noise_expectation}
+    \widehat{\langle O \rangle} = \sum_{\bm{s}} \hat{f}(\mathcal{U},\bm{s},O,\rho).
+\end{equation}
 
 假设系统中的噪声是单比特Pauli噪声，如式~\eqref{eq:pauli_noise}所示，Pauli噪声信道$\mathcal{N}$可以表示为$\mathcal{N}(\rho) = (1-p_x-p_y-p_z)\rho + p_x X\rho X + p_y Y\rho Y + p_z Z\rho Z$。将Pauli算符$X$、$Y$、$Z$和$I$是单位算符代入Pauli噪声信道$\mathcal{N}$，我们可以得到Pauli噪声信道$\mathcal{N}$对Pauli算符的作用：
 \begin{equation}
