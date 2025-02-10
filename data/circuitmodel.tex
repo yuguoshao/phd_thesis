@@ -4,14 +4,14 @@
 在如今NISQ时代，噪声难以避免的出现在量子线路中。这些噪声导致许多需要高保真度的量子算法难以实现。比如Shor算法需要使用到深层量子线路，因此对噪声的容忍度较低。为了在近期的量子设备中实现实用性的量子算法，变分量子算法作为最受欢迎的NISQ算法，普遍被认为是一个很好的解决方案。变分量子算法的核心思想是通过参数化的量子线路作为
 %#TODO
 
-在本节的讨论中，变分量子线路的每一层 $\mathcal{U}_i(\bm{\theta}_i)$ 是由 $R_i$ 个旋转门和 $C_i$ 个 Clifford 门组成，这些门作用于相互不相交的量子比特上，$\bm{\theta}_i=(\theta_{i,1},\cdots,\theta_{i,R_i})$ 表示第 $i$ 层的参数向量。
+在本节的讨论中，我们将变分量子线路的深度记为 $L$，即 $\mathcal{U}(\bm{\theta})=\mathcal{U}_L(\bm{\theta}_L)\cdots\mathcal{U}_1(\bm{\theta}_1)$。变分量子线路的每一层 $\mathcal{U}_i(\bm{\theta}_i)$ 是由 $R_i$ 个旋转门和 $C_i$ 个 Clifford 门组成，这些门作用于相互不相交的量子比特上，$\bm{\theta}_i=(\theta_{i,1},\cdots,\theta_{i,R_i})$ 表示第 $i$ 层的参数向量，$\bm{\theta}=(\bm{\theta}_1,\cdots,\bm{\theta}_L)$ 表示整个变分量子线路的参数向量。
 具体来说，第 $i$ 层中的第 $j$ 个旋转门表示为 $U_{i, j}(\theta_{i,j})=\exp{-i \frac{\theta_{i,j}}{2} \sigma_{i,j}}$，其中 $j \in \{1, \cdots , R_i\}$，$\theta_{i,j}$ 是旋转角度，$\sigma_{i, j}\in \{\mathbb{I}, X,Y,Z\}^{\otimes n}$为Pauli旋转门对应的Pauli算符。
 类似地，第 $i$ 层中的第 $k$ 个 Clifford 门表示为 $V_{i,k}$，其中 $k \in \{1, \cdots , C_i\}$。$V_{i,k}\in\{\mathrm{H}(a),\mathrm{S}(a),\mathrm{CNOT}(a,b)\}$，其中 $a,b $ 指的是门作用的量子比特的序号。
 
 记所有Pauli旋转门 $U_{i,j}(\theta_{i,j})$ 的 Pauli 算符集合为 $\{\sigma_{i,j}\}$。
 我们将集合 $\{\overline{\sigma}_{i,j}\}$ 表示为经过后续 Clifford 门变换后的所有 $\sigma_{i,j}$，即 $\overline{\sigma}_{i,j}= \mathcal{V}_{L} \cdots \mathcal{V}_{i} \sigma_{i,j} \mathcal{V}_{i}^\dagger \cdots \mathcal{V}_{L}^\dagger$，其中 $\mathcal{V}_{i} = \prod_{k=1}^{C_i} V_{i,k}$ 是对应于第 $i$ 层中所有 Clifford 门的张量积的幺正变换。
 
-为了确保引理~\ref{lemma:MSE_l} 的有效性，我们需要一个容易实现的前提条件：集合 $\{\overline{\sigma}_{i,j}\}$ 可以生成 $\{\mathbb{I}, X, Y, Z\}^{\otimes n}$，其相位为 $\{e^{i\psi}|\psi=0,\frac{\pi}{2},\pi,\frac{3\pi}{2}\}$，其形式化表示为
+为了确保引理~\ref{lemma:cross_items} 的有效性，我们需要一个容易实现的前提条件：假设集合 $\{\overline{\sigma}_{i,j}\}$ 在忽略相位的意义下，可以生成 $\{\mathbb{I}, X, Y, Z\}^{\otimes n}$。这一条件可以通过以下等式来表示：
 \begin{equation}\label{eq:generate}
   \langle \{\overline{\sigma}_{i,j}\}\rangle/\left(\langle \{\overline{\sigma}_{i,j}\}\rangle\cap\langle i\mathbb{I}^{\otimes n}\rangle\right)=\{\mathbb{I},X,Y,Z\}^{\otimes n},
 \end{equation}
@@ -167,7 +167,7 @@
 
 
 综上所述，对于变分量子线路，根据式~\eqref{eq:total_cost}和式~\eqref{eq:space_cost}，在给定截断参数$M$的情况下，含噪声期望值模拟的时间复杂度$C$和空间复杂度$S$分别为：
-\begin{equation}
+\begin{equation}\label{eq:vqa:cost}
     \begin{aligned}
         C&=\begin{cases}
             \mathrm{Poly}(n) \order{L} 2^M, & \text{如果$\abs{\bullet}_{\mathcal{N}}$属于\textbf{情况1}} \\
@@ -180,3 +180,77 @@
 
 
 \subsection{误差分析}
+在上一节中，已经得到了在给定截断参数$M$的情况下，模拟变分量子线路的计算复杂度（式~\eqref{eq:vqa:cost}）。在这一节中，我们将讨论在给定的误差容忍度$\epsilon$下，如何选择截断参数$M$。
+
+误差可以用均方误差（Mean Square Error, MSE）来衡量，对于一个随机变量$X$，其均方误差定义为$\mathbb{E}[(X-\hat{X})^2]$，其中$\hat{X}$是$X$的估计值。在这里，我们考虑的是含噪声期望值模拟的误差，即真实含噪声期望值$\widetilde{\langle O\rangle}$和其估计值$\widehat{\langle O\rangle}$之间的均方误差。根据定义（式~\eqref{eq:noise_expectation}和式~\eqref{eq:truncated_expectation}），含噪声期望值模拟的误差为：
+\begin{equation}
+    \widetilde{\langle O\rangle}-\widehat{\langle O\rangle}=\sum_{\abs{\bm{s}}_{\mathcal{N}}>M}\tilde{f}(\mathcal{U},\bm{s},O,\rho),
+\end{equation}
+其中$\abs{\bullet}_{\mathcal{N}}$定义在式~\eqref{eq:noise_hamming_weight}中，表示与噪声模型$\mathcal{N}$关联的Hamming weight，$\tilde{f}(\mathcal{U},\bm{s},O,\rho)$定义在式~\eqref{eq:noise_contribution}中，表示一个Pauli路径$\bm{s}$对含噪声期望值的贡献。
+
+
+如果有式~\eqref{eq:generate}成立，有以下引理成立：
+\begin{lemma}\label{lemma:cross_items}
+    对于变分量子线路，如果式~\eqref{eq:generate}成立，则对任意两个不同的Pauli路径$\bm{s}$和$\bm{s}'$，有：
+    \begin{equation}\label{eq:E_cross_equals_0}
+        \mathbb{E}_{\bm{\theta}}\left[\tilde{f}(\mathcal{U},\bm{s},O,\rho)\tilde{f}(\mathcal{U},\bm{s}',O,\rho)\right]=0,
+    \end{equation}
+    其中期望是对于均匀随机选择的旋转角度$\bm{\theta}$。
+\end{lemma}
+
+
+关于均方误差，有以下引理：
+\begin{lemma}\label{lemma:MSE_l}
+    对于变分量子线路，如果式~\eqref{eq:E_cross_equals_0}成立，那么对任意的$\nu > 0$，只要截断参数$M$满足：
+    \begin{equation}
+        M\geq\frac{1}{4\gamma}\ln{\frac{\norm{O}_\infty^2}{\nu}},
+    \end{equation}
+    其中$\gamma:=\min\{p|{p \in \{p_x,p_y,p_z\},p\neq 0}\}$，那么含噪声期望值模拟的均方误差满足：
+    \begin{equation}
+        \mathbb{E}_{\bm{\theta}}\left[\left(\widetilde{\langle O\rangle}-\widehat{\langle O\rangle}\right)^2\right]\leq\nu,
+    \end{equation}
+    其中期望是对于均匀随机选择的旋转角度$\bm{\theta}$。
+\end{lemma}
+\begin{proof}
+    根据式~\eqref{eq:noise_contribution}，含噪声期望值模拟的误差为：
+    \begin{equation}
+        \widetilde{\langle O\rangle}-\widehat{\langle O\rangle}=\sum_{\abs{\bm{s}}_{\mathcal{N}}>M}\tilde{f}(\mathcal{U},\bm{s},O,\rho).
+    \end{equation}
+    因此，含噪声期望值模拟的均方误差为：
+    \begin{equation}
+        \begin{aligned}
+            \mathbb{E}_{\bm{\theta}}\left[\left(\widetilde{\langle O\rangle}-\widehat{\langle O\rangle}\right)^2\right]&=\mathbb{E}_{\bm{\theta}}\left[\left(\sum_{\abs{\bm{s}}_{\mathcal{N}}>M}\tilde{f}(\mathcal{U},\bm{s},O,\rho)\right)^2\right]\\
+            &=\sum_{\abs{\bm{s}}_{\mathcal{N}}>M}\mathbb{E}_{\bm{\theta}}\left[\tilde{f}(\mathcal{U},\bm{s},O,\rho)^2\right],
+        \end{aligned}
+    \end{equation}
+    其中，等号是因为根据式~\eqref{eq:E_cross_equals_0}，对于任意两个不同的Pauli路径$\bm{s}$和$\bm{s}'$，有：
+    \begin{equation}
+        \mathbb{E}_{\bm{\theta}}\left[\tilde{f}(\mathcal{U},\bm{s},O,\rho)\tilde{f}(\mathcal{U},\bm{s}',O,\rho)\right]=0.
+    \end{equation}
+    
+    另一方面，在无噪声的理想情况下，有：
+    \begin{equation}
+        \abs{\sum_{\bm{s}}f(\mathcal{U},\bm{s},O,\rho)}=\abs{\Tr{\rho \mathcal{U}^\dagger s \mathcal{U} O}}\leq\norm{O}_\infty.
+    \end{equation}
+    因此，有如下不等式：
+    \begin{equation}
+        \mathbb{E}_{\bm{\theta}}\left[ \sum_{\bm{s}}\tilde{f}(\mathcal{U},\bm{s},O,\rho)\right]^2=\sum_{\bm{s}}\mathbb{E}_{\bm{\theta}}\left[f(\mathcal{U},\bm{s},O,\rho)^2\right]\leq\norm{O}_\infty^2.
+    \end{equation}
+    根据不等式~\eqref{eq:noise_suppression}，可以得到：
+    \begin{equation}
+        \begin{aligned}
+            \sum_{\abs{\bm{s}}_{\mathcal{N}}>M}\mathbb{E}_{\bm{\theta}}\left[\tilde{f}(\mathcal{U},\bm{s},O,\rho)^2\right] &\leq (1-2\gamma)^{2M} \sum_{\abs{\bm{s}}_{\mathcal{N}}>M}\mathbb{E}_{\bm{\theta}}\left[f(\mathcal{U},\bm{s},O,\rho)^2\right]\\
+            &\leq (1-2\gamma)^{2M} \norm{O}_\infty^2\\
+            &\leq \exp{-4\gamma M} \norm{O}_\infty^2.
+        \end{aligned}
+    \end{equation}
+
+    于是，对于任意的$\nu > 0$，只要截断参数$M$满足：
+    \begin{equation}
+        M\geq\frac{1}{4\gamma}\ln{\frac{\norm{O}_\infty^2}{\nu}},
+    \end{equation}
+    就有：
+    \begin{equation}
+        \mathbb{E}_{\bm{\theta}}\left[\left(\widetilde{\langle O\rangle}-\widehat{\langle O\rangle}\right)^2\right]\leq\nu.
+    \end{equation}
+\end{proof}
