@@ -524,8 +524,8 @@ Pauli路径的定义如下：
 \end{definition} 
 
 设$\gamma\triangleq \min\{p|{p \in \{p_x,p_y,p_z\},p\neq 0}\}$为噪声信道$\mathcal{N}$中非零概率的最小值。由引理~\ref{lemma:noise}，我们可以得到含噪声的Pauli路径的贡献函数$\tilde{f}(\mathcal{U},\bm{s},O,\rho)$与理想无噪声的Pauli路径的贡献函数$f(\mathcal{U},\bm{s},O,\rho)$之间的关系：
-\begin{equation}
-    \abs{\tilde{f}(\mathcal{U},\bm{s},O,\rho)} \leq \gamma^{\abs{\bm{s}}_{\mathcal{N}}} \abs{f(\mathcal{U},\bm{s},O,\rho)}.
+\begin{equation}\label{eq:noise_suppression}
+    \abs{\tilde{f}(\mathcal{U},\bm{s},O,\rho)} \leq (1-2\gamma)^{\abs{\bm{s}}_{\mathcal{N}}} \abs{f(\mathcal{U},\bm{s},O,\rho)}.
 \end{equation}
 
 \begin{figure}
