@@ -19,7 +19,7 @@
 为了证明这一条件确实容易满足，考虑在电路的最后两层中，每个量子比特上都有一层 $R_X$ 门和一层 $R_Z$ 门作用，那么 $\{X_i, Z_i\}_{i=1,\cdots,n}$ 包含在 $\{\overline{\sigma}_{i,j}\}$ 中。这些 $\{ X_i,Z_i \}_{i=1,\cdots,n}$ 足以生成 $\{\mathbb{I},X,Y,Z\}^{\otimes n}$。事实上，这一充分条件可以进一步减弱，如补充材料~{VIII}~\cite{supplementary} 中所示。
 
 
-\subsubsection{计算复杂度分析}
+\subsection{计算复杂度分析}
 \begin{proposition}\label{prop:layer_terms}
     计算 $f$ 中第 $i$ 层项的时间和空间复杂度为 $\order{n}$，可通过如下等式计算：
     \begin{equation}\label{eq:i-layer_terms}
@@ -177,3 +177,6 @@
     \end{aligned}
 \end{equation}
 其中$n$为量子比特数，$L$为线路深度，$\mathcal{N}$为噪声模型。
+
+
+\subsection{误差分析}
