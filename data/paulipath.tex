@@ -545,7 +545,7 @@ Pauli路径的定义如下：
 \end{equation}
 $\widehat{\langle O \rangle}$给出了含有噪声的量子线路的期望值$\widetilde{\langle O \rangle}$的一个近似值。
 
-\subsection{OBPPP算法}
+\subsection{OBPPP算法}\label{sec:obppp}
 在本节中，我们将介绍一种基于Pauli路径积分模拟的量子线路期望值计算算法——可观测量在Pauli路径下的反向传播算法（Observable's Back-Propagation on Pauli Path，OBPPP）。OBPPP算法通过计算低weight的Pauli路径的贡献函数，实现了对含有噪声的量子线路的期望值的高效计算。
 
 模拟含噪期望值算法的核心是如何高效的枚举出与噪声关联的Hamming Weight小于等于$M$的Pauli路径。对于每个给定的Pauli路径$\bm{s}$，其贡献函数$\tilde{f}(\mathcal{U},\bm{s},O,\rho)$可以通过式~\eqref{eq:pp:contribution}计算。

@@ -544,3 +544,107 @@
 这完成了引理~\ref{lemma:cross_items} 的证明。
 
 \subsubsection{命题~\ref{prop:lambda_and_L}的证明}
+
+在命题~\ref{prop:lambda_and_L}中，我们在噪声处于情况1时，讨论了当噪声率$\gamma$与线路深度$L$满足 $\gamma=\Omega(\frac{1}{\log L})$ 和 $\gamma=\order{\frac{1}{L}}$ 两种情况时，截断Pauli路径积分方法模拟含噪声量子电路的有效性。
+
+对于 $\gamma=\Omega(\frac{1}{\log L})$，我们需要计算 $\widehat{\langle O \rangle}$，使得均方误差 $\mathbb{E}_{\bm{\theta}}\abs{\widetilde{\langle O \rangle}-\widehat{\langle O \rangle}}^2$ 小于一个足够小的常数 $c$。 
+根据引理~\ref{lemma:MSE_l}，当 
+\begin{equation} 
+    M\geq \frac{1}{4\gamma} \ln{\frac{\norm{O}\infty^2}{c}} \sim \frac{1}{\gamma} 
+\end{equation} 时，可以满足 $\mathbb{E}_{\bm{\theta}}\abs{\widetilde{\langle O \rangle}-\widehat{\langle O \rangle}}^2 \leq c$。
+
+通过设置 $M\sim\frac{1}{\gamma}$时，根据式~\eqref{eq:vqa:cost}当噪声为\textbf{情况1}时，模拟算法获得期望值估计 $\widehat{\langle O \rangle}$ 的总运行时间为：
+\begin{equation} 
+    \begin{aligned} 
+    \mathrm{Poly}(n) \order{L} 2^{M} =&\mathrm{Poly}(n,L) 2^{\order{\frac{1}{\gamma}}}\\ 
+    =&\mathrm{Poly}(n,L) L^{\order{1}}\\
+    =&\mathrm{Poly}(n,L). 
+\end{aligned} 
+\end{equation} 
+
+对于 $\gamma=\order{\frac{1}{L}}$，我们将构造一个具体的例子，在这个例子下，我们的方法将不得不花费相对于线路深度 $L$ 指数的时间成本，以实现足够小的均方误差。
+
+我们考虑一个特殊的变分量子线路$\mathcal{U}$， 其包含一层作用于每个量子比特的 $R_Z$ 门，一层作用于每个量子比特的 $R_X$ 门和 $L-2$ 层作用于第一个量子比特的 $R_X$ 门，如图~\ref{ap:prop:fig:ansatz} 所示。 
+初始状态设置为 $\rho=\ketbra{0}{0}^{\otimes n}$，可观测量设为 $O=Z_1+Y_1$。
+线路中的噪声，假设是退极化噪声 $p_x = p_y = p_z = \frac{\lambda}{4}$，并满足 $\lambda=\order{\frac{1}{L}}$。
+
+\begin{figure}[tbp] 
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/Z_Ansatz.pdf} \caption{难以多项式时间模拟的线路例子：每个量子比特上有一层 $R_Z$ 门，每个量子比特上有一层 $R_X$ 门，第一个量子比特上有 $L-2$ 层 $R_X$ 门。}\label{ap:prop:fig:ansatz} 
+\end{figure}
+
+如果截断含噪声期望值 $\abs{\bm{s}}\leq L$，估计的期望值可以表示为： 
+\begin{equation} 
+    \widehat{\langle O \rangle}=\sum_{\abs{s}\leq L} \tilde{f}(\mathcal{U},\bm{s},O,\rho)=\sum_{m=0}^L (1-\lambda)^m \sum_{\abs{s}=m} f(\mathcal{U},\bm{s},O,\rho).
+\end{equation}
+
+在考虑 $\widetilde{\langle O \rangle}$ 和 $\widehat{\langle O \rangle}$ 之间的差异之前，我们首先考虑无噪声情况。第一个量子比特上的酉矩阵可以表示为： 
+\begin{equation} 
+    U|_1=\exp{-i\frac{\theta_{2,1}+\cdots+\theta_{L,1} }{2}X_1}\exp{-i\frac{\theta_{1,1}}{2}Z_1}.
+\end{equation} 
+记 $\alpha=\frac{\theta_{2,1}+\cdots+\theta_{L,1} }{2}$，无噪声理想期望值可以表示为： 
+\begin{equation}\label{ap:eq:noiseless_cost} 
+    \begin{aligned} 
+        \langle O \rangle&=\bra{0}\exp{-i\frac{\theta_{1,1}}{2}Z_1}^\dagger\exp{-i \alpha X_1}^\dagger (Z_1+Y_1) \exp{-i \alpha X_1}\exp{-i\frac{\theta_{1,1}}{2}Z_1}\ket{0}\\
+        &=\cos{2\alpha}-\sin{2\alpha}. 
+    \end{aligned} 
+\end{equation}
+
+注意在第~\ref{sec:obppp}节中，我们讨论了对于具有非零贡献的 Pauli 路径 $\bm{s}$，必须有 $\abs{s_i} > 0$ 对于 $i=0,\cdots,L$成立。因此需要 $\abs{\bm{s}}\geq L+1$。
+
+相反，若对于某个Pauli路径$\bm{s}$，如果 $\abs{\bm{s}}> L+1$且存在一个量子比特 $k\neq 1$，使得 $s_{i}|_k$ 在某些层 $i$ 上不是单位算符，则因为$O|_k=I$，会有 $f(\mathcal{U},\bm{s},O,\rho)=0$ 成立。
+因此，对 $\langle O \rangle(\theta)$ 有非零贡献的 Pauli 路径 $\bm{s}$ 必须满足 $\abs{s}=L+1$。 
+我们可以得出结论： 
+\begin{equation}\label{ap:eq:noiseless_cost_2} 
+    \begin{aligned} \langle O \rangle=\sum_{s\in \bm{P}^{L+1}_n} f(\mathcal{U},\bm{s},O,\rho)=\sum_{\abs{\bm{s}}=L+1} f(\mathcal{U},\bm{s},O,\rho).
+    \end{aligned} 
+\end{equation}
+
+结合等式~\eqref{ap:eq:noiseless_cost} 和式~\eqref{ap:eq:noiseless_cost_2}，可以得到： 
+\begin{equation} 
+    \mathbb{E}_{\bm{\theta}}\langle O \rangle^2=\mathbb{E}_{\bm{\theta}} \left[\sum_{\abs{s}=L+1} f(\mathcal{U},\bm{s},O,\rho) \right]^2=\mathbb{E}_{\alpha}(\cos{2\alpha}-\sin{2\alpha})^2=\mathbb{E}{\alpha}[1-\sin4\alpha]=1. 
+\end{equation} 
+上述方程中的最后一个等式是因为 $\alpha$ 遵循广义 Irwin-Hall 分布，其特征函数 $\varphi_{\alpha}(t)=\mathbb{E}[e^{it\alpha}]$ 可以表示为 $\left(\frac{e^{i\frac{\pi}{2}t}-e^{-i\frac{\pi}{2}t}}{i\pi t}\right)^{L-1}$。于是，有 
+\begin{equation} 
+    \mathbb{E}_{\alpha}[\sin4\alpha]=\textrm{Im }\mathbb{E}[e^{i4\alpha}]=\textrm{Im }\varphi_{\alpha}(4)=\textrm{Im }\left(\frac{e^{2\pi i}-e^{-2\pi i}}{4\pi i}\right)^{L-1}=0.
+\end{equation}
+
+综上所述，对于$\widetilde{\langle O \rangle}$ 和 $\widehat{\langle O \rangle}$ 之间的均方误差可以估计为： 
+\begin{equation} 
+    \begin{aligned} 
+        \mathbb{E}_{\bm{\theta}}\abs{\widetilde{\langle O \rangle}-\widehat{\langle O \rangle}}^2 &=\mathbb{E}_{\bm{\theta}}\left[\sum_{\abs{s}> L}\tilde{f}(\mathcal{U},\bm{s},O,\rho)\right]^2\\
+         &=\mathbb{E}_{\bm{\theta}}\left[\sum_{\abs{s}=L+1}\tilde{f}(\mathcal{U},\bm{s},O,\rho)\right]^2\\
+        &= (1-\lambda)^{2(L+1)}\mathbb{E}_{\bm{\theta}} \left[\sum_{\abs{s}=L+1}{f}(\mathcal{U},\bm{s},O,\rho)\right]^2\\ 
+        &=(1-\lambda)^{2(L+1)}.
+    \end{aligned} 
+\end{equation}
+
+根据伯努利不等式，对于 $r\geq 1$ 和 $x\geq -1$，有 
+\begin{equation} 
+    (1+x)^r\geq 1+r. 
+\end{equation}
+
+由于 $\lambda=\order{\frac{1}{L}}$，存在一个常数 $c$ 使得 $c\geq \lambda (L+1)$。因此，我们有 \begin{equation} 
+    (1-\lambda)^{2(L+1)}= (1-\lambda)^{\frac{2(L+1)}{4c} 4c} \geq \left(1-\lambda \frac{2(L+1)}{4c} \right)^{4c}\geq \left(\frac{1}{2}\right)^{4c}, 
+\end{equation} 
+此时有
+\begin{equation} 
+    \mathbb{E}_{\bm{\theta}}\abs{\widetilde{\langle O \rangle}-\widehat{\langle O \rangle}}^2 =\Omega(1). 
+\end{equation}
+
+所以截断 $\abs{s}\leq L$ 是不够的。 而具有非零贡献且满足 $\abs{\bm{s}}=L+1$ 的 Pauli 路径的数量为 $2^{L-1}$，具体为：
+\begin{equation} 
+    \begin{aligned}
+        &\bm{s}=(s_0,s_1,\cdots,s_L)=(Z_1,Z_1,\cdots,Z_1,Y_1),\\
+        &s_0=Z_1, \quad s_1=Z_1, \quad s_2=\begin{cases}
+            Z_1 \\ \text{或}\\
+            Y_1,
+        \end{cases}
+        \cdots, s_L=\begin{cases}
+            Z_1 \\ \text{或} \\
+            Y_1.
+        \end{cases}
+    \end{aligned}
+\end{equation}
+
+因此，对于 $\gamma=\order{\frac{1}{L}}$，我们需要考虑所有具有非零贡献的 Pauli 路径，这将导致指数时间成本。这完成了命题~\ref{prop:lambda_and_L}的证明。
