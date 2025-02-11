@@ -345,3 +345,202 @@
 在后续的子章节中，将会证明引理~\ref{lemma:cross_items}和命题~\ref{prop:lambda_and_L}，以及讨论式~\eqref{eq:generate}减弱的情况。
 
 \subsubsection{引理~\ref{lemma:cross_items}的证明}\label{temp:subsubsection:cross_items}
+
+在引理~\ref{lemma:cross_items}中，我们称如果Pauli算符集合$\{\overline{\sigma}_{i,j}\}$可以生成$\{\mathbb{I},X,Y,Z\}^{\otimes n}$，即
+\begin{equation}\label{ap:eq:generate} 
+    \langle {\overline{\sigma}_{i,j}}\rangle/\left(\langle {\overline{\sigma}_{i,j}}\rangle\cap\langle i\mathbb{I}^{\otimes n}\rangle\right)=\{\mathbb{I},X,Y,Z\}^{\otimes n}, 
+\end{equation} 
+那么对于任意不同的Pauli路径$\bm{s}$和$\bm{s^{\prime}}$，我们有 
+\begin{equation} 
+    \mathbb{E}_{\bm{\theta}}f(\mathcal{U},\bm{s},O,\rho)f(\mathcal{U},\bm{s^{\prime}},O,\rho)=0, 
+\end{equation} 
+其中$\overline{\sigma}{i,j}$定义为： 
+\begin{equation}\label{ap:eq:effected_Pauli} 
+    \overline{\sigma}_{i,j}= \mathcal{V}_{L} \cdots \mathcal{V}_{i} \sigma_{i,j} \mathcal{V}_{i}^\dagger\cdots \mathcal{V}_{L}^\dagger. 
+\end{equation}
+
+为了证明这一结论，我们首先定义Pauli算符集合之间的“分割”关系： 
+
+\begin{definition} 
+    假设有两个Pauli算符集合$A$和$B$。如果在$B$中不存在两个不同的元素与$A$中的每个元素表现出相同的反对易/对易关系，我们定义$B$被$A$分割。 
+\end{definition} 
+\begin{remark} 使用“分割”这个名称是因为如果$A$可以分割$B$，那么通过表征其与$A$中每个元素的交换关系，可以唯一确定$B$中的任何元素。从某种意义上说，$A$通过表征它们的交换关系将$B$中的每个元素分隔成独立的部分。
+\end{remark}
+\begin{example}
+    假设$A=\{X_1,Y_2\}$和$B=\{X_1X_2,Y_1Y_2\}$。$A$可以分割$B$，因为$B$中的每个元素与$A$中的每个元素表现出不同的对易/反对易关系。
+\end{example}
+
+在开始正式的证明之前，我们引入以下引理： 
+\begin{lemma}\label{ap:lemma:3terms_exchange} 
+    假设$\mathcal{P}$、$\sigma_a$、$\sigma_b$和$\sigma_c$是Pauli算符。如果$\mathcal{P}\sigma_a$和$\mathcal{P}\sigma_b$与$\sigma_c$具有相同的对易或反对易关系。那么$\sigma_a$和$\sigma_b$与$\sigma_c$具有相同的对易或反对易关系。
+
+\begin{proof}
+    首先，我们假设$\mathcal{P}\sigma_a$和$\mathcal{P}\sigma_b$与$\sigma_c$对易，对于$i=a,b$，可以表示为
+    \begin{equation}\label{ap:eq:3terms_exchange}
+        \mathcal{P}\sigma_i\sigma_c=\sigma_c\mathcal{P}\sigma_i=\pm\mathcal{P}\sigma_c\sigma_i,
+    \end{equation}
+    其中符号$\pm$仅当$\mathcal{P}$与$\sigma_c$对易时设为$+$，反对易时设为$-$。
+    
+    这导致：
+    \begin{equation}
+    \sigma_i\sigma_c=\pm\sigma_c\sigma_i,
+    \end{equation}
+    其中符号$\pm$与式~\eqref{ap:eq:3terms_exchange}相同，对于$i=a,b$。
+
+    类似的，按同样方式讨论$\mathcal{P}\sigma_a$和$\mathcal{P}\sigma_b$与$\sigma_c$反对易的情况，我们得到$\sigma_a$和$\sigma_b$与$\sigma_c$具有相同的对易或反对易关系。
+\end{proof}
+
+\end{lemma}
+
+我们将证明如果${\overline{\sigma}_{i,j}}$可以分割线性组成$O$的Pauli算符集合$\{\sigma\}$，则可以建立类似的结论： 
+\begin{lemma}\label{ap:lemma:split} 
+    假设Pauli算符集合$\{\overline{\sigma}_{i,j}\}$可以分割$O$的Pauli算符集合$\{\sigma\}$。那么对于任意不同的Pauli路径$\bm{s}\neq \bm{s^{\prime}}\in \bm{P}^{L+1}_n$，我们有：
+    \begin{equation} 
+        \mathbb{E}_{\bm{\theta}}f(\mathcal{U},\bm{s},O,\rho)f(\mathcal{U},\bm{s^{\prime}},O,\rho)=0. 
+    \end{equation}
+    \begin{proof}
+    注意到：
+    \begin{equation}\label{ap:eq:E_cross_terms} 
+        \begin{aligned} 
+            &\mathbb{E}_{\bm{\theta}}f(\mathcal{U},\bm{s},O,\rho)f(\mathcal{U},\bm{s^{\prime}},O,\rho)\\
+            &=\Tr{Os_L}\Tr{Os'_L}\left(\prod_{i=1}^{L}\mathbb{E}_{\bm{\theta}_i}\Tr{s_i\mathcal{U}_i s_{i-1}\mathcal{U}_i^\dagger}\Tr{s'_i\mathcal{U}_i s'_{i-1}\mathcal{U}_i^\dagger}\right)\Tr{s_0\rho}\Tr{s'_0\rho}.
+        \end{aligned} 
+    \end{equation} 
+    因此，我们只需证明存在$i$使得$\mathbb{E}_{\bm{\theta}_i}\Tr{s_i\mathcal{U}_i s_{i-1}\mathcal{U}_i^\dagger}\Tr{s'_i\mathcal{U}_i s'_{i-1}\mathcal{U}_i^\dagger}=0$，则有$\mathbb{E}_{\bm{\theta}}f(\mathcal{U},\bm{s},O,\rho)f(\mathcal{U},\bm{s^{\prime}},O,\rho)=0$。
+    
+    根据命题~\ref{prop:layer_terms}，式~\eqref{ap:eq:E_cross_terms}中与第$i$层相关元素可以写为 
+    \begin{equation}\label{ap:eq:E_cross_i-layer} 
+        \begin{aligned} 
+            \mathbb{E}_{\bm{\theta}_i}&\Tr{s_i\mathcal{U}_i s_{i-1}\mathcal{U}_i^\dagger}\Tr{s'_i\mathcal{U}_i s'_{i-1}\mathcal{U}_i^\dagger}\\
+            =&\Tr{(s_i s_{i-1})\big|_{I_i}}\Tr{(s'_i s'_{i-1})\big|_{I_i}}
+            \prod_{k=1}^{C_i}\Tr{\left(s_iV_{i,k} s_{i-1}V_{i,k}^{\dagger}\right)\big|_\g{V_{i,k}}}\Tr{\left(s'_iV_{i,k} s'_{i-1}V_{i,k}^{\dagger}\right)\big|_\g{V_{i,k}}}\\
+            &\prod_{\sigma_{i,j}\in C(i,s_{i-1})}\Tr{(s_i s_{i-1})\big|_{\g{\sigma_{i,j}}}}\prod_{\sigma_{i,l}\in C(i,s_{i-1}')}\Tr{(s'_i s'_{i-1})\big|_{\g{\sigma_{i,l}}}}\\
+            &\mathbb{E}_{\bm{\theta}_i}\left\{\prod_{\sigma_{i,j'}\in AC(i,s_{i-1})}\Bigg[ \Tr{(s_i s_{i-1})\big|_{\g{\sigma_{i,j'}}}}\cos{\theta_{i,j'}}
+            - \Tr{(is_i \sigma_{i,j'}s_{i-1})\big|_{\g{\sigma_{i,j'}}}}\sin{\theta_{i,j'}}\Bigg]\right.\\
+            &\left.\prod_{\sigma_{i,l'}\in AC(i,s_{i-1}')}\Bigg[ \Tr{(s'_i s'_{i-1})\big|_{\g{\sigma_{i,l'}}}}\cos{\theta_{i,l'}}
+            - \Tr{(is'_i \sigma_{i,l'}s'_{i-1})\big|_{\g{\sigma_{i,l'}}}}\sin{\theta_{i,l'}}\Bigg]\right\}.
+        \end{aligned} 
+    \end{equation}
+    以下证明分将为两部分:
+
+    在证明的第一部分中，将证明如果$\{\overline{\sigma}_{i,j}\}$可以分割组成$O$的Pauli算符集合$\{\sigma\}$，那么可以得到$s_L= s_L'$，否则$\mathbb{E}_{\bm{\theta}}f(\mathcal{U},\bm{s},O,\rho)f(\mathcal{U},\bm{s^{\prime}},O,\rho)=0$。
+    
+    如果在第$i$层有$s_{i-1}$和$s_{i-1}'$相对于$\sigma_{i,j}$有不同的交换关系。 
+    不失一般性，可假设$s_{i-1}$与$\sigma_{i,j}$对易，而$s_{i-1}'$与$\sigma_{i,j}$反对易。 
+    通过反对易，可知$i \sigma_{i,j} s_{i-1}'$是一个带有符号因子的归一化Pauli算符。 
+    如命题~\ref{prop:layer_terms}的注释中讨论的，此时有$s_{i}'|_{\g{\sigma_{i,j}}}=s_{i-1}'|_{\g{\sigma_{i,j}}}$，并在$\Tr{s'_i\mathcal{U}_i s'_{i-1}\mathcal{U}_i^\dagger}$含有因子$\cos{\theta_{i,j}}$，或者$s_{i}'|_{\g{\sigma_{i,j}}}=\left(i\sigma_{i,j} s_{i-1}'\right)|_{\g{\sigma_{i,j}}}$（带有符号$\pm$），并含有因子$\sin{\theta_{i,j}}$，否则$\Tr{s'_i\mathcal{U}_i s'_{i-1}\mathcal{U}_i^\dagger}=0$。 
+    然而，此时仍然会有$\mathbb{E}_{\bm{\theta}_i}\Tr{s_i\mathcal{U}_i s_{i-1}\mathcal{U}_i^\dagger}\Tr{s'_i\mathcal{U}_i s'_{i-1}\mathcal{U}_i^\dagger}=0$，因为$\mathbb{E}_{\theta_{i,j}} \sin{\theta_{i,j}}=\mathbb{E}_{\theta_{i,j}} \cos{\theta_{i,j}}=0$。
+    
+    因此，对于任何层$i=1,\cdots,L$和$j=1,\cdots,R_i$，Pauli算符$s_{i-1}$和$s_{i-1}'$相对于$\sigma_{i,j}$有相同的交换关系。 在这种情况下，式~\eqref{ap:eq:E_cross_i-layer}可以写为 
+    \begin{equation}\label{ap:eq:E_cross_i-layer-rewrited}
+        \begin{aligned}
+        &\mathbb{E}_{\bm{\theta}_i}\Tr{s_i\mathcal{U}_i s_{i-1}\mathcal{U}_i^\dagger}\Tr{s'_i\mathcal{U}_i s'_{i-1}\mathcal{U}_i^\dagger}\\
+        =&\Tr{(s_i s_{i-1})\big|_{I_i}}\Tr{(s'_i s'_{i-1})\big|_{I_i}}
+        \prod_{k=1}^{C_i}\Tr{\left(s_iV_{i,k} s_{i-1}V_{i,k}^{\dagger}\right)\big|_\g{V_{i,k}}}\Tr{\left(s'_iV_{i,k} s'_{i-1}V_{i,k}^{\dagger}\right)\big|_\g{V_{i,k}}}\\
+        &\prod_{\sigma_{i,j}\in C(i,s_{i-1})}\Tr{(s_i s_{i-1})\big|_{\g{\sigma_{i,j}}}}\Tr{(s'_i s'_{i-1})\big|_{\g{\sigma_{i,j}}}}\\
+        &\prod_{\sigma_{i,j'}\in AC(i,s_{i-1})}\mathbb{E}_{\theta_{i,j'}}\left\{ \Bigg[ \Tr{(s_i s_{i-1})\big|_{\g{\sigma_{i,j'}}}}\cos{\theta_{i,j'}}
+        - \Tr{(is_i \sigma_{i,j'}s_{i-1})\big|_{\g{\sigma_{i,j'}}}}\sin{\theta_{i,j'}}\Bigg]\right.\\
+        &\left.\quad\quad\quad\quad\quad\Bigg[ \Tr{(s'_i s'_{i-1})\big|_{\g{\sigma_{i,j'}}}}\cos{\theta_{i,j'}}
+        - \Tr{(is'_i \sigma_{i,j'}s'_{i-1})\big|_{\g{\sigma_{i,j'}}}}\sin{\theta_{i,j'}}\Bigg]\right\}\\
+        =&\Tr{(s_i s_{i-1})\big|_{I_i}}\Tr{(s'_i s'_{i-1})\big|_{I_i}}
+        \prod_{k=1}^{C_i}\Tr{\left(s_iV_{i,k} s_{i-1}V_{i,k}^{\dagger}\right)\big|_\g{V_{i,k}}}\Tr{\left(s'_iV_{i,k} s'_{i-1}V_{i,k}^{\dagger}\right)\big|_\g{V_{i,k}}}\\
+        &\prod_{\sigma_{i,j}\in C(i,s_{i-1})}\Tr{(s_i s_{i-1})\big|_{\g{\sigma_{i,j}}}}\Tr{(s'_i s'_{i-1})\big|_{\g{\sigma_{i,j}}}}\\
+        &\prod_{\sigma_{i,j'}\in AC(i,s_{i-1})}\Bigg[\Tr{(s_i s_{i-1})\big|_{\g{\sigma_{i,j'}}}}\Tr{(s'_i s'_{i-1})\big|_{\g{\sigma_{i,j'}}}}\mathbb{E}_{{\theta}_{i,j'}}\left(\cos{\theta_{i,j'}}\right)^2\\
+        &\quad\quad\quad\quad\quad +\Tr{(is_i \sigma_{i,j'}s_{i-1})\big|_{\g{\sigma_{i,j'}}}}\Tr{(is'_i \sigma_{i,j'}s'_{i-1})\big|_{\g{\sigma_{i,j'}}}}\mathbb{E}_{{\theta}_{i,j'}}\left(\sin\theta_{i,j'}\right)^2\Bigg],
+        \end{aligned}
+    \end{equation}
+
+    其中最后一个等式由$\mathbb{E}_{\theta_{i,j}} \sin{\theta_{i,j}} \cos{\theta_{i,j}}=0$给出。
+
+    类似地，式~\eqref{ap:eq:E_cross_i-layer-rewrited}意味着在忽略符号$\pm$时，若$\Tr{s_i\mathcal{U}_i s_{i-1}\mathcal{U}_i^\dagger}\Tr{s'_i\mathcal{U}_i s'_{i-1}\mathcal{U}_i^\dagger}=0$则有： 
+    \begin{equation}\label{ap:eq:none_R_ele}
+        \begin{gathered}
+          s_i\big|_{I_i}=s_{i-1}\big|_{I_i} \;,\; s'_i\big|_{I_i}=s'_{i-1}\big|_{I_i}, \; \mathrm{and}\\
+          s_i\big|_{\g{V_{i,k}}}=(V_{i,k} s_{i-1}V_{i,k}^\dagger)\big|_{\g{V_{i,k}}},\\
+          s'_i\big|_{\g{V_{i,k}}}=(V_{i,k} s'_{i-1}V_{i,k}^\dagger)\big|_{\g{V_{i,k}}},
+        \end{gathered}
+    \end{equation}
+    对于$k=1,\cdots,C_i$成立。%如果不是这样，那么$\Tr{s_i\mathcal{U}_i s_{i-1}\mathcal{U}_i^\dagger}\Tr{s'_i\mathcal{U}_i s'_{i-1}\mathcal{U}_i^\dagger}=0$。
+    
+    对于$j\in{1,\cdots,R_i}$，如果$\sigma_{i,j}\in C(i,s_{i-1})$，则有$s_{i}|_{\g{\sigma_{i,j}}}=s_{i-1}|_{\g{\sigma_{i,j}}}$和$s'_{i}|_{\g{\sigma_{i,j}}}=s'_{i-1}|_{\g{\sigma_{i,j}}}$成立；否则$\Tr{(s_i s_{i-1})\big|_{\g{\sigma_{i,j}}}}\Tr{(s'_i s'_{i-1})\big|_{\g{\sigma_{i,j}}}}=0$。 
+    
+    对于$j'\in{1,\cdots,R_i}$，如果$\sigma_{i,j'}\in AC(i,s_{i-1})$，我们有两种情况： 
+    \begin{enumerate} 
+        \item $s_{i}|_{\g{\sigma_{i,j'}}}=s_{i-1}|_{\g{\sigma_{i,j'}}}$和$s'_{i}|_{\g{\sigma_{i,j'}}}=s'_{i-1}|_{\g{\sigma_{i,j'}}}$。 
+        \item $s_{i}|_{\g{\sigma_{i,j'}}}= \left(i\sigma_{i,j'} s_{i-1}\right)|_{\g{\sigma_{i,j'}}}$和$s_{i}|_{\g{\sigma_{i,j'}}}= \left(i\sigma_{i,j'} s'_{i-1}\right)|_{\g{\sigma_{i,j'}}}$（忽略符号$\pm$）。 
+    \end{enumerate} 
+    如果这两种情况都不成立，则式~\eqref{ap:eq:E_cross_i-layer-rewrited} 等于零。
+    我们将这些作用于 $s_{i-1}$ 和 $s'_{i-1}$ 的 $i\sigma_{i,j'}$ 乘积记为算子 $\mathcal{P}_i$。
+    然后结合 式~\eqref{ap:eq:none_R_ele}，我们得到 $s_i= \mathcal{P}_i \mathcal{V}_i s_{i-1} \mathcal{V}_i^\dagger$，$s_i'=\mathcal{P}_i \mathcal{V}_i s_{i-1}' \mathcal{V}_i^\dagger$ （忽略符号 $\pm$），对于 $i=1,\cdots ,L$成立。
+    
+    因此，必须有
+    \begin{equation}
+      \begin{aligned}
+        s_{i-1}&=\mathcal{V}_{i}^\dagger \mathcal{P}_{i}\cdots \mathcal{V}_L^\dagger \mathcal{P}_L s_L \mathcal{V}_L\cdots\mathcal{V}_{i},\\
+        s'_{i-1}&= \mathcal{V}_{i}^\dagger \mathcal{P}_{i}\cdots \mathcal{V}_L^\dagger \mathcal{P}_L s'_L \mathcal{V}_L\cdots\mathcal{V}_{i},
+      \end{aligned}
+    \end{equation}
+    忽略符号 $\pm$。
+    
+    如前所述，$s_{i-1}$ 和 $s_{i-1}'$ 相对于 $\sigma_{i,j}$ 具有相同的交换关系，这导致 $\mathcal{P}_{i} \mathcal{V}_{i+1}^\dagger \cdots \mathcal{V}_L^\dagger \mathcal{P}_L s_L \mathcal{V}_L \cdots\mathcal{V}_{i+1}$ 和 $\mathcal{P}_{i}\mathcal{V}_{i+1}^\dagger \cdots \mathcal{V}_L^\dagger \mathcal{P}_L s'_L \mathcal{V}_L\cdots \mathcal{V}_{i+1}$ 与 $\mathcal{V}_{i} \sigma_{i,j}\mathcal{V}_{i}^\dagger$ 具有相同的交换关系。
+    根据引理~\ref{ap:lemma:3terms_exchange}，可知$\mathcal{V}_{i+1}^\dagger \mathcal{P}_{i+1}\cdots \mathcal{V}_L^\dagger \mathcal{P}_L s_L \mathcal{V}_L\cdots\mathcal{V}_{i+1}$ 和 $\mathcal{V}_{i+1}^\dagger \mathcal{P}_{i+1}\cdots \mathcal{V}_L^\dagger \mathcal{P}_L s'_L \mathcal{V}_L\cdots\mathcal{V}_{i+1}$ 相对于 $\mathcal{V}_{i}\sigma_{i,j}\mathcal{V}_{i}^\dagger$ 具有相同的交换关系。
+    重复此过程直到$\mathcal{P}_L s_L$和$\mathcal{P}_L s'_L$，我们得到 $s_L$ 和 $s'_L$ 相对于 $\mathcal{V}_{L} \cdots \mathcal{V}_{i} \sigma_{i,j} \mathcal{V}_{i}^\dagger\cdots \mathcal{V}_{L}^\dagger=\overline{\sigma}_{i,j}$ 具有相同的交换关系。
+
+    因此，$s_L$ 和 $s_L'$ 相对于 $\{\overline{\sigma}_{i,j}\}$ 中的每个元素具有相同的交换关系。另一方面，$s_L$ 和 $s'_L$ 包含在 $O$ 的 Pauli 算符集合 $\{\sigma\}$ 中，否则将有 $\Tr{Os_L}\Tr{Os'_L}=0$。由于分割假设，得出结论 $s_L=s_L'$。
+
+
+    在证明的第二部分中，我们将证明 $s_L=s_L'$ 意味着 $s_i=s_i'$ 对于 $i=0,\cdots,L$，否则 $\mathbb{E}_{\bm{\theta}}f(\mathcal{U},\bm{s},O,\rho)f(\mathcal{U},\bm{s^{\prime}},O,\rho)=0$。
+    
+    为了证明这一点，只需证明如果 $\mathbb{E}_{\bm{\theta}}f(\mathcal{U},\bm{s},O,\rho)f(\mathcal{U},\bm{s^{\prime}},O,\rho)\neq 0$，且 $s_i=s_i'$，则 $s_{i-1}=s_{i-1}'$。
+    因为 $s_{i}=s_{i}'$， 此时有 $C(i,s_{i-1})=C(i,s_{i})=C(i,s'_{i-1})$ 和 $AC(i,s_{i-1})=AC(i,s_{i})=AC(i,s'_{i-1})$，式~\eqref{ap:eq:E_cross_i-layer} 可以再次重写为 式~\eqref{ap:eq:E_cross_i-layer-rewrited}。
+    
+    因此类似的，有以下关系成立：
+    \begin{equation}
+    \begin{gathered}
+      s_{i-1}\big|_{I_i}=s'_{i-1}\big|_{I_i}=s_i\big|_{I_i},\\
+      s_{i-1}\big|_{\g{V_{i,k}}}=s'_{i-1}\big|_{\g{V_{i,k}}}=(V_{i,k}^\dagger s_i V_{i,k}) \big|_{\g{V_{i,k}}}
+    \end{gathered}
+    \end{equation}
+    取决于符号 $\pm$ 对于 $k=1,\cdots,C_i$，否则 $\Tr{s_i\mathcal{U}_i s_{i-1}\mathcal{U}_i^\dagger}\Tr{s'_i\mathcal{U}_i s'_{i-1}\mathcal{U}_i^\dagger}=0$。
+    
+    假设 $s_{i-1}\big|_{\g{\sigma_{i,j}}}\neq s'_{i-1}\big|_{\g{\sigma_{i,j}}}$， 对于某些 $\sigma_{i,j}\in C(i,s_{i})$成立，则有 $\Tr{(s_i s_{i-1})\big|_{\g{\sigma_{i,j}}}}$ 或 $\Tr{(s_i' s_{i-1}')\big|_{\g{\sigma_{i,j}}}}$ 为零，导致式~\eqref{ap:eq:E_cross_i-layer-rewrited} 为零。
+    
+    类似地，假设存在 $s_{i-1}\big|_{\g{\sigma_{i,j'}}}\neq s'_{i-1}\big|_{\g{\sigma_{i,j'}}}$ 对于某些 $\sigma_{i,j'}\in AC(i,s_{i})$成立，则等式 $\Tr{(s_i s_{i-1})\big|_{\g{\sigma_{i,j'}}}}\Tr{(s'_i s'_{i-1})\big|_{\g{\sigma_{i,j'}}}}$ 和 $\Tr{(is_i \sigma_{i,j'}s_{i-1})\big|_{\g{\sigma_{i,j'}}}}\Tr{(is'_i \sigma_{i,j'}s'_{i-1})\big|_{\g{\sigma_{i,j'}}}}$ 都为零，导致 式~\eqref{ap:eq:E_cross_i-layer-rewrited} 等于零。
+    
+    基于上述讨论，当 $s_{i}=s_{i}'$ 时，我们必须有 $s_{i-1}=s_{i-1}'$ 对于 $i=1,\cdots,L$，否则 $\mathbb{E}_{\bm{\theta}}f(\mathcal{U},\bm{s},O,\rho)f(\mathcal{U},\bm{s^{\prime}},O,\rho)=0$。
+    这完成了第二部分的证明。
+
+
+    综上所述，如果有$\mathbb{E}_{\bm{\theta}}f(\mathcal{U},\bm{s},O,\rho)f(\mathcal{U},\bm{s^{\prime}},O,\rho)\neq 0$成立，则有$\bm{s}=\bm{s^{\prime}}$。
+    \end{proof}
+\end{lemma}
+    
+\begin{remark}
+    具体来说，对于 $O$ 只有一个 Pauli 算符 $\sigma$ 的情况，Pauli 算符集合 $\{\overline{\sigma}_{i,j}\}$ 自然分割了 $O$ 的 Pauli 算符集合 $\{\sigma\}$，此时将不再需要对变分线路要求有假设式~\eqref{eq:generate}成立。
+\end{remark}
+    
+如果 $\{\overline{\sigma}_{i,j}\}$ 可以分割 $\{\mathbb{I},X,Y,Z\}^{\otimes n}$，显然可以分割 $\{\sigma\}$。
+我们将使用一个引理来解释 $\{\overline{\sigma}_{i,j}\}$ 分割 $\{\mathbb{I},X,Y,Z\}^{\otimes n}$ 和 $\{\overline{\sigma}_{i,j}\}$ 生成 $\{\mathbb{I},X,Y,Z\}^{\otimes n}$ 之间的等价性。
+在提出引理之前，我们必须澄清生成 $\{\mathbb{I},X,Y,Z\}^{\otimes n}$ 的 Pauli 集合 $A$ 的定义。我们说 Pauli 集合 $A$ 生成 $\{\mathbb{I},X,Y,Z\}^{\otimes n}$ 意味着 $\langle A \rangle/\left( \langle A \rangle\cap\langle i\mathbb{I}^{\otimes n} \rangle \right) = \mathbb {P}^n$，其中 $\mathbb{P}_n:=\mathrm{PG}_n/\langle i\mathbb{I}^{\otimes n}\rangle$ 且 $\mathrm{PG}_n$ 是 $n$ 量子比特 Pauli 群。
+在此表达式中，符号 $\langle A \rangle$ 指的是由集合 $A$ 生成的 Pauli 子群（$A$ 中元素及其逆的有限乘积）。商用于消除相位因子的影响。
+    
+    
+\begin{lemma}\label{ap:lemma:split_generate}
+    $A$ 分割 $\{\mathbb{I},X,Y,Z\}^{\otimes n}$ 当且仅当 $\langle A\rangle/\left(\langle A\rangle\cap\langle i\mathbb{I}^{\otimes n}\rangle\right)=\mathbb{P}^n$，其中 $\mathbb{P}_n:=\mathrm{PG}_n/\langle i\mathbb{I}^{\otimes n}\rangle$。
+\end{lemma}
+\begin{proof}
+    假设 $\langle A\rangle/\left(\langle A\rangle\cap\langle i\mathbb{I}^{\otimes n}\rangle\right)=\mathbb{P}^n$。取 $b_1,b_2\in \{\mathbb{I},X,Y,Z\}^{\otimes n}$ 使得 $b_1$ 和 $b_2$ 与 $A$ 中的每个元素具有相同的交换关系。
+    由于 $\left[b_1b_2,a\right]=0$ 对于所有 $a\in A$成立，我们有 $\left[b_1b_2,g\right]=0$ 对于所有 $g\in\langle i\mathbb{I}^{\otimes n},A\rangle=\mathrm{PG}_n$成立，这意味着 $b_1b_2\in\langle i\mathbb{I}^{\otimes n}\rangle$。结合 $b_1,b_2\in \{\mathbb{I},X,Y,Z\}^{\otimes n}$，我们有 $b_1=b_2$。
+    
+    另一方面，假设 $A$ 分割 $\{\mathbb{I},X,Y,Z\}^{\otimes n}$，目标是证明 $\langle A\rangle/\left(\langle A\rangle\cap\langle i\mathbb{I}^{\otimes n}\rangle\right)=\mathbb{P}^n$。
+    为了证明这一点，只需证明如果 $\langle A\rangle/\left(\langle A\rangle\cap\langle i\mathbb{I}^{\otimes n}\rangle\right)\neq\mathbb{P}^n$，则存在一个非单位 Pauli 算符与 $A$ 的每个元素交换。
+    
+    我们设 $C=\langle A\rangle/\left(\langle A\rangle\cap\langle i\mathbb{I}^{\otimes n}\rangle\right)$，然后考虑由 $C$ 和 $\mathbb{P}^n$ 生成的 $C^*$-代数 $\mathcal{M}$ 和 $\mathcal{P}$。
+    根据冯·诺依曼双交换定理~\cite{kadison1986fundamentals}，我们有 $\mathcal{M}''=\overline{\mathcal{M}}=\mathcal{M}$。
+    由于 $C\neq\mathbb{P}^n$以及Pauli 算符构成矩阵代数的正交基，我们可以得出 $\mathcal{M}\neq \mathcal{P}$，于是 $\mathcal{M}''\neq \mathcal{P}$。
+    这意味着 $\mathcal{M}'$ 中存在非单位元素。换句话说，存在一个非平凡元素 $x=c_1P_1+c_2P_2+\cdots$（$P_i$ 代表不同的 Pauli 算符且 $c_i\in \mathbb{C}$）与 $A$ 中的每个元素交换。这导致得出结论 $\{P_1,P_2,\cdots\}$ 也与 $A$ 中的每个元素交换且它们不能全为单位元素。
+\end{proof}
+    
+这完成了引理~\ref{lemma:cross_items} 的证明。
+
+\subsubsection{命题~\ref{prop:lambda_and_L}的证明}
