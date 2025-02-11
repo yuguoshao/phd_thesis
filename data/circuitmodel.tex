@@ -278,8 +278,52 @@
 
 结合Markov不等式，可以得到如下主要定理：
 \begin{theorem}\label{thm:main}
-    对于变分量子线路，如果初始态密度矩阵$\rho$和观测量$O$分别满足稀疏性和Pauli稀疏性，且式~\eqref{eq:E_cross_equals_0}成立，对于固定的$\gamma:=\min\{p|{p \in \{p_x,p_y,p_z\},p\neq 0}\}$，给定任意截断误差$\varepsilon$，存在一个多项式规模的经典算法来近似含噪声期望值$\widetilde{\langle O\rangle}$，在旋转角度$\bm{\theta}$均匀分布时，至少有$1-\delta$的概率满足$\abs{\widetilde{\langle O\rangle}-\widehat{\langle O\rangle}} \leq \varepsilon$。对于噪声\textbf{情况1}，其时间复杂度为$\mathrm{Poly}(n) \order{L} \bigg(\frac{\norm{O}_\infty}{\varepsilon \sqrt{\delta}} \bigg)^{\order{\frac{1}{\gamma}}}$，对于\textbf{情况2}，其时间复杂度为$\mathrm{Poly}(n)  \order{(nL)^{\frac{1}{2\gamma} \ln{\frac{\norm{O}_\infty}{\varepsilon \sqrt{\delta}}}+1}}$。空间复杂度为$\order{\mathrm{Poly}(n)+nL}$。
+    对于变分量子线路，如果初始态密度矩阵$\rho$和观测量$O$分别满足稀疏性和Pauli稀疏性，且式~\eqref{eq:E_cross_equals_0}成立，对于固定的$\gamma:=\min\{p|{p \in \{p_x,p_y,p_z\},p\neq 0}\}$，给定任意截断误差$\varepsilon$，存在一个多项式规模的经典算法来近似含噪声期望值$\widetilde{\langle O\rangle}$，在旋转角度$\bm{\theta}$均匀分布时，至少有$1-\delta$的概率满足$\abs{\widetilde{\langle O\rangle}-\widehat{\langle O\rangle}} \leq \varepsilon$。对于噪声\textbf{情况1}，其时间复杂度为$\mathrm{Poly}(n) \order{L} \bigg(\frac{\norm{O}_\infty}{\varepsilon \sqrt{\delta}} \bigg)^{\order{\frac{1}{\gamma}}}$，对于\textbf{情况2}，其时间复杂度为$\mathrm{Poly}(n)  \order{(2nL)^{\frac{1}{2\gamma} \ln{\frac{\norm{O}_\infty}{\varepsilon \sqrt{\delta}}}+1}}$。空间复杂度为$\order{\mathrm{Poly}(n)+nL}$。
 \end{theorem}
+\begin{proof}
+
+  根据引理~\ref{lemma:MSE_l}，我们已经证明如果 $M\geq\frac{1}{4\gamma}\ln{\frac{\norm{O}_\infty^2}{\nu}}$，则
+ \begin{equation}
+  \mathbb{E}_{\bm{\theta}}\abs{\widetilde{\langle O\rangle}-\widehat{\langle O\rangle}}^2 \leq \nu.
+ \end{equation}
+  
+ 根据Markov不等式，对于任意概率 $\delta$，我们有
+ \begin{equation}
+  \Pr{\abs{\widetilde{\langle O\rangle}-\widehat{\langle O\rangle}}\geq\frac{1}{\sqrt{\delta}}\sqrt{\mathbb{E}_{\bm{\theta}}\abs{\widetilde{\langle O\rangle}-\widehat{\langle O\rangle}}^2}}=\Pr{\abs{\widetilde{\langle O\rangle}-\widehat{\langle O\rangle}}^2\geq\frac{1}{\delta}{\mathbb{E}_{\bm{\theta}}\abs{\widetilde{\langle O\rangle}-\widehat{\langle O\rangle}}^2}}\leq \delta。
+ \end{equation}
+
+因此，对于均匀选取的旋转角度 $\bm{\theta}$，至少有 $1-\delta$ 的概率满足
+\begin{equation}
+  \abs{\widetilde{\langle O\rangle}-\widehat{\langle O\rangle}} \leq \frac{1}{\sqrt{\delta}}\sqrt{\mathbb{E}_{\bm{\theta}}\abs{\widetilde{\langle O\rangle}-\widehat{\langle O\rangle}}^2}\leq \sqrt{\frac{\nu}{\delta}}.
+\end{equation}
+设 $\varepsilon$ 为期望误差，可以设置 $\nu=\varepsilon^2 \delta$ 以满足要求，因此截断权重 $M$ 需要满足
+\begin{equation}
+  M\geq \frac{1}{2\gamma} \ln{\frac{\norm{O}_\infty}{\varepsilon \sqrt{\delta}}}.
+\end{equation}
+
+根据式~\ref{eq:vqa:cost}，我们可以获得截断权重为 $M=\frac{1}{2\gamma} \ln{\frac{\norm{O}_\infty}{\varepsilon \sqrt{\delta}}}$ 的近似观测值 $\widehat{\langle O\rangle}$。
+对于\textbf{情况1}，获得 $\widehat{\langle O\rangle}$ 的时间复杂度为：
+\begin{equation}
+\begin{aligned}
+\mathrm{Poly}(n) \order{L} 2^{M}
+&=\mathrm{Poly}(n) \order{L} \bigg(\frac{\norm{O}_\infty}{\varepsilon \sqrt{\delta}} \bigg)^{\order{\frac{1}{\gamma}}}\\
+&=\mathrm{Poly}\left(n,L,\frac{1}{\varepsilon},\frac{1}{\sqrt{\delta}},\norm{O}_{\infty}\right).
+\end{aligned}
+\end{equation}
+
+对于\textbf{情况2}，所需的时间复杂度约为：
+\begin{equation}
+  \mathrm{Poly}(n)\order{(2nL)^{M+1}}
+  =
+  \mathrm{Poly}(n)  \order{(2nL)^{\frac{1}{2\gamma} \ln{\frac{\norm{O}_\infty}{\varepsilon \sqrt{\delta}}}+1}}.
+\end{equation}
+
+变量 $n$、$L$、$\varepsilon$、$\delta$ 和 $\norm{O}_\infty$ 之间的关系是非多项式的。因此，在这种情况下，多项式关系不适用，只能得出准多项式关系。
+特别地，在给定相对误差 $\frac{\varepsilon}{\norm{O}_\infty}$ 和成功概率 $\delta$ 的情况下，时间复杂度受限于 $\mathrm{Poly}(n)  (2nL)^{\order{\frac{1}{\gamma}}}$，这表明当所需精度保持不变时，计算复杂度与电路规模保持多项式关系。
+
+在空间复杂度方面，根据式~\eqref{eq:vqa:cost}，所需的空间复杂度为 $\order{\mathrm{Poly}(n)+nL}$。
+\end{proof}
+
 \begin{remark}
     从以上定理可以看出，对于含噪声期望值模拟，无论处于\textbf{情况1}还是\textbf{情况2}，其时间复杂度关于线路规模都是多项式级别的$\poly(n,L)$。因此，该算法是一个多项式时间复杂度的经典算法。那么什么时候会体现出量子优势呢？随着实验精度的提高，噪声会进一步被抑制。在这种情况下，可以进一步增加量子线路的深度，以获得更好的结果。因此，一个值得注意的问题是，当噪声率和线路深度的关系如何影响量子优势的体现。
     我们通过以下命题，在噪声处于\textbf{情况1}的情况下，讨论了该问题：
