@@ -147,14 +147,14 @@
     C_{s}=\mathrm{Poly}(n) \order{L} C_{\text{split}} N_{\text{max}}^{M}= \mathrm{Poly}(n) \order{L} 2^M.
 \end{equation}
 满足$\abs{\bm{s}}\leq M$的Pauli路径数量最多为：
-\begin{equation}
+\begin{equation}\label{eq:vqa:case1:N_M}
     N_M=\poly(n) N_{\text{max}}^{M}=\poly(n) 2^M.
 \end{equation}
 
 对于\textbf{情况2}，根据式~\eqref{eq:case2:N_M}和式~\eqref{eq:case2:cost_s}，Pauli路径枚举过程的时间复杂度为：
 \begin{equation}
     C_{s}=\mathrm{Poly}(n) \order{(nL)^M} C_{\text{split}} N_{\text{max}}^{M}= \mathrm{Poly}(n) \order{(nL)^M} 2^M.
-\end{equation}
+\end{equation}\label{eq:vqa:case2:N_M}
 满足$\abs{\bm{s}}\leq M$的Pauli路径数量最多为：
 \begin{equation}
     N_M=\poly(n)(nLN_{\text{max}})^{M+1}= \poly(n)(2nL)^{M+1}.
