@@ -24,6 +24,8 @@
 \end{equation*}
 其中$n$是线路的规模，$L$是线路的深度，$M$是截断变量。可以看到在过去理论估计中，计算复杂度关于截断变量$M$是指数关系。这个指数因子的来源是由于在Pauli 路径枚举过程中，根据式~\eqref{eq:vqa:case1:N_M}，符合条件$\abs{\bm{s}}\leq M$的Pauli路径数目是指数级别的。在这一节中，我们将通过具体的数值模拟结果来估计，给定截断变量$M$时，满足条件Pauli路径的真实数目。
 
+在本节中，考虑的噪声模型均为退极化噪声模型，即满足$p_x=p_y=p_z=\frac{\lambda}{4}$，其中$\lambda$是噪声强度。
+
 
 对于截断变量的取值，根据引理~\ref{lemma:MSE_l}的注释，我们可以得到
 对于变分量子线路在退极化噪声下，如果式~\eqref{eq:E_cross_equals_0}成立，那么对任意的$\nu > 0$，只要截断参数$M$满足：
@@ -81,7 +83,126 @@
 从数值结果中可以看到，对于不同的$M$，在给定线路规模$n$和深度$L$的情况下，具有非零贡献的Pauli路径的数量是不同的。这说明在实际的模拟中，噪声的大小将会显著影响模拟算法的计算复杂度。
 
 
-\subsection{模拟误差与截断变量$M$的关系}
+\subsection{量子线路规模与截断变量$M$的关系}
+
+在本节中，我们研究了在实现可靠精度的情况下，在不同电路规模下截断数$M$的要求。
+
+与前一节类似，我们也以MaxCut问题对应的可观测量为例，在数值上分析$M$与线路规模之间的关系。
+对于给定的量子比特数$n$，我们随机生成一个$n\times n$的邻接$(0,1)$矩阵$A$，其中每个条目为$1$的概率为$0.5$。
+可观测量为$O=\sum_{A_{i,j}=1} Z_iZ_j$。
+初始状态的密度矩阵设为$\rho=\ketbra{0}{0}^{\otimes n}$。
+
+在这一节的模拟中，考虑的量子线路是硬件高效变分量子线路（Hardware Efficient Ans\"atz）~\cite{kandala2017hardwarea}的一个例子，如图~\ref{fig:HEA_Ansatz}所示。
+该线路由一系列单量子比特旋转和纠缠的双量子比特门组成，可以分割为$D$个深度为$4$的线路块，每个模块包含两层层作用在所有量子比特上的单量子比特$R_X$和$R_Z$旋转门，以及两层分别以奇数量子比特为控制位和偶数量子比特为目标位的CNOT门。
+值得注意的是，双量子比特门的应用仅限于相邻的量子比特，这一设计适合于当前阶段NISQ设备的硬件限制。
+对于给定的重复次数$D$，该硬件高效变分量子线路的深度为$4\times D+2$，参数的数量为$2\times D+2$。
+
+
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures/complexity2/HEA.pdf}
+    \caption{Hardware Efficient Ans\"atz}\label{fig:HEA_Ansatz}
+\end{figure}
+
+我们随机均匀生成$100$个参数组，记为$\bm{\theta^1}\cdots \bm{\theta^{100}}$，其中每个参数$\bm{\theta^i}$是一个长度为$2\times D+2$的向量，每个元素在$[0,2\pi]$之间均匀分布。
+为了方便，记参数取值为参数组$\bm{\theta}$时的含噪声期望值为$\widetilde{\langle O \rangle}(\bm{\theta})$，使用截断数为$M$的Pauli路径积分方法估计的含噪声期望值为$\widehat{\langle O \rangle}(\bm{\theta})$。
+我们的数值模拟目标是，找到满足近似含噪声期望值$\widehat{\langle O \rangle}(\bm{\theta})$与精确含噪声期望值$\widetilde{\langle O \rangle}(\bm{\theta})$之间的相对差异在$100$个参数组上均低于$0.1\%$的最小截断数$M$：
+\begin{equation}
+    \begin{aligned}
+        \text{minimize} \quad & M,\\
+        \text{subject to} \quad & \widehat{\langle O \rangle}=\sum_{\abs{\bm{s}}\leq M}\tilde{f}(\mathcal{U},\bm{s},O,\rho),\\
+        &\max_{i}\frac{\abs{\widetilde{\langle O \rangle}(\bm{\theta^i})-\widehat{\langle O \rangle}(\bm{\theta^i})}}{\abs{\widetilde{\langle O \rangle}(\bm{\theta^i})}}\leq 0.001.
+    \end{aligned}
+\end{equation}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.45\textwidth]{figures/complexity2/6}
+    \includegraphics[width=0.45\textwidth]{figures/complexity2/8}
+    \includegraphics[width=0.45\textwidth]{figures/complexity2/10}
+    \includegraphics[width=0.45\textwidth]{figures/complexity2/12}
+    \caption{满足相对误差要求的最小截断$M$的取值}\label{fig:numerical_M}
+\end{figure}
+
+结果如图~\ref{fig:numerical_M}所示。
+首先，我们观察到在所有情况下，最小截断$M$随着噪声率$\lambda$的增加而减少。这一趋势与引理~\ref{lemma:MSE_l}中的理论分析一致。
+数值结果表明，当噪声率保持在较低水平时，最小截断值$M$随着电路深度$L$线性增加。
+这一趋势是由于噪声对Pauli路径的影响较小，导致在浅电路中Pauli路径的传播距离随着电路变深而增加，从而提高了它们的Hamming Weight。因此，在量子线路变深的过程中，为了保留相关的Pauli路径不被丢弃，截断变量$M$需要增加。
+
+当噪声强度较大时，电路深度$L$对于最小截断值$M$的减少速率方面起着关键作用。
+这一现象是由于噪声的累积随着电路深度的增加而加剧，导致期望值$\widetilde{\langle O \rangle}(\bm{\theta})$更快地收敛到$\tr{O}$（平凡Pauli路径的贡献）。因此，对于电路深度更深的情况，最小截断值$M$更快地收敛到$0$。
+
+此外，随着量子比特数$n$的增加，最小截断值$M$也趋于增加。
+然而，这一增加是适度的，表明OBPPP方法在实际应用中，并不会过度受限于量子比特数$n$的规模。
+
+我们还探讨了在给定电路规模时，精度与截断数$M$之间的关系。当$n = 12$时，我们确定了实现不同精度水平所需的最小$M$值：
+\begin{equation}
+    \begin{aligned}
+        \text{minimize} \quad & M,\\
+        \text{subject to} \quad & \widehat{\langle O \rangle}=\sum_{\abs{\bm{s}}\leq M}\tilde{f}(\mathcal{U},\bm{s},O,\rho),\\
+        &\max_{i}\frac{\abs{\widetilde{\langle O \rangle}(\bm{\theta^i})-\widehat{\langle O \rangle}(\bm{\theta^i})}}{\abs{\widetilde{\langle O \rangle}(\bm{\theta^i})}}\leq 0.1,0.05,0.01,0.001,0.0001,0.00001,
+    \end{aligned}
+\end{equation}
+分别对应于$90\%,95\%,99\%,99.9\%,99.99\%,99.999\%$的精度。
+结果如图~\ref{fig:numerical_ACC}所示，表明所需的最小截断值$M$随着所需精度的增加而增加。
+
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.32\textwidth]{figures/complexity2/ACC1}
+    \includegraphics[width=0.32\textwidth]{figures/complexity2/ACC2}
+    \includegraphics[width=0.32\textwidth]{figures/complexity2/ACC3}
+    \caption{
+        不同精度水平下所需的最小截断值$M$}\label{fig:numerical_ACC}
+\end{figure}
+
+从数值结果可以看出，当对精度的需求迅速增加时，对$M$的需求增加相对温和。
+在$L=6$且噪声率$\lambda<0.05$的情况下，实现$>99.9\%$精度所需的最小$M$约为$34$。注意，图中显示的$99.9\%$和$99.99\%$精度对应的结果被$99.999\%$的结果所掩盖。
+当噪声率$\lambda$接近$0$时，实现高精度（$\geq 99.9\%$）所需的$M$值趋于相同，表明此时$M$足够大以涵盖计算中的足够多的Pauli路径。
+
+当噪声率$\lambda$增加时，实现低精度所需的$M$将比实现高精度所需的$M$减少得更快，这一趋势与引理~\ref{lemma:MSE_l}一致。
+
+对于实现$99.9\%$精度所需的最小截断值$M$，我们通过以下公式估计取定该$M$值时经验均方误差$\tilde{\nu}$：
+\begin{equation}\label{ap:eq:emse}
+    \tilde{\nu} = \frac{1}{100}\sum_{i=1}^{100}\left|\widetilde{\langle O \rangle}(\bm{\theta^i}) - \widehat{\langle O \rangle}(\bm{\theta^i})\right|^2,
+\end{equation}
+其中
+\begin{equation}
+    \begin{aligned}
+        \widehat{\langle O \rangle}=&\sum_{\abs{\bm{s}}\leq M}\tilde{f}(\mathcal{U},\bm{s},O,\rho),\\
+        M=&\arg\min_{M} \left\{ \max_{i} \frac{\left|\widetilde{\langle O \rangle}(\bm{\theta^i}) - \widehat{\langle O \rangle}(\bm{\theta^i})\right|}{\left|\widetilde{\langle O \rangle}(\bm{\theta^i})\right|} \leq 0.001 \right\}.
+    \end{aligned}
+\end{equation}
+然后将$M$与由式~\ref{eq:depolarizing_M}给出的关于$M$解析界进行比较：
+\begin{equation}\label{ap:eq:analytical_bound}
+  \frac{1}{2\lambda}\ln{\frac{\norm{O}_\infty^2}{\tilde{\nu}}}.
+\end{equation}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.32\textwidth]{figures/complexity2/12_1}
+    \includegraphics[width=0.32\textwidth]{figures/complexity2/12_2}
+    \includegraphics[width=0.32\textwidth]{figures/complexity2/12_3}
+    \caption{
+        实际应用中所需的最小截断数$M$与理论解析估计的比较}\label{fig:numerical_M2}
+\end{figure}
+
+量子比特数$n=12$的对应结果如图~\ref{fig:numerical_M2}所示（其他情况类似）。理论的解析估计结果记为\textit{``Theoretical predictions of M"}，为了清晰起见，理论估计的数据使用对数轴显示在右侧。
+为了避免式~\eqref{ap:eq:analytical_bound}的分母为$0$，移除了$\lambda=0$的解析估计结果。
+结果表明，在实际情况下，为达到目标精度所需的$M$值显著低于理论估计的边界（$\sim 100$ vs $\sim 5000$）。
+
+最后，我们展示了在不同噪声率$\lambda$下，经验均方误差$\tilde{\nu}$随$M$增加的变化趋势，以显示收敛趋势。对于$n=12$的情况，如图~\ref{fig:numerical_MSE}所示。
+y轴表示经验均方误差，由公式~\ref{ap:eq:emse}给出，并以对数刻度显示。
+注意，在图\#Layer=6的数据中中，省略了$M=34$的结果，此时均方误差的值降到了$e^{-20}$以下。
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.3\textwidth]{figures/complexity2/mse_12_6.pdf}
+    \includegraphics[width=0.3\textwidth]{figures/complexity2/mse_12_10.pdf}
+    \includegraphics[width=0.3\textwidth]{figures/complexity2/mse_12_14.pdf}
+    \caption{对于不同噪声率$\lambda$，$M$增加时的均方误差的变化趋势}\label{fig:numerical_MSE}
+\end{figure}
 
 
 \section{Ising模型演化}
