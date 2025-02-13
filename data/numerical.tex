@@ -314,4 +314,73 @@ OBPPP的运行时间也比稀疏Pauli动力学（Sparse Pauli Dynamic，SPD）~\
 
 
 \section{QAOA算法实验}
-    我们还与一个困离子系统的实验进行了比较~\cite{pagano2020quantum}，并得到了高度一致的结果
+
+
+    在上一节中，我们进行了IBM的Ising模型演化实验的模拟，IBM的实验运行一个典型的超导量子比特系统中。
+    在本节中，我们将模拟文献~\cite{pagano2020quantum}中报告的离子阱系统的实验结果，并得到高度一致的结果。
+    
+    在实验中，作者使用了一维排列的$^{171}$Yb$^+$离子，并使用该离子系统实现了低深度长程的量子近似优化算法（QAOA）的演示实验。
+    在该QAOA算法中，优化问题被编码在具有长程相互作用的横场反铁磁Ising模型哈密顿量中：
+    \begin{equation}\label{eq:qaoa:hamiltonian}
+        H=\underbrace{\sum_{i<j}J_{ij}X_iX_j}_{H_A}+\underbrace{B\sum_iY_i}_{H_B}.
+    \end{equation}
+    其中，$J_{i,j}>0$表示自旋$i$和$j$之间的Ising耦合强度，随自旋间距离按幂律衰减；$B$表示横向磁场强度。为了方便我们将$\sum_{i<j}J_{ij}X_iX_j$记为$H_A$，$B\sum_iY_i$记为$H_B$。
+    
+    系统的初态度经过$p$层QAOA线路块演化后的状态为：
+    \begin{equation}
+      \ket{\vec{\beta},\vec{\gamma}}=\prod_{k=1}^p e^{-i\beta_k (H_B/J_0)} e^{-i\gamma_k (H_A/J_0)}\ket{\psi_0},
+    \end{equation}
+    其中$J_0$是最近邻耦合的平均值，角度向量$\vec{\beta}$和$\vec{\gamma}$是用于最小化最终能量的变分参数：
+    \begin{equation}
+      E(\vec{\beta},\vec{\gamma})=\bra{\vec{\beta},\vec{\gamma}}H\ket{\vec{\beta},\vec{\gamma}}。
+    \end{equation}
+    初始状态设为$\ket{\psi_0}=\ket{\uparrow\uparrow\dots\uparrow}_Y$，其中$\ket{\uparrow}_Y=(\ket{\uparrow}_Z+i\ket{\downarrow}_Z)/\sqrt{2}$。
+    
+    在原实验设定中，作者使用无量纲相对量：
+    \begin{equation}\label{ap:eq:qaoa:eta}
+      \eta=\frac{E(\vec{\beta},\vec{\gamma})-E_{\max}}{E_{gs}-E_{\max}}
+    \end{equation}
+    来衡量QAOA算法输出结果的表现，其中$E_{gs}$是哈密顿量~\eqref{eq:qaoa:hamiltonian}的基态能量，$E_{\max}$表示最高激发态的能量。
+    
+    在本节中，我们将使用OBPPP算法模拟文献~\cite{pagano2020quantum}中图2C的实验结果。
+    在该实验中，量子比特数为$n=12$，QAOA线路块的层数为$p=1$。
+    在我们的模拟过程中，Ising模型的耦合强度$J_{ij}$设为文献~\cite{pagano2020quantum}补充信息中给出的解析拟合形式：
+    \begin{equation}
+      J_{ij}\approx\frac{J_0}{r^{\alpha^\prime}}e^{-\beta^\prime(r-1)},
+    \end{equation}
+    其中$J_0$是最近邻耦合的平均值，$r=\abs{i-j}$是离子间距，$\alpha^\prime,\beta^\prime$是指数衰减变量。
+    根据参考文献中的设定，$J_0=0.580$，$\alpha^\prime=0.322$，$\beta^\prime=0.229$，横向磁场满足$B/J_0=-0.25$。
+    
+    \begin{figure}[hbp]	
+        \centering
+        \includegraphics[width=0.75\textwidth]{figures/Ion_ansatz.pdf}
+        \caption{QAOA实验模拟中使用的12量子比特电路}\label{fig:Ion_Ansatz}
+    \end{figure}
+    
+    模拟中使用的电路如图~\ref{fig:Ion_Ansatz}所示。通过以下公式：
+    \begin{equation}
+        SH\ket{1}=S(\ket{0}-\ket{1})/\sqrt{2}=(\ket{0}-i\ket{1})/\sqrt{2}=-i\ket{\uparrow}_Y,
+    \end{equation}
+    我们使用初始状态$\ket{1}$并通过一层$H$门和一层$S$门，等效生成实验中的初始状态$\ket{\psi_0}$。
+    电路中对应于$H_A$部分的演化：
+    \begin{equation}
+        e^{-i\gamma (H_A/J_0)}=e^{-i\gamma \sum (J_{ij}/J_0)X_iX_j},
+    \end{equation}
+    可以通过一系列$R_{XX}$门，利用$\Pi e^{-i\gamma(J_{ij}/J_0)X_iX_j}$来实现。
+    因为在实验中总共有$(^{12}_2)=66$对相互作用（或$R_{XX}$门），这些$R_{XX}$门可以按最紧凑的排列方式在电路中使用$66/6=11$层线路实现。
+    而演化对应于$H_B$的部分$e^{-i\beta (H_B/J_0)}=e^{-i\beta \sum(B/J_0)Y_i}$，可以由一层作用于每个量子比特的$R_Y$门实现。
+    %初始状态$\ket{1}$首先通过一层$H$门和一层$S$门，等效生成实验中的初始状态$\ket{\psi_0}$。
+    电路中对应于$H_A$的演化由11层不重叠的$R_{XX}$门实现，对应于$H_B$的演化由一层作用于每个量子比特的$R_Y$门实现，而生成初始态制备需要额外的两层线路，于是电路的总层数为14层。
+    
+    \begin{figure}[htbp]
+        \centering
+        \includegraphics[width=0.95\textwidth]{figures/QAOA.pdf}
+        \caption{QAOA实验结果与模拟结果的比较}\label{fig:QAOA_result}
+    \end{figure}
+    
+    在文献~\cite{pagano2020quantum}的图2C中，作者报告了设定角度$\beta^\star=1.12$时，测量期望值视角度$\eta$为变分参数$\gamma$的函数的实验结果。
+    模拟结果如图~\ref{fig:QAOA_result}所示，y轴$\eta$定义在式~\ref{ap:eq:qaoa:eta}中。
+    为了模拟退极化噪声$p_x = p_y = p_z = \frac{\lambda}{4}$存在时的含噪声测量期望值结果，类似于前一节，我们使用SLSQP优化器优化式~\ref{ap:eq:minimal_lambda}以获得合适的噪声率$\lambda$来拟合实验结果。
+    优化后所得的最佳噪声率为$\lambda=0.011437$。
+    从图中可以看出，噪声的出现影响了QAOA的性能，实验结果相比于无噪声推测结果略低。
+    与实验结果相比较，在这个离子阱系统实验中，我们的方法很好地拟合了含噪声的实验结果，表明OBPPP方法在实际应用中具有很好的适用性。
