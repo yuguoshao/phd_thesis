@@ -1,6 +1,6 @@
-\chapter{具体线路的复杂度与误差分析}
+%\chapter{具体线路的复杂度与误差分析}
 
-\section{变分量子线路}
+\chapter{含噪的变分量子线路模拟}
 在如今NISQ时代，噪声难以避免的出现在量子线路中。这些噪声导致许多需要高保真度的量子算法难以实现。比如Shor算法需要使用到深层量子线路，因此对噪声的容忍度较低。为了在近期的量子设备中实现实用性的量子算法，变分量子算法作为最受欢迎的NISQ算法，普遍被认为是一个很好的解决方案。变分量子算法的核心思想是通过参数化的量子线路作为
 %#TODO
 
@@ -19,7 +19,7 @@
 为了证明这一条件确实容易满足，考虑在电路的最后两层中，每个量子比特上都有一层 $R_X$ 门和一层 $R_Z$ 门作用，那么 $\{X_i, Z_i\}_{i=1,\cdots,n}$ 包含在 $\{\overline{\sigma}_{i,j}\}$ 中。这些 $\{ X_i,Z_i \}_{i=1,\cdots,n}$ 足以生成 $\{\mathbb{I},X,Y,Z\}^{\otimes n}$。事实上，这一充分条件可以进一步减弱，如第~\ref{temp:subsubsection:cross_items}节 中所示。
 
 
-\subsection{计算复杂度分析}
+\section{计算复杂度分析}
 \begin{proposition}\label{prop:layer_terms}
     计算 $f$ 中第 $i$ 层项的时间和空间复杂度为 $\order{n}$，可通过如下等式计算：
     \begin{equation}\label{eq:i-layer_terms}
@@ -179,7 +179,7 @@
 其中$n$为量子比特数，$L$为线路深度，$\mathcal{N}$为噪声模型。
 
 
-\subsection{误差分析}
+\section{误差分析}
 在上一节中，已经得到了在给定截断参数$M$的情况下，模拟变分量子线路的计算复杂度（式~\eqref{eq:vqa:cost}）。在这一节中，我们将讨论在给定的误差容忍度$\epsilon$下，如何选择截断参数$M$。
 
 误差可以用均方误差（Mean Square Error, MSE）来衡量，对于一个随机变量$X$，其均方误差定义为$\mathbb{E}[(X-\hat{X})^2]$，其中$\hat{X}$是$X$的估计值。在这里，我们考虑的是含噪声期望值模拟的误差，即真实含噪声期望值$\widetilde{\langle O\rangle}$和其估计值$\widehat{\langle O\rangle}$之间的均方误差。根据定义（式~\eqref{eq:noise_expectation}和式~\eqref{eq:truncated_expectation}），含噪声期望值模拟的误差为：
@@ -650,7 +650,7 @@
 因此，对于 $\gamma=\order{\frac{1}{L}}$，我们需要考虑所有具有非零贡献的 Pauli 路径，这将导致指数时间成本。这完成了命题~\ref{prop:lambda_and_L}的证明。
 
 
-\section{Clifford扰动线路}
+\chapter{Clifford扰动量子线路的模拟}
 
 
 \section{随机量子线路}
