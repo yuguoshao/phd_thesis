@@ -903,6 +903,101 @@ $N_M$是$\mathcal{S}_M$的元素个数。
 
 因为在\textbf{情况1}和\textbf{情况2}中，算法的差别仅有在枚举的过程中丢弃的情况不同，因此在空间复杂度上，\textbf{情况1}和\textbf{情况2}的空间复杂度是相同的，如式~\eqref{eq:path:space_cost}所示。
     
+
+
+\subsection{SPD算法}
+在本节中，我们将介绍另一种基于Pauli路径积分的模拟的量子线路期望值算法——稀疏Pauli动力学算法（Sparse Pauli Dynamics, SPD）。该算法的思想首先出现在文献~\cite{beguvsic2023simulating}中，我们在此基础上刻画了该算法的推广形式。
+SPD已经在文献~\cite{beguvsic2023fast,beguvsic2024real}中被应用于量子线路的模拟，取得了较好的效果。
+与前面介绍的OBPPP相比，OBPPP将量子线路的期望值转换为Pauli路径的贡献和，并由噪声对Pauli路径贡献的影响所启发，通过对Hamming Weight做截断以实现线路期望值的高效近似计算。
+而SPD算法的主要思想则是通过贪心策略的方式，尝试枚举具有最大贡献的Pauli路径，从而高效计算量子线路的期望值。在SPD算法的设计中，并不依赖于噪声的特性，因此SPD算法可以适用于无噪声量子线路的模拟。为方便讨论，在本节中我们将不考虑噪声的影响，只考虑无噪声的情况近似$\langle O \rangle$的模拟。
+
+具体来说，在SPD算法中，与OBPPP算法类似，我们首先将量子线路的期望值转换为Pauli路径的贡献和，如式~\eqref{eq:expectation}所示为：
+\begin{equation}
+    \langle O \rangle = \sum_{\bm{s}} f(\mathcal{U},\bm{s},O,\rho).
+\end{equation}
+然后，我们通过通过计算部分具有显著贡献的Pauli路径，来近似计算量子线路的期望值：
+\begin{equation}
+    \widehat{\langle O \rangle} = \sum_{\bm{s}\in \mathcal{A}} f(\mathcal{U},\bm{s},O,\rho),
+\end{equation}
+其中$\mathcal{A}$是Pauli路径的集合，将会在接下来的内容中详细介绍。作为对比，OBPPP算法将$\mathcal{A}$设置为所有与噪声关联的Hamming Weight小于等于$M$且具有非平凡贡献函数的Pauli路径的集合$\mathcal{A}=\{\bm{s}\mid \abs{\bm{s}}_{\mathcal{N}} \leq M\}$。
+
+因此，类似于式~\eqref{eq:total_cost}，SPD算法的时间复杂度可以表示为：
+\begin{equation}\label{eq:spd_cost}
+    C = C_s+N_MC_f,
+\end{equation}
+其中$C_s$是枚举所有具有非平凡贡献函数的Pauli路径的时间复杂度，$N_M$是满足条件的Pauli路径的数量，$C_f$是计算每个Pauli路径的贡献的时间复杂度可以通过式~\eqref{eq:cost_f}计算。
+
+同样，类似于式~\eqref{eq:space_cost}，SPD算法的空间复杂度可以表示为：
+\begin{equation}\label{eq:spd_space}
+    S = S_s+S_f,
+\end{equation}
+其中$S_s$是枚举所有具有非平凡贡献函数的Pauli路径的空间复杂度，$S_f$是计算每个Pauli路径的贡献的空间复杂度可以通过式~\eqref{eq:space_f}计算。
+
+接下来，我们将详细介绍SPD算法的设计并估计关联的$C_s$、$N_M$和$S_s$的取值。
+SPD算法的过程类似于OBPPP算法，也是从观测量$O$开始，逐层向前传播，枚举所有可能的满足条件的Pauli路径。
+不同之处在于SPD算法在枚举的过程中，不是按照Hamming Weight的大小进行截断。为了刻画SPD的截断思路，我们首先对Pauli路径定义如下的函数：
+\begin{definition}
+    对于一个量子线路$\mathcal{U}$，假设其门集合为$\{U_{i,j}\}$。对于一个具体的Pauli路径$\bm{s}$，定义函数$g(\bm{s})$为：
+    \begin{equation}
+        g(\bm{s})=\sum_{i=1}^{L}\sum_{j} h(s_{i-1},s_i,U_{i,j}),
+    \end{equation}
+    其中$h(s_{i-1},s_i,U_{i,j})$表示由以下公式定义的示性函数：
+    \begin{equation}
+        h(s_{i-1},s_i,U_{i,j})=
+        \begin{cases}
+            0, & \text{if } \forall t \text{ s.t. } \abs{\Tr{s_i|_{\supp(U_{i,j})} U_{i,j} s_{i-1}|_{\supp(U_{i,j})} U_{i,j}^\dagger}} \geq \abs{\Tr{s_i|_{\supp(U_{i,j})} U_{i,j} t U_{i,j}^\dagger}},\\
+            1, & \text{otherwise},
+        \end{cases}
+    \end{equation}
+    其中$t$选自支撑集$\supp(U_{i,j})$上归一化的Pauli算符$\{\frac{\mathbb{I}}{\sqrt{2}},\frac{X}{\sqrt{2}},\frac{Y}{\sqrt{2}},\frac{Z}{\sqrt{2}}\}^{\otimes \supp(U_{i,j})}$。$^{\otimes \supp(U_{i,j})}$表示仅在$\supp(U_{i,j})$上的Pauli算符。
+\end{definition}
+
+SPD算法的核心思路是以贪心的策略，尝试枚举具有最大贡献函数的Pauli路径。函数$g(\bm{s})$的定义是为了标记Pauli路径在整个反向传递的枚举过程中有几次不是最大贡献的情况。
+为了贪心的搜索具有最大贡献函数的Pauli路径，SPD算法只考虑拥有较小$g(\bm{s})$值的Pauli路径。因此，在SPD算法中，将$\mathcal{A}$定义为$g(\bm{s})\leq M$的Pauli路径的集合：
+\begin{equation}
+    \mathcal{A}=\{\bm{s}\mid g(\bm{s})\leq M\}.
+\end{equation}
+
+算法的主要过程同OBPPP算法~\ref{ALGORITHM_HS}，唯一区别是在第$i$层时，将$\abs{s_{L}}_H+\cdots+\abs{s_{L-i}}_H\leq M-(L-i)$的条件替换为：
+\begin{equation}
+    \sum_{j} h(s_{L-1},L_i,U_{L,j})+\cdots+\sum_{j} h(s_{L-i-1},s_{L-i},U_{L-i,j})\leq M.
+\end{equation}
+因此，SPD算法枚举过程的空间复杂度$S_s$与OBPPP的空间复杂度$S_s$相同，如式~\eqref{eq:path:space_cost}所示。
+
+
+对于SPD算法在枚举Pauli路径过程的时间复杂度$C_s$和$N_M$的估计，其情况与OBPPP算法处于噪声\textbf{情况2}类似。为了方便分析，我们假设在每个门$U_{i,j}$处，$\abs{\Tr{s_i|_{\supp(U_{i,j})} U_{i,j} t U_{i,j}^\dagger}}$取到最大值的Pauli算符$t$是唯一的。
+在这种情况下，我们可以证明SPD算法的时间复杂度$C_s$和$N_M$的估计与OBPPP算法的情况2相同，如式~\eqref{eq:case2:cost_s}和式~\eqref{eq:case2:N_M}所示。
+
+这是因为，对于SPD算法可以用归纳法证明，假设我们首先设定$g(\bm{s})\leq 0$，对于从给定的Pauli算符$s_L$在第$i$层第$j$个门的反向传播过程中产生的分支只有一条满足$h(s_{L-1},L_i,U_{L,j})=0$的Pauli路径，因此只有一条Pauli路径满足$g(\bm{s})\leq 0$。因为至多有$nL$个位置需要计算，每个位置至多产生$N_{\max}$个潜在的分支，时间复杂度上界为$\order{C_{\text{split}}nLN_{\text{max}}}$。图~\ref{fig:bp_tree_ele:spd}展示了在$g(\bm{s})\leq 1$的情况下的反向传播过程。
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}
+      [level distance=4mm,level/.style={sibling distance=120/#1}],
+      \node(a) {}
+        child{
+          child{ child{child{child child} child{child}} child{child{child}}
+            } 
+            child{child{child{child}}}
+          };
+      \node at ($(a)+(0,-20mm)$) {$\vdots$};
+      \node at ($(a)+(-2.5,-20mm)$) {$\vdots$};
+      \node at ($(a)+(1.5,-20mm)$) {$\vdots$};
+    \end{tikzpicture}
+    \caption{当设定 $g(\bm{s})\leq 1$时的反向传播过程。}\label{fig:bp_tree_ele:spd}
+\end{figure}
+假设$g(\bm{s})\leq M-1$时，从$s_L$开始的Pauli路径最多有$(nLN_{\text{max}})^{M-1}$条路径，枚举过程的时间复杂度上界为$\order{C_{\text{split}}(nLN_{\text{max}})^{M}}$。
+那么在$g(\bm{s})\leq M$时，如果在第$i$层的第$j$个门处存在一个分叉点，因为只有一条分支满足$h(s_{L-1},L_i,U_{L,j})=0$，除一个分支外，新产生的最多$N_{\max}$个分支回落到$g(\bm{s})\leq M-1$的情况。因此，考虑所有可能的分叉点从$s_L$开始的Pauli路径最多有$(nLN_{\text{max}})^{M}$条路径，枚举过程的时间复杂度上界为$\order{C_{\text{split}}(nLN_{\text{max}})^{M+1}}$。
+
+综上所述，对于SPD算法，枚举所有具有非平凡贡献函数的Pauli路径的时间复杂度为：
+\begin{equation}\label{eq:spd:cost_s}
+    C_s=\mathrm{Poly}(n) \order{(nL)^{M}} C_{\text{split}} N_{\text{max}}^{M}.
+\end{equation}
+满足条件的Pauli路径的数量$N_M$最多为：
+\begin{equation}\label{eq:spd:N_M}
+    N_M=\mathrm{Poly}(n) (nLN_{\text{max}})^{M+1}.
+\end{equation}
+
 \section{本章小结}
 
 
