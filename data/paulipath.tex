@@ -5,15 +5,15 @@
 \section{量子计算的经典模拟}
 随着量子计算硬件的快速发展，量子比特规模已达到数百量级（如IBM Quantum Heron处理器）。然而，当前含噪声中等规模量子（NISQ）设备的计算保真度仍受限于退相干时间和门操作误差。在此背景下，量子计算的经典模拟技术具有多重意义：
 \begin{itemize}
-    \item 量子计算的经典模拟是验证量子计算硬件的有效手段。通过经典模拟，我们可以验证量子计算硬件的正确性，评估其性能，甚至优化量子算法。
-    \item 突破现有量子计算硬件的规模限制。通过经典模拟，我们可以模拟更大规模的量子系统，以探索量子计算的潜在应用（如数千量子比特）。
-    \item 辅助算法设计。通过经典模拟，为算法提供参数优化、误差分析等支持。
+    \item 量子计算的经典模拟是验证量子计算硬件的有效手段。通过经典模拟建立量子态的精确参考模型，可量化硬件性能指标（如量子体积、门保真度）。例如IBM Qiskit Ignis框架~\cite{qiskit2024}通过对比模拟结果与实际量子比特测量，可定位量子门错误源并优化校准流程。
+    \item 突破现有量子计算硬件的规模限制。经典模拟可构建虚拟量子系统突破物理硬件的量子比特数限制，我们可以模拟更大规模的量子系统，以探索量子计算的潜在应用（如数千量子比特）。为量子纠错编码、量子化学模拟等应用提供预研平台。
+    \item 辅助算法设计。通过经典模拟，通过模拟实现算法参数空间的快速遍历（如VQE算法的哈密顿量参数优化），结合噪声模型可预测算法在真实硬件中的退化规律，为算法提供参数优化、误差分析等支持。
 \end{itemize}
-在本章中，我们将介绍量子计算的经典模拟方法，重点介绍Pauli路径积分模拟方法。
+在本章中，我们将介绍常用的量子计算的经典模拟方法，包括全状态模拟（Full-State Simulation）和稳定子模拟（Stabilizer Simulation）。在此基础上，我们将介绍一类高效的经典模拟方法——基于Pauli路径积分的经典模拟（Pauli Path Integral Simulation）。
 
 
 \subsection{全状态模拟}
-常见的量子计算经典模拟方法包括全状态模拟，全状态模拟全状态模拟（Full-State Simulation）是量子计算经典模拟的一种直接方法，即在经典计算机上存储和演化完整的量子态向量或密度矩阵。
+常见的量子计算经典模拟方法包括全状态模拟，全状态模拟是量子计算经典模拟的一种直接方法，即在经典计算机上存储和演化完整的量子态向量或密度矩阵。
 
 在纯态量子计算模型中，一个$n$量子比特的量子态可以用$2^n$维复向量表示：
 \begin{equation}
@@ -42,42 +42,54 @@
 \end{equation}
 同样地，对于密度矩阵模拟，时间复杂度和空间复杂度也是关于qubit数目的指数级量级。
 
+
+
+随着系统规模的增加，所需的内存成本也在增加，全状态模拟器无法模拟大型量子电路。为了在实际应用中更加高效，可以进行一些近似，以在更少运行时间的代价下模拟更大的量子系统。一方面可以在算法层面上优化，
+比如可以通过一种低秩分解方法~\cite{chen2021low}，将密度矩阵分解为低秩矩阵，以更高效的模拟含噪声量子量子电路的演化。
+还能通过为特定用途的模拟设计专用的的全状态模拟方法~\cite{jones2020efficient,kassal2008polynomial}或对具有特定结构的电路进行优化~\cite{bravyi2016improved,vidal2003efficient}。
+此外，还可对代码实现层面进行优化，包括使用多线程并行化模拟~\cite{de2019massively}、GPU加速~\cite{amariutei2011parallel}、以及重排序加速~\cite{fatima2021faster}等。
+
+
 全状态模拟的主要优点是直观、易于理解，但其缺点也显而易见：空间复杂度和时间复杂度都是指数级的，因此全状态模拟只适用于小规模量子系统的模拟。对于大规模量子系统，全状态模拟的计算复杂度是无法接受的。因此，我们需要寻找更高效的量子计算经典模拟方法。
 
 \subsection{Stabilizers稳定子模拟}
 
+对于只由Clifford门构成的量子线路，被称为Clifford量子线路。Clifford量子线路的一个重要特性是其可以通过稳定子模拟方法高效模拟。稳定子模拟的基本思想是通过维护一个稳定子群生成元的表格，通过Clifford门的作用更新表格，从而模拟量子线路的演化。
 
-一个n量子比特的纯态  $|\psi\rangle $ 被称为稳定子态，如果存在一个由n个独立、对易的Pauli算符组成的集合  $\{S_1, S_2, …, S_n\}$ ，使得：
-\begin{equation}
-    S_i |\psi\rangle = |\psi\rangle, \quad \forall i \in \{1, 2, …, n\}.
-\end{equation}
-每个生成元  $S_i$  是由单比特Pauli算符的张量积构成的算符，可以表示为：
+为介绍稳定子模拟方法，我们首先介绍稳定子的定义。
+对于一个n量子比特的纯态$|\psi\rangle$，我们称一个酉算子$U$稳定该纯态，如果它作用在该纯态上不改变其状态，即$U|\psi\rangle = |\psi\rangle$。注意到，如果酉算子$U$和$V$都稳定该纯态，则$UV$和$U^\dagger$也稳定该纯态。因此，所有稳定该纯态的酉算子构成一个群，称为稳定子群（Stabilizer Group），记作$\text{Stab}(\ket{\psi})$。
+此外，对于两个不同的量子态$\ket{\psi}\neq\ket{\phi}$，一定有$\text{Stab}(\ket{\psi})\neq\text{Stab}(\ket{\phi})$。因此，稳定子群与量子态一一对应。
 
-\begin{equation}
-    S_i = \alpha_i P_{i1} \otimes P_{i2} \otimes … \otimes P_{in},
-\end{equation}
-其中，  $\alpha_i\in\{-1,+1\}$  是相位因子，  $P_{ij}\in\{I, X, Y, Z\}$  是单比特Pauli算符。
+特别地，如果一个量子态的稳定子群$\text{Stab}(\ket{\psi})$是Pauli群$\mathcal{P}_n=\{ \alpha P_{1} \otimes P_{2} \otimes \cdots \otimes P_{n}\}$的子群，则称该量子态为稳定子态，其中$\alpha\in\{-1,+1\}$是相位因子，$P_i\in\{I,X,Y,Z\}$是Pauli算符。
 
+因为，对于任何一个有限群$G$，都可以找到一个生成元的集合，使得生成元集合的大小不超过$\log_2|G|$。于是，对任何稳定子态，都可以找到一个稳定子群的生成元集合$\{S_1, S_2, …, S_n\}$，使得$\text{Stab}(\ket{\psi})=\langle S_1, S_2, …, S_n \rangle$，且每个生成元$S_i$都是Pauli算符，其中$\langle S_1, S_2, …, S_n \rangle$表示生成元集合$\{S_1, S_2, …, S_n\}$生成的群。
 
-这些算符的集合被称为  $|\psi\rangle $ 的稳定子群（Stabilizer Group），记作 $ \mathcal{S}$ 。由于这些算符是对易的，因此  $\mathcal{S}$  是Pauli群的一个阿贝尔子群。
-同样的，$n$个对易的Pauli算符的集合也可以生成一个稳定子群，且该该稳定子群唯一地对应一个量子态满足$S\ket{\psi_S}=\ket{\psi_S}$对任意$S\in\mathcal{S}$成立。
-
-
-例如，对于单比特态  $|0\rangle$ ，有：
-
+例如，对于单比特态 $|0\rangle$，有：
 \begin{equation}
     Z |0\rangle = |0\rangle.
 \end{equation}
-$|0\rangle$的稳定子群是 $\mathcal{S} = \{I,Z\}$ 。
+因此，$|0\rangle$的稳定子群是$\mathcal{S} = \{I,Z\}$，稳定子群的生成元集合是$\{Z\}$。
 
-
-一个Pauli算符可以用两个boolean值向量和一个相位因子表示：
+因为一个Pauli算符可以用两个boolean值向量和一个相位因子表示：
 \begin{equation}
     P = (-1)^\alpha \otimes_{i=1}^n X_i^{x_i} Z_i^{z_i},
 \end{equation}
-其中，$\alpha\in\{0,1\}$是相位因子，  $x_i, z_i\in\{0,1\}$  是boolean值向量。这意味着，一个Pauli算符可以用一个长度为  $2n+1$  的boolean值向量表示。因此，一个$n\times (2n+1)$的boolean值矩阵可以表示一个稳定子群的完整信息。
+其中，$\alpha\in\{0,1\}$是相位因子，$x_i, z_i\in\{0,1\}$是boolean值向量。这意味着，一个Pauli算符可以用一个长度为$2n+1$的boolean值向量表示。
+因此，一个$n\times (2n+1)$的boolean值表格可以表示一个稳定子群的完整信息。通过稳定子群与稳定子态的一一对应关系，我们可以用一个$n\times (2n+1)$的boolean值表格表示一个稳定子态。
 
-同时，因为Pauli算符在Clifford门作用下是闭的，任何的Clifford门构成的量子线路可以通过在作用Clifford门之后更新稳定子群的表格模拟。已知的算法可以实现以$\order{n^2}$的计算复杂度更新一次表格~\cite{PhysRevA.70.052328}。
+同时，因为Pauli算符在Clifford门作用下是闭的，任何的Clifford门构成的量子线路可以通过在作用Clifford门之后更新稳定子群生成元的表格模拟。根据Gottesman-Knill定理~\cite{gottesman1998heisenberg}，对于Clifford群的生成元$H, S, CNOT$或是测量门，都可以在多项式的时间内更新稳定子群的生成元表格。
+因此，Clifford线路总是可以被高效模拟的。
+
+事实上，对于Clifford门的稳定子群生成元的表格更新是非常高效的，对每一个门所需的时间复杂度是$\order{n}$。但是对于测量算子，并不是那么高效，在测量门后更新稳定子群生成元的表格通常需要$\order{n^3}$的时间复杂度。
+为了改进这一问题，在后续参考文献~\cite{PhysRevA.70.052328}通过引入不稳定（Destabilizer）算子，将测量门的更新时间复杂度降低到$\order{n^2}$。
+
+稳定子模拟方法只适用于Clifford线路的模拟，对于非Clifford线路，稳定子模拟方法并不适用。然而，Clifford线路的集合并不是universal的，即Clifford线路不能用于通用量子计算。为了实现通用的量子计算，需要额外的资源，一个标准的方案是通过引入Magic态，而模拟的计算代价是随着Magic态的数量增加而指数增加。因此，对于由Clifford门主导的线路，即只包含少量非Clifford门的量子线路，仍是可以高效的模拟的。
+对于这类电路的模拟，主要有两类方法：准概率（Quasiprobability）方法和Stabilizer-Rank方法。
+准概率方法~\cite{pashayan2015estimating}通过对稳定子态和作用算符的准概率分布进行采样，可以获得观测量期望值的无偏估计。
+准概率方法允许电路元素的概率表示为负值，而负值的大小，即偏离真实概率分布的程度，是影响模拟代价的核心因素。
+另一类基于Stabilizer-Rank的方法，是将量子态分解为稳定子态的线性组合。Stabilizer-Rank定义为一个量子态可以分解成的最小的稳定子态数量，这个量衡量了基于Stabilizer-Rank模拟方法的计算复杂度。另一方面，Stabilizer-Rank的求解通常是一个困难的问题~\cite{bravyi2016improved}，因此使用Stabilizer-Rank精确模拟可能会带来高昂的代价。这激发了文献~\cite{bravyi2019simulation,qassim2019clifford}的工作，提出了一种稀疏化方法，通过包含较少稳定子态的分解来近似目标态。
+
+
 
 \section{基于Pauli路径积分的经典模拟}
 在这一节中，我们将介绍一种高效的量子计算经典模拟方法，使用Feynman路径积分的思想，将量子线路的演化结果表示为以Pauli算符为基的路径积分。在本节中，我们将介绍Pauli路径积分模拟方法的基本原理和实现细节。
