@@ -925,24 +925,24 @@ SPD已经在文献~\cite{beguvsic2023fast,beguvsic2024real}中被应用于量子
 \begin{equation}\label{eq:spd_cost}
     C = C_s+N_MC_f,
 \end{equation}
-其中$C_s$是枚举所有具有非平凡贡献函数的Pauli路径的时间复杂度，$N_M$是满足条件的Pauli路径的数量，$C_f$是计算每个Pauli路径的贡献的时间复杂度可以通过式~\eqref{eq:cost_f}计算。
+其中$C_s$是枚举Pauli路径过程的时间复杂度，$N_M$是满足条件的Pauli路径的数量，$C_f$是计算每个Pauli路径的贡献的时间复杂度可以通过式~\eqref{eq:cost_f}计算。
 
 同样，类似于式~\eqref{eq:space_cost}，SPD算法的空间复杂度可以表示为：
 \begin{equation}\label{eq:spd_space}
     S = S_s+S_f,
 \end{equation}
-其中$S_s$是枚举所有具有非平凡贡献函数的Pauli路径的空间复杂度，$S_f$是计算每个Pauli路径的贡献的空间复杂度可以通过式~\eqref{eq:space_f}计算。
+其中$S_s$是枚举Pauli路径过程的空间复杂度，$S_f$是计算每个Pauli路径的贡献的空间复杂度可以通过式~\eqref{eq:space_f}计算。
 
 接下来，我们将详细介绍SPD算法的设计并估计关联的$C_s$、$N_M$和$S_s$的取值。
 SPD算法的过程类似于OBPPP算法，也是从观测量$O$开始，逐层向前传播，枚举所有可能的满足条件的Pauli路径。
 不同之处在于SPD算法在枚举的过程中，不是按照Hamming Weight的大小进行截断。为了刻画SPD的截断思路，我们首先对Pauli路径定义如下的函数：
 \begin{definition}
     对于一个量子线路$\mathcal{U}$，假设其门集合为$\{U_{i,j}\}$。对于一个具体的Pauli路径$\bm{s}$，定义函数$g(\bm{s})$为：
-    \begin{equation}
+    \begin{equation}\label{eq:spd_g}
         g(\bm{s})=\sum_{i=1}^{L}\sum_{j} h(s_{i-1},s_i,U_{i,j}),
     \end{equation}
     其中$h(s_{i-1},s_i,U_{i,j})$表示由以下公式定义的示性函数：
-    \begin{equation}
+    \begin{equation}\label{eq:spd_h}
         h(s_{i-1},s_i,U_{i,j})=
         \begin{cases}
             0, & \text{if } \forall t \text{ s.t. } \abs{\Tr{s_i|_{\supp(U_{i,j})} U_{i,j} s_{i-1}|_{\supp(U_{i,j})} U_{i,j}^\dagger}} \geq \abs{\Tr{s_i|_{\supp(U_{i,j})} U_{i,j} t U_{i,j}^\dagger}},\\
@@ -957,7 +957,10 @@ SPD算法的核心思路是以贪心的策略，尝试枚举具有最大贡献�
 \begin{equation}
     \mathcal{A}=\{\bm{s}\mid g(\bm{s})\leq M\}.
 \end{equation}
-
+综上，在SPD算法中，近似计算量子线路的期望值由下式给出：
+\begin{equation}\label{eq:spd:approximation}
+    \widehat{\langle O \rangle} = \sum_{\bm{s}\in \{\bm{s}\mid g(\bm{s})\leq M\}} f(\mathcal{U},\bm{s},O,\rho),
+\end{equation}
 算法的主要过程同OBPPP算法~\ref{ALGORITHM_HS}，唯一区别是在第$i$层时，将$\abs{s_{L}}_H+\cdots+\abs{s_{L-i}}_H\leq M-(L-i)$的条件替换为：
 \begin{equation}
     \sum_{j} h(s_{L-1},L_i,U_{L,j})+\cdots+\sum_{j} h(s_{L-i-1},s_{L-i},U_{L-i,j})\leq M.
@@ -989,7 +992,7 @@ SPD算法的核心思路是以贪心的策略，尝试枚举具有最大贡献�
 假设$g(\bm{s})\leq M-1$时，从$s_L$开始的Pauli路径最多有$(nLN_{\text{max}})^{M-1}$条路径，枚举过程的时间复杂度上界为$\order{C_{\text{split}}(nLN_{\text{max}})^{M}}$。
 那么在$g(\bm{s})\leq M$时，如果在第$i$层的第$j$个门处存在一个分叉点，因为只有一条分支满足$h(s_{L-1},L_i,U_{L,j})=0$，除一个分支外，新产生的最多$N_{\max}$个分支回落到$g(\bm{s})\leq M-1$的情况。因此，考虑所有可能的分叉点从$s_L$开始的Pauli路径最多有$(nLN_{\text{max}})^{M}$条路径，枚举过程的时间复杂度上界为$\order{C_{\text{split}}(nLN_{\text{max}})^{M+1}}$。
 
-综上所述，对于SPD算法，枚举所有具有非平凡贡献函数的Pauli路径的时间复杂度为：
+综上所述，对于SPD算法，枚举所有满足条件的Pauli路径的时间复杂度为：
 \begin{equation}\label{eq:spd:cost_s}
     C_s=\mathrm{Poly}(n) \order{(nL)^{M}} C_{\text{split}} N_{\text{max}}^{M}.
 \end{equation}
@@ -1001,7 +1004,7 @@ SPD算法的核心思路是以贪心的策略，尝试枚举具有最大贡献�
 \section{本章小结}
 
 
-本章介绍了使用经典计算机模拟量子计算机的意义与应用，并介绍了部分常用的模拟方法，包括全状态和稳定子模拟方法。在介绍了这些方法的基础上，我们介绍了一种新的模拟方法，即Pauli路径方法。Pauli路径方法通过枚举所有可能的Pauli路径，计算每个Pauli路径的贡献，从而计算量子线路的输出，如式~\eqref{eq:expectation}所示：
+本章介绍了使用经典计算机模拟量子计算机的意义与应用，并介绍了部分常用的模拟方法，包括全状态和稳定子模拟方法。在介绍了这些方法的基础上，我们介绍了一种新的模拟方法，即Pauli路径方法。Pauli路径方法通过枚举所有满足条件的Pauli路径，并计算每个Pauli路径的贡献，从而计算量子线路的输出，如式~\eqref{eq:expectation}所示：
 \begin{equation*}
     \langle O \rangle = \sum_{\bm{s}} f(\mathcal{U},\bm{s},O,\rho).
 \end{equation*}
