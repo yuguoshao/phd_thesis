@@ -16,6 +16,7 @@ Clifford扰动量子线路的模拟可以用于量子错误缓解等领域，通
 \begin{equation}
     \langle O \rangle = \tr{O \mathcal{U}(\bm{\theta})\rho \mathcal{U}(\bm{\theta})^\dagger}.
 \end{equation}
+在本章中，如不加说明，假设可观测量$O$是一个Pauli算符，即$O\in \{\mathbb{I},X,Y,Z\}^{\otimes n}$。
 通过使用SPD算法截断高阶扰动项，可以高效地近似观测期望值。
 首先注意到，Pauli旋转门$e^{i\frac{\theta}{2} P}$作用在Pauli算符$\sigma$上的演化描述为：
 \begin{equation}\label{eq:heisenberg}
@@ -89,3 +90,134 @@ Clifford扰动量子线路的模拟可以用于量子错误缓解等领域，通
 其中$n$为量子比特数，$L$为线路深度。
 
 \section{误差分析}
+当量子线路中的旋转角度较小时，则$\sin{\theta}$项的值较小，因此对$\sin{\theta}$项的截断将提供对期望值的良好近似。
+为了证明这一点，我们引入小角度空间$\Theta=\{\bm{\theta}\mid \abs{\theta_i}\leq \theta_* ,i=1,\cdots,L \}$，并分析小角度空间中的截断误差。
+
+
+
+首先，我们需要利用以下引理来证明在小角度空间中，不同Pauli路径的贡献函数相互正交：
+\begin{lemma}
+对于任意不同的Pauli路径$\bm{s},\bm{s}^{\prime}\in \bm{P}^{L+1}_n$，以及小角度空间$\Theta=\{\bm{\theta}\mid \abs{\theta_i}\leq \theta_* ,i=1,\cdots,L \}$，我们有
+\begin{equation}\label{ap:eq:E_cross_equals_0}
+\mathbb{E}_{\Theta}f(\mathcal{U},\bm{s},O,\rho)f(\mathcal{U},\bm{s}^{\prime},O,\rho)=0.
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+    这个引理可以通过分析演化过程来证明。根据式~\eqref{eq:pp:contribution}，我们有
+    \begin{equation}
+        \begin{aligned}
+            f(\mathcal{U},\bm{s},O,\rho)f(\mathcal{U},\bm{s}^{\prime},O,\rho)=&\Tr{Os_L}\Tr{Os'_L}\\
+            &\left(\prod_{i=1}^{L}\Tr{s_i\mathcal{U}_i(\theta_i) s_{i-1}\mathcal{U}_i(\theta_i)^\dagger}\Tr{s'_i\mathcal{U}_i(\theta_i) s'_{i-1}\mathcal{U}_i(\theta_i)^\dagger}\right)\\
+            &\Tr{s_0 \rho}\Tr{s'_0 \rho}
+        \end{aligned}
+    \end{equation}
+    首先，必须有$s_L=s'_L$，因为初始可观测量是相同的Pauli算符，否则因子$\Tr{Os_L}\Tr{Os'_L}$为零。
+    然后，我们考虑在算子$\mathcal{U}_L(\theta_L)=C_L\exp{-i \theta_i P_L / 2}$下$s_{L-1}$和$s'_{L-1}$的演化。
+
+    如果$P_L$与$C_L^\dagger s_L C_L$对易，根据方程~\eqref{eq:heisenberg}，我们有$\mathcal{U}_L(\theta_L)^\dagger s_L \mathcal{U}_L(\theta_L)=\mathcal{U}_L(\theta_L)^\dagger s'_L \mathcal{U}_L(\theta_L) = C_L^\dagger s_L C_L$，那么$s_{L-1}=s'_{L-1}$，否则因子$\Tr{s_L\mathcal{U}_L(\theta_L) s_{L-1}\mathcal{U}_L(\theta_L)^\dagger}\Tr{s'_L\mathcal{U}_L(\theta_L) s'_{L-1}\mathcal{U}_L(\theta_L)^\dagger}$为零。
+
+    如果$P_L$与$C_L^\dagger s_L C_L$反对易，根据方程~\eqref{eq:heisenberg}，$s_{L-1}$和$s'_{L-1}$可以是$C_L^\dagger s_L C_L$或$P_L C_L^\dagger s_L C_L$，否则$\Tr{s_L\mathcal{U}_L(\theta_L) s_{L-1}\mathcal{U}_L(\theta_L)^\dagger}\Tr{s'_L\mathcal{U}_L(\theta_L) s'_{L-1}\mathcal{U}_L(\theta_L)^\dagger}=0$。如果$s_{L-1}\neq s'_{L-1}$，意味着在乘积$f(\mathcal{U},\bm{s},O,\rho)f(\mathcal{U},\bm{s}^{\prime},O,\rho)$中存在因子$\cos{\theta_L}\sin{\theta_L}$，由于
+    \begin{equation}
+        \int_{-\theta_*}^{\theta_*}\cos{\theta_L}\sin{\theta_L}\mathrm{d}\theta_L=0,
+    \end{equation}
+    因此我们必须有$s_{L-1}=s'_{L-1}$。重复这个过程，我们有$s=s'$，否则$\mathbb{E}_{\Theta}f(\mathcal{U},\bm{s},O,\rho)f(\mathcal{U},\bm{s}^{\prime},O,\rho)=0$，这完成了证明。
+\end{proof}
+
+
+
+对于$\langle O \rangle$和$\langle O \rangle ^{(M)}$之间在平均情况下的误差，我们可以用均方误差来度量，对均方误差我们有如下引理可以提供上界：
+\begin{lemma}
+    如果可观测量$O$是一个Pauli算符，那么在小角度空间$\Theta$中，$\langle O \rangle$和$\langle O \rangle ^{(M)}$之间的均方误差上界为
+    \begin{equation}
+        \mathbb{E}_{\Theta}\left(\langle O \rangle - \langle O \rangle ^{(M)}\right)^2 \leq  \left(1+c\right)^L - \left(1+c\right)^M,
+    \end{equation}
+    其中$c=\frac{\theta_*^2}{3}+\order{\theta_*^4}$是一个常数。
+\end{lemma}
+
+\begin{proof}
+    根据式~\eqref{eq:sim_noiseless}，近似期望值的定义，我们有
+    \begin{equation}
+        \begin{aligned}
+        \mathbb{E}_{\Theta}\left(\langle O \rangle - \langle O \rangle ^{(M)}\right)^2 &= \mathbb{E}_{\Theta}\left(\sum_{\bm{s}\in \{\bm{s}\mid g(\bm{s})> M\}} f(\mathcal{U},\bm{s},O,\rho)\right)^2\\
+        &=\sum_{s,s'\in\{\bm{s}\mid g(\bm{s})> M\}} \mathbb{E}_{\Theta}\left(f(\mathcal{U},\bm{s},O,\rho)f(\mathcal{U},\bm{s}^\prime,O,\rho) \right)\\
+        &=\sum_{\bm{s}\in \{\bm{s}\mid g(\bm{s}) > M\}} \mathbb{E}_{\Theta}\left(f(\mathcal{U},\bm{s},O,\rho)\right)^2,
+      \end{aligned}
+    \end{equation}
+    其中最后一个等式由方程~\eqref{ap:eq:E_cross_equals_0}得出。
+
+    根据Hölder不等式，在对于$p,q>0$满足$\frac{1}{p}+\frac{1}{q}=1$时，有$\abs{\tr{A^\dagger B}}\leq \norm{A}_p\norm{B}_q$，我们有
+    \begin{equation}
+        \begin{aligned}
+            f(\mathcal{U},\bm{s},O,\rho)^2=&\Tr{Os_L}^2\tr{\rho s_0}^2\left(\prod_{i=1}^{L}\Tr{s_i\mathcal{U}_i(\theta_i) s_{i-1}\mathcal{U}_i(\theta_i)^\dagger}\right)^2\\
+        \leq & \left(\norm{O}_2\norm{s_L}_2 \norm{\rho}_1\norm{s_0}_\infty\right)^2  \left(\prod_{i=1}^{L}\Tr{s_i\mathcal{U}_i(\theta_i) s_{i-1}\mathcal{U}_i(\theta_i)^\dagger}\right)^2\\
+        =& \left(\prod_{i=1}^{L}\Tr{s_i\mathcal{U}_i(\theta_i) s_{i-1}\mathcal{U}_i(\theta_i)^\dagger}\right)^2,
+        \end{aligned}
+    \end{equation}
+    其中最后一个等式成立是因为$\norm{O}_2=\sqrt{\tr{OO^\dagger}}=\sqrt{2^n}$，$\norm{\rho}_1=\tr{\rho}=1$，$\norm{s_L}_2=\sqrt{\tr{s_L^\dagger s_L}}=1$，$\norm{s_0}_\infty=\left(\frac{1}{\sqrt{2}}\right)^2$。
+
+    集合$\{\bm{s}\mid g(\bm{s})=l\}$表示在其贡献中拥有正好$l$个$\sin{\theta}$项的Pauli路径集合。因为总共有$L$个门至多$L$个分叉点，于是集合$\{\bm{s}\mid g(\bm{s})= l\}$的数量上界为$\binom{L}{l}$。
+
+    如果我们将常数$c$记为：
+    \begin{equation}
+        c=\mathbb{E}_{\abs{\theta}\leq \theta_*}\sin^2{\theta}=\frac{1}{2\theta_*} \int_{-\theta_*}^{\theta_*}(\sin^2{\theta})\mathrm{d}\theta= \frac{1}{2}-\frac{\sin{2\theta_*}}{2\theta_*}=\frac{ \theta_*^2}{3}+\order{\theta_*^4}.
+    \end{equation}
+
+    那么对于任何$s\in\{\bm{s}\mid g(\bm{s})= l\}$，我们有
+    \begin{equation}
+        \begin{aligned}
+        \mathbb{E}_{\Theta}f(\mathcal{U},\bm{s},O,\rho)^2 &\leq \mathbb{E}_{\Theta}\left(\prod_{i=1}^{L}\Tr{s_i\mathcal{U}_i(\theta_i) s_{i-1}\mathcal{U}_i(\theta_i)^\dagger}\right)^2\\
+        &= \prod_{i=1}^{L}\mathbb{E}_{\abs{\theta_i}\leq \theta_*}\Tr{s_i\mathcal{U}_i(\theta_i) s_{i-1}\mathcal{U}_i(\theta_i)^\dagger}^2\\
+        & \leq c^{l},
+        \end{aligned}
+    \end{equation}
+    其中不等式成立是因为$\Tr{s_i\mathcal{U}_i(\theta_i) s_{i-1}\mathcal{U}_i(\theta_i)^\dagger}^2$等于$\cos^2{\theta_i}$或$\sin^2{\theta_i}$或$1$，并且$\mathbb{E}_{\abs{\theta_i}\leq \theta_*}\cos^2{\theta_i}\leq 1$和$\mathbb{E}_{\abs{\theta_i}\leq \theta_*}\sin^2{\theta_i}=c$。
+
+    因此，我们有
+    \begin{equation}
+    \begin{aligned}
+        \sum_{s\in\{\bm{s}\mid g(\bm{s})>M\}} \mathbb{E}_{\Theta}f(\mathcal{U},\bm{s},O,\rho)^2 &\leq \sum_{l=M+1}^{L} \sum_{\{\bm{s}\mid g(\bm{s})=l\}} \mathbb{E}_{\Theta}f(\mathcal{U},\bm{s},O,\rho)^2\\
+        & \leq \sum_{l=M+1}^{L} \sum_{\{\bm{s}\mid g(\bm{s})=l\}} c^l \\
+        & \leq \sum_{l=M+1}^{L} \binom{L}{l} c^l\\
+        & \leq  \left(1+c\right)^L-\left(1+c\right)^M.\\
+      \end{aligned}
+\end{equation}
+
+\end{proof}
+
+对于最差情况下的误差，我们有如下引理：
+\begin{lemma}
+    对于Pauli可观测量$O$，在小角度空间$\Theta$中，$\langle O \rangle$和$\langle O \rangle ^{(M)}$之间的差异上界为
+    \begin{equation}
+        \abs{\langle O \rangle - \langle O \rangle ^{(M)}} \leq  \left(1+\sin{\theta_*}\right)^L - \left(1+\sin{\theta_*}\right)^M.
+    \end{equation}
+\end{lemma}
+
+\begin{proof}
+    根据式~\eqref{eq:sim_noiseless}，近似期望值的定义，我们有
+    \begin{equation}
+        \begin{aligned}
+            \abs{\langle O \rangle - \langle O \rangle ^{(M)}} &= \abs{\sum_{s\in\{\bm{s}\mid g(\bm{s})>M\}} f(s,\bm{\theta}) \tr{\rho s_0}} \\
+            &\leq \sum_{s\in\{\bm{s}\mid g(\bm{s})>M\}} \abs{f(s,\bm{\theta}) \tr{\rho s_0}}\\
+            &= \sum_{l=M+1}^{L} \sum_{\{\bm{s}\mid g(\bm{s})=l\}} \abs{f(s,\bm{\theta}) \tr{\rho s_0}}\\
+            &\leq \sum_{l=M+1}^{L} \sum_{\{\bm{s}\mid g(\bm{s})=l\}} \sin^l{\theta_*} \\
+            &\leq \sum_{l=M+1}^{L} \binom{L}{l} \sin^l{\theta_*}\\
+            &\leq  \left(1+\sin{\theta_*}\right)^L - \left(1+\sin{\theta_*}\right)^M.
+        \end{aligned}
+    \end{equation}
+    这完成了证明。
+\end{proof}
+
+注意到，对于任意$\delta>0$，如果$0<c<\frac{\ln{1+\frac{\delta}{2}}}{L-M}\leq \frac{\ln{2}}{M}$，那么我们有：
+\begin{equation}
+  \begin{aligned}
+     \left(1+c\right)^{L}-\left(1+c\right)^{M}&= \left(1+c\right)^{M} \left(\left(1+c\right)^{L-M}-1 \right)\\
+    &\leq 2\left(1+\frac{\delta}{2}-1\right)=\delta.
+  \end{aligned}
+\end{equation}
+其中最后一个不等式是由于$(1+x)^m\leq e^{mx}$。因此$(1+c)^M\leq e^{cM}\leq 2$且$\left(1+c\right)^{L-M}\leq e^{c(L-M)}\leq 1+\frac{\delta}{2}$。
+
+综上所述，我们有以下定理：
+\begin{theorem}
+    对于任意给定的$\delta>0$，如果$\frac{\ln{1+\frac{\delta}{2}}}{L-M}\leq \frac{\ln{2}}{M}$，且$\theta_*=\frac{\ln{1+\frac{\delta}{2}}}{L-M}=\order{\frac{1}{L}}$，则有截断误差$\abs{\langle O \rangle - \langle O \rangle ^{(M)}}\leq \delta$。在平均情况下，如果有$\theta_*=\sqrt{\frac{3\ln{1+\frac{\delta}{2}}}{L-M}}=\order{\frac{1}{\sqrt{L}}}$，则有均方误差为了使均方误差小于$\mathbb{E}_{\Theta}\left(\langle O \rangle - \langle O \rangle ^{(M)}\right)^2 \leq \delta$。
+\end{theorem}
