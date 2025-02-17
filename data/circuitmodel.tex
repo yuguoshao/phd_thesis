@@ -1,6 +1,6 @@
 %\chapter{具体线路的复杂度与误差分析}
 
-\chapter{含噪的变分量子线路模拟}
+\chapter{含噪的变分量子线路模拟}\label{chap:noisy_vqa}
 在如今NISQ时代，噪声难以避免的出现在量子线路中。这些噪声导致许多需要高保真度的量子算法难以实现。比如Shor算法需要使用到深层量子线路，因此对噪声的容忍度较低。为了在近期的量子设备中实现实用性的量子算法，变分量子算法作为最受欢迎的NISQ算法，普遍被认为是一个很好的解决方案。变分量子算法的核心思想是通过参数化的量子线路作为
 %#TODO
 
@@ -119,7 +119,7 @@
 \end{remark}
 
 结合式~\eqref{eq:cost_rho}和式~\eqref{eq:cost_O}，我们可以得到式~\eqref{eq:cost_f}对于变分量子线路取值为：
-\begin{equation}
+\begin{equation}\label{eq:vqa:c_f}
     C_f=\order{L n}+\order{n}+\order{\poly(n)}=\order{\poly(n)+L n}.
 \end{equation}
 式~\eqref{eq:space_f}对于变分量子线路取值为：
@@ -650,11 +650,3 @@
 因此，对于 $\gamma=\order{\frac{1}{L}}$，我们需要考虑所有具有非零贡献的 Pauli 路径，这将导致指数时间成本。这完成了命题~\ref{prop:lambda_and_L}的证明。
 
 
-\chapter{Clifford扰动量子线路的模拟}
-
-在
-
-在如今NISQ时代，噪声难以避免的出现在量子线路中。这些噪声导致许多需要高保真度的量子算法难以实现。比如Shor算法需要使用到深层量子线路，因此对噪声的容忍度较低。为了在近期的量子设备中实现实用性的量子算法，变分量子算法作为最受欢迎的NISQ算法，普遍被认为是一个很好的解决方案。变分量子算法的核心思想是通过参数化的量子线路作为
-
-
-\chapter{随机量子线路}

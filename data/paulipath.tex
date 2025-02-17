@@ -965,7 +965,10 @@ SPD算法的核心思路是以贪心的策略，尝试枚举具有最大贡献�
 \begin{equation}
     \sum_{j} h(s_{L-1},L_i,U_{L,j})+\cdots+\sum_{j} h(s_{L-i-1},s_{L-i},U_{L-i,j})\leq M.
 \end{equation}
-因此，SPD算法枚举过程的空间复杂度$S_s$与OBPPP的空间复杂度$S_s$相同，如式~\eqref{eq:path:space_cost}所示。
+因此，SPD算法枚举过程的空间复杂度$S_s$与OBPPP的空间复杂度$S_s$相同，如式~\eqref{eq:path:space_cost}所示为：
+\begin{equation}\label{eq:spd:space_cost}
+    S_s=\order{\mathrm{Poly}(n)}+\sum_{i=1}^{L}\left(\order{\max\{S_{\text{split}},n\}}\right)\leq\order{\mathrm{Poly}(n)+\max\{S_{\text{split}},n\}L}.
+\end{equation}
 
 
 对于SPD算法在枚举Pauli路径过程的时间复杂度$C_s$和$N_M$的估计，其情况与OBPPP算法处于噪声\textbf{情况2}类似。为了方便分析，我们假设在每个门$U_{i,j}$处，$\abs{\Tr{s_i|_{\supp(U_{i,j})} U_{i,j} t U_{i,j}^\dagger}}$取到最大值的Pauli算符$t$是唯一的。
