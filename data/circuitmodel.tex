@@ -57,8 +57,9 @@
     \end{equation}
     其中$\supp:\{\mathbb{I}, X, Y, Z\}^{\otimes n}\cup\{\mathrm{CNOT}_{a,b},\mathrm{H}_a,\mathrm{S}_a\}\rightarrow2^{\{1,\cdots, n\}}$ 为从幺正算符到其非平凡作用的量子比特的映射。这里 $2^{\{1,\cdots, n\}}$ 表示 $\{1,\cdots, n\}$ 的所有子集。
     为了简化，我们将 $i$ 层中 $n$ 个量子比特的索引根据所应用门的类型分为三组。这些组分别表示为符号 $\big|_{I_i}$、$\big|_\g{V_{i,k}}$ 和 $\big|_\g{\sigma_{i,j}}$，对应于没有门作用、Clifford 门作用和 Pauli 旋转门作用。此外，集合 $C(i,s_{i-1})$ 和 $AC(i,s_{i-1})$ 分别表示 $\{\sigma_{i,j}\}_{j=1}^{R_i}$ 中与 $s_{i-1}$ 对易和反对易的 Pauli 算符集合。
-    
-    \begin{proof}
+\end{proposition}
+
+\begin{proof}
     
     在变分量子线路中，$\mathcal{U}_i$ 由一系列门 $U_{i,1},\cdots,U_{i,R_i}$ 和 $V_{i,1},\cdots,V_{i,C_i}$ 组成，并且不会在每个量子比特上操作两次。
     Pauli 旋转门 $U_{i,j}(\theta_{i,j})$ 的形式为：
@@ -117,7 +118,7 @@
 
     综上所述，计算 $f$ 中第 $i$ 层项的时间和空间复杂度为 $\order{n}$。
     \end{proof}
-\end{proposition}
+
 
 \begin{remark}\label{remark:f_ele}
 通过利用不同 Pauli 算符的正交性，可以在 $\Tr{s_i\mathcal{U}_i s_{i-1}\mathcal{U}_i^\dagger} \neq 0$ 时，建立以下$s_i$ 和 $s_{i-1}$ 之间的关系：
