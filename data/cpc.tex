@@ -230,3 +230,11 @@ Clifford扰动量子线路的模拟可以用于量子错误缓解等领域，通
 \begin{theorem}
     对于任意给定的$\delta>0$，如果$\frac{\ln{1+\frac{\delta}{2}}}{L-M}\leq \frac{\ln{2}}{M}$，且$\theta_*=\frac{\ln{1+\frac{\delta}{2}}}{L-M}=\order{\frac{1}{L}}$，则有截断误差$\abs{\langle O \rangle - \langle O \rangle ^{(M)}}\leq \delta$。在平均情况下，如果有$\theta_*=\sqrt{\frac{3\ln{1+\frac{\delta}{2}}}{L-M}}=\order{\frac{1}{\sqrt{L}}}$，则有均方误差为了使均方误差小于$\mathbb{E}_{\Theta}\left(\langle O \rangle - \langle O \rangle ^{(M)}\right)^2 \leq \delta$。
 \end{theorem}
+
+可以看到在定理的描述中，$M$的取值似乎对于小角度空间的刻画$\theta_*$并不敏感。并且假设要实现$10^{-2}$的截断误差，根据解析结果需要$\theta_*$大概为$\ln 1+\frac{10^{-2}}{2} \approx 0.005$，这是一个非常小的角度。但在实际应用中，可以看到这个解析结果是非常宽松的，实际可用的角度远大于这个值。并且，稍大的$M$即可保证截断误差在可接受范围内。我们将在后续的数值结果中详细讨论。
+
+\section{本章小结}
+在本章中，我们讨论了Clifford扰动量子线路的模拟问题。
+我们首先介绍了Clifford扰动量子线路的定义，与Clifford主导的量子线路不同，Clifford扰动量子线路是包含了大量接近Clifford的非Clifford门，因此难以被Stabilizer稳定子模拟起直接模拟。
+
+然后，我们介绍了SPD算法，并将其应用于Clifford扰动量子线路的模拟问题。我们分析了SPD算法的计算复杂度和空间复杂度，并讨论了截断误差的上界。最后，我们证明了在小角度空间中，SPD算法可以提供高效的近似期望值，并且可以保证截断误差和均方误差在可接受范围内。在下一章中，我们将通过数值实验验证我们的理论结果。
