@@ -826,7 +826,7 @@ $N_M$是$\mathcal{S}_M$的元素个数。
 
 在\textbf{情况2}中，可以不失一般性的假设${p_x,p_y,p_z}$中只有$p_x$是非零的。与噪声关联的Hamming Weight 满足$\abs{\bm{s}}_{\mathcal{N}}=\sum_{P\in {Y,Z}}\abs{\bm{s}}_P$，此情况下的策略是截断$Y$、$Z$算符的数量小于$M$，形式化为$\abs{\bm{s}}_Y+\abs{\bm{s}}_Z=\abs{s_L}_Y+\abs{s_L}_Z+\cdots+\abs{s_0}_Y+\abs{s_0}_Z\leq M$。
 为讨论在该噪声情形下的反向传播，定义以下的条件：
-\begin{definition}
+\begin{definition}\label{def:monotonic}
     对于一个量子线路$\mathcal{U}$，假设其门集合为$\{\mathcal{U}_{i,j}\}$。称$\mathcal{U}$是关于噪声关联的Hamming Weight $\abs{\bullet}_{\mathcal{N}}$单调增的，如果对于任意的$i,j,s$，有$\abs{\left\{s'\mid \Tr{sU_{i,j}s' U_{i,j}^\dagger}\neq 0,\ \abs{s'}_{\mathcal{N}}=0\right\}}\leq 1$，其中$s$和$s'$是Pauli算符。
 \end{definition}
 并非所有的量子线路都满足该条件。但是，对于一些特定的量子线路模型，例如由Clifford和Pauli旋转门组成的线路，这个定义是成立的。我们将讨论满足该定义的线路模型在噪声\textbf{情况2}的反向传播算法。

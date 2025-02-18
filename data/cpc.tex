@@ -9,14 +9,17 @@
 在这一章中，我们将讨论如何利用SPD模拟算法模拟Clifford扰动量子线路。Clifford扰动量子线路是由接近Clifford门的门组成的量子线路。
 Clifford扰动量子线路的模拟可以用于量子错误缓解等领域，通过扩展Clifford数据回归方法（Clifford Data Regression，CDR）将错误缓解的回归数据集扩展到Clifford扰动量子线路上，可以显著的提高错误缓解的效果~\cite{zhang2024clifford}，这种方法被称为Clifford扰动数据回归（Clifford Perturbation Data Regression，CPDR）。
 
-类似于第~\ref{chap:noisy_vqa}章，在我们的线路模型中Clifford扰动线路是一类特殊的变分量子线路，对于一个$L$层的Clifford扰动量子线路，我们可以表示为
+%类似于第~\ref{chap:noisy_vqa}章，
+在我们的线路模型中Clifford扰动线路是一类特殊的变分量子线路，对于一个$L$层的Clifford扰动量子线路，我们可以表示为
 \begin{equation}\label{eq:parameterized_circuit}
     \mathcal{U}(\bm{\theta})=\mathcal{U}_L(\theta_L)  \cdots \mathcal{U}_1(\theta_1),
 \end{equation}
 其中$\bm{\theta}=(\theta_1,\cdots,\theta_L)$是旋转角度向量。每一个酉算子$\mathcal{U}_i(\theta_i):=\exp{-i \theta_i P_i / 2}C_i $ 包含一个Clifford算符$C_i$和一个在Pauli算符 $P_i\in\{\mathbb{I},X,Y,Z\}^{\otimes n}$上旋转$\theta_i$角度的Pauli旋转算符$\exp{-i \theta_i P_i / 2}$。
 注意到，当旋转角度$\theta$取值为$\{\frac{k\pi}{4}\mid k\in \mathbb{Z}\}$时，Pauli旋转门$e^{-i\frac{\theta}{2} P}=\cos{\frac{\theta}{2}}\mathbb{I}+i\sin{\frac{\theta}{2}}P$属于Clifford群。
-因此，我们可以假设在方程~\eqref{eq:parameterized_circuit}中的旋转角度$\theta_i$位于$[-\frac{\pi}{4},\frac{\pi}{4}]$范围内。对于任何超出此范围的$\theta_i$，存在$\theta'_i\in [-\frac{\pi}{4},\frac{\pi}{4}]$使得$\theta'_i+\frac{k\pi}{2}=\theta_i$。在这种情况下，酉算子$\mathcal{U}_i(\theta_i)$可以写成$\mathcal{U}_i(\theta_i)=e^{-i\frac{\theta}{2} P_i}C_i=e^{-i\frac{\theta'_i}{2} P_i}e^{-i\frac{k\pi}{4} P_i}C_i$，其中$e^{-i\frac{k\pi}{4} P_i}C_i$是一个Clifford算符。通过将$C_i$替换为$C_i'=e^{-i\frac{k\pi}{4} P_i}C_i$，酉算子变为$\mathcal{U}_i(\theta_i)=e^{-i\frac{\theta'_i}{2} P_i}C_i'$，其中$\theta'_i\in [-\frac{\pi}{4},\frac{\pi}{4}]$。
-由于旋转角度被限制在较窄的范围$[-\frac{\pi}{4},\frac{\pi}{4}]$内，Pauli旋转可以解释为Clifford算符的扰动。
+
+因此，我们可以假设在方程~\eqref{eq:parameterized_circuit}中的旋转角度$\theta_i$位于$[-\frac{\pi}{4},\frac{\pi}{4}]$范围内。对于任何超出此范围的$\theta_i$，存在$\theta'_i\in [-\frac{\pi}{4},\frac{\pi}{4}]$使得$\theta'_i+\frac{k\pi}{2}=\theta_i$。
+此时，酉算子$\mathcal{U}_i(\theta_i)$可以写成$\mathcal{U}_i(\theta_i)=e^{-i\frac{\theta}{2} P_i}C_i=e^{-i\frac{\theta'_i}{2} P_i}e^{-i\frac{k\pi}{4} P_i}C_i$，其中$e^{-i\frac{k\pi}{4} P_i}C_i$是一个Clifford算符。通过将$C_i$替换为$C_i'=e^{-i\frac{k\pi}{4} P_i}C_i$，酉算子变为$\mathcal{U}_i(\theta_i)=e^{-i\frac{\theta'_i}{2} P_i}C_i'$，其中$\theta'_i\in [-\frac{\pi}{4},\frac{\pi}{4}]$。
+由于旋转角度被限制在较窄的范围$[-\frac{\pi}{4},\frac{\pi}{4}]$内，这些Pauli旋转算符，可以被解释为对Clifford算符的扰动。
 
 在我们的讨论中，量子线路$\mathcal{U}(\bm{\theta})$作用到初始量子态$\rho$上，目标是近似演化后的量子态在可观测量$O$下的观测期望值：
 \begin{equation}
@@ -42,8 +45,8 @@ Clifford扰动量子线路的模拟可以用于量子错误缓解等领域，通
     g(\bm{s})=\sum_{i=1}^{L}\sum_{j} h(s_{i-1},s_i,U_{i,j}),
 \end{equation}
 其实是该Pauli路径对应的，定义于式~\eqref{eq:pp:contribution}中，贡献函数$f(\mathcal{U},\bm{s},O,\rho)$里的$\sin$因子的数量。
-因为，在SPD算法中，近似的观测期望值是枚举所有满足$\{\bm{s}\mid g(\bm{s})\leq M\}$的Pauli路径，并通过式~\eqref{eq:spd:approximation}计算的，所以我们可以直接通过截断$\sin$因子的个数来近似观测期望值。
 
+因为在SPD算法中，近似的观测期望值是枚举所有满足$\{\bm{s}\mid g(\bm{s})\leq M\}$的Pauli路径，并通过式~\eqref{eq:spd:approximation}计算的，所以我们可以直接通过截断$\sin$因子的个数来近似观测期望值。
 具体来说，在海森堡图景中~\cite{zhang2024clifford}，观测期望值被重新表述为$\langle O \rangle = \tr{\rho \tilde{O}}$，其中$\tilde{O} = \mathcal{U}_1(\theta_1)^{\dagger} \cdots  \mathcal{U}_L(\theta_L)^{\dagger} O \mathcal{U}_L(\theta_L)  \cdots \mathcal{U}_1(\theta_1)$表示海森堡演化后的可观测量。
 通过对所有酉算子$U_i(\theta_i)$迭代这个过程，根据式~\eqref{eq:heisenberg}，得到的海森堡演化后的可观测量$\tilde{O}$呈现为Pauli算符的线性组合，表示为$\tilde{O} = \sum_\sigma c_\sigma \sigma$，其中$c_\sigma$是由$\cos(\theta_i)$和$\sin(\theta_i)$乘积组成的多变量三角多项式。
 
@@ -53,7 +56,7 @@ Clifford扰动量子线路的模拟可以用于量子错误缓解等领域，通
   \langle O \rangle ^{(M)}= \tr{\rho \tilde{O}_M}= \sum_{\bm{s}\in \{\bm{s}\mid g(\bm{s})\leq M\}} f(\mathcal{U},\bm{s},O,\rho).
 \end{equation}
 
-接下来，我们将讨论使用SPD算法计算$\langle O \rangle ^{(M)}$的计算复杂度，和误差估计。
+接下来，我们将讨论使用SPD算法计算$\langle O \rangle ^{(M)}$的计算复杂度和误差估计。
 
 \section{计算复杂度分析}
 根据式~\eqref{eq:spd_cost}，我们可以看到，计算$\langle O \rangle ^{(M)}$的计算复杂度可以表示为$C = C_s+N_MC_f$，其中$C_s$是枚举所有满足条件的Pauli路径的时间复杂度，$N_M$是满足条件的Pauli路径的数量，$C_f$是计算每个Pauli路径的贡献的时间复杂度。

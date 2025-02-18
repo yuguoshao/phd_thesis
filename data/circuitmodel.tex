@@ -178,7 +178,13 @@
     N_M=\poly(n) N_{\text{max}}^{M}=\poly(n) 2^M.
 \end{equation}
 
-对于\textbf{情况2}，根据式~\eqref{eq:case2:N_M}和式~\eqref{eq:case2:cost_s}，Pauli路径枚举过程的时间复杂度为：
+
+对于\textbf{情况2}，我们需要首先说明，对于变分量子线路是自然满足定义~\ref{def:monotonic}中刻画的对噪声关联的Hamming Weight 单调增条件。即对量子线路$\mathcal{U}$中的任意门$U_{i,j}$有$\abs{\left\{s'\mid \Tr{sU_{i,j}s' U_{i,j}^\dagger}\neq 0,\ \abs{s'}_{\mathcal{N}}=0\right\}}\leq 1$，其中$s$和$s'$是Pauli算符。
+当$U_{i,j}$为Clifford门时，对给定的$s$因为满足$\Tr{sU_{i,j}s' U_{i,j}^\dagger}\neq 0$的只有一个，因此$\abs{\left\{s'\mid \Tr{sU_{i,j}s' U_{i,j}^\dagger}\neq 0,\ \abs{s'}_{\mathcal{N}}=0\right\}}\leq 1$自然成立。
+当$U_{i,j}$为Pauli旋转门时，不妨设为$U_{i,j}(\theta_{i,j})=\exp{-i \frac{\theta_{i,j}}{2} \sigma_{i,j}}$。根据注释~\ref{remark:f_ele}，若$s$与$\sigma_{i,j}$对易，则只有$s'=s$满足$\Tr{sU_{i,j}s' U_{i,j}^\dagger}\neq 0$。若$s$与$\sigma_{i,j}$反对易，则只有$s'=s$或$s'=\pm i \sigma_{i,j}s$满足$\Tr{sU_{i,j}s' U_{i,j}^\dagger}\neq 0$。不失一般性，可假设$\abs{\bullet}_{\mathcal{N}}=\abs{\bullet}_Y+\abs{\bullet}_Z$，即$\mathcal{N}$的噪声模型只包含$X$的Pauli算符。因此，若$\abs{s}_{\mathcal{N}}=0$则必有$\abs{\pm i \sigma_{i,j}s}_{\mathcal{N}}\neq 0$，因为$s$与$\sigma_{i,j}s$反对易，反之亦然。因此，对于变分量子线路，满足对噪声关联的Hamming Weight 单调增条件。
+
+
+对于\textbf{情况2}，根据式~\eqref{eq:case2:N_M}和式~\eqref{eq:case2:cost_s}，当量子线路$\mathcal{U}$满足对噪声关联的Hamming Weight 单调增时，Pauli路径枚举过程的时间复杂度为：
 \begin{equation}
     C_{s}=\mathrm{Poly}(n) \order{(nL)^M} C_{\text{split}} N_{\text{max}}^{M}= \mathrm{Poly}(n) \order{(nL)^M} 2^M.
 \end{equation}\label{eq:vqa:case2:N_M}
