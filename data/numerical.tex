@@ -210,6 +210,40 @@ y轴表示经验均方误差，由公式~\ref{ap:eq:emse}给出，并以对数�
 \end{figure}
 
 
+\section{Clifford扰动线路模拟的误差}
+对于Clifford扰动量子线路，可以使用SPD方法对其实现高效模拟，并能在小角度空间$\Theta=\{\bm{\theta}\mid \abs{\theta_i}\leq \theta_* ,i=1,\cdots,L \}$上实现高精度模拟。
+
+根据定理~\ref{thm:spd},在理论结果中，我们证明了如果最大角度限制为$\theta_*=\frac{\ln{1+\frac{\delta}{2}}}{L-M}$，则在小角度空间$\bm{\theta}\in\Theta=\{\bm{\theta}\mid \abs{\theta_i}\leq \theta_* ,i=1,\cdots,L \}$内，截断误差可以被限制在$\abs{\langle O \rangle - \langle O \rangle ^{(M)}}\leq \delta$。从理论结果出发，为了达到$10^{-2}$的精度，解析结果表明$\theta_*$应约为$\ln{1+\frac{10^{-2}}{2}}\approx 0.005$，这是一个非常狭窄的区间。
+
+过小的可用小角度空间将会为CPDR框架准备足够的训练数据时带来困难。
+幸好在实际情况中，当截断数$M$适中（例如$M=5,7$）时，数值结果在更广泛的角度范围内仍然非常准确，使得这种方法得以适用于实际场景。
+
+
+在本节中，我们在文献~\cite{sim2019expressibility}中提出的硬件高效电路上对SPD模拟器进行基准测试。
+硬件高效电路由多个重复块组成，每个块的结构如图~\ref{fig:hardware_block}所示，其中首先包含一层$R_X$旋转门和一层$R_Z$旋转门，然后紧随其后的是按顺序作用在相邻量子比特上的CNOT门。
+在我们的设置中，我们测试的量子电路包含五个块，量子比特数量从2到15不等。此外，每个门的旋转角度在整个电路中被设置为是相同的，且范围在$[0,\pi/4]$之间。
+
+\begin{figure}[!ht]
+    \centering
+\includegraphics[width=0.5\textwidth]{figures/circuit_20241207.pdf}
+    \caption{硬件高效电路中每个块的结构}
+\label{fig:hardware_block}
+\end{figure}
+
+
+第一个模拟结果展示了，在固定量子比特数为$n=15$的电路中，误差$\abs{\langle O \rangle - \langle O \rangle^{(M)}}$随旋转角度$\theta_*$的变化。
+如图~\ref{fig:bench_mini_AQC}(a)所示，当$\theta_*\leq \pi/20$时，截断误差随着截断数$M$的增加迅速减少。对于$10^{-2}$的精度，$\theta_*\leq \pi/20$对于$M\geq 5$是足够的。此外，当$M=11$时，截断误差在$\theta_*=\pi/8$之前保持在$10^{-2}$以内。这表明稍大一些的$M$值可以在实际场景中显著提高精度，超出理论界限。
+
+为了评估大规模量子电路的可扩展性，我们评估了不同截断数$M$和量子比特数量在$[2,15]$范围内的截断误差$\abs{\langle O \rangle - \langle O \rangle ^{(M)}}$。考虑到SPD模拟器用于为CPDR框架提供训练数据，我们将每个旋转门的角度设置为适当的值以准备训练数据。基于数值测试的经验结果，我们建议将$\theta_* = \pi/20$并从$\Theta$中获取训练数据，以平衡训练集大小和模拟精度。如图~\ref{fig:bench_mini_AQC}(b)所示，展示了在给定旋转角度$\theta_*=\pi/20$时，误差随量子比特数$n$的变化。随着量子比特数量的增加，误差在$M\geq 5$时保持在$10^{-2}$以下，这表明SPD模拟器对于大规模量子电路是可扩展的。
+
+
+\begin{figure}[!ht]
+    \centering
+\includegraphics[width=\textwidth]{figures/SPD_benchmark.pdf}
+    \caption{SPD模拟器在硬件高效电路上的基准测试}
+\label{fig:bench_mini_AQC}
+\end{figure}
+
 \section{Ising模型演化实验}
 
 

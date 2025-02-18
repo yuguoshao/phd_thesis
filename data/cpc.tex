@@ -227,7 +227,7 @@ Clifford扰动量子线路的模拟可以用于量子错误缓解等领域，通
 其中最后一个不等式是由于$(1+x)^m\leq e^{mx}$。因此$(1+c)^M\leq e^{cM}\leq 2$且$\left(1+c\right)^{L-M}\leq e^{c(L-M)}\leq 1+\frac{\delta}{2}$。
 
 综上所述，我们有以下定理：
-\begin{theorem}
+\begin{theorem}\label{thm:spd}
     对于任意给定的$\delta>0$，如果$\frac{\ln{1+\frac{\delta}{2}}}{L-M}\leq \frac{\ln{2}}{M}$，且$\theta_*=\frac{\ln{1+\frac{\delta}{2}}}{L-M}=\order{\frac{1}{L}}$，则有截断误差$\abs{\langle O \rangle - \langle O \rangle ^{(M)}}\leq \delta$。在平均情况下，如果有$\theta_*=\sqrt{\frac{3\ln{1+\frac{\delta}{2}}}{L-M}}=\order{\frac{1}{\sqrt{L}}}$，则有均方误差为了使均方误差小于$\mathbb{E}_{\Theta}\left(\langle O \rangle - \langle O \rangle ^{(M)}\right)^2 \leq \delta$。
 \end{theorem}
 
