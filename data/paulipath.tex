@@ -92,7 +92,7 @@
 
 
 \section{基于Pauli路径积分的经典模拟}
-在这一节中，我们将介绍一种高效的量子计算经典模拟方法，使用Feynman路径积分的思想，将量子线路的演化结果表示为以Pauli算符为基的路径积分。在本节中，我们将介绍Pauli路径积分模拟方法的基本原理和实现细节。
+在这一节中，我们将介绍一种高效的量子计算经典模拟方法，该方法利用Feynman路径积分的思想，将量子线路的演化结果表示为以Pauli算符为基的路径积分。在本节中，我们将介绍Pauli路径积分模拟方法的基本原理和实现细节。
 
 为了方便，我们假设量子线路$\mathcal{U}$包含$L$层量子门，每一层包含若干个量子门。同一层的量子门作用在不同的量子比特上，因此可以并行作用。对于真实的量子硬件，每一个门能够作用的量子比特数目是有限的，如果限制一个量子门只能作用到至多$k$个量子比特上，我们称为$k$-local量子门。对于常见的量子硬件，如超导量子比特，通常$k=2$。
 %在本章中，我们暂不考虑$k$-local量子门的限制，即我们可以任意选择量子门作用的量子比特，将会在后续复杂度和误差分析中讨论这一问题。
@@ -338,7 +338,7 @@ Pauli路径的定义如下：
 
 
 \subsection{噪声对Pauli路径的效应}
-在实际的量子计算中，由于噪声的存在，量子线路的演化会受到噪声的影响。在Pauli路径积分模拟中，我们可以通过引入噪声模型来模拟噪声对量子线路的影响。
+在实际的量子计算中，由于噪声的存在，量子线路的演化会受到噪声的影响。在Pauli路径积分模拟中，我们可以通过在单个Pauli路径上引入噪声模型来模拟噪声对量子线路的影响。
 
 在先前的章节中，我们已经介绍了量子信道的Kraus算符表示。对于一个量子信道$\mathcal{E}$，其Kraus算符表示为$\{K_i\}$，我们可以将量子信道$\mathcal{E}$作用在量子态$\rho$上表示为：
 \begin{equation}
@@ -480,9 +480,9 @@ Pauli路径的定义如下：
 于是我们可以定义含有噪声的Pauli路径的贡献函数：
 
 \begin{definition}
-    对于一个深度为$L$的含噪量子线路$\widetilde{\mathcal{U}}$，和某个对应的Pauli路径$\bm{s}= (s_0, s_1, \cdots, s_L)$，初始量子态$\rho$和可观测量$O$，其贡献函数$f(\mathcal{U},\bm{s},O,\rho)$定义为：
+    对于一个深度为$L$的含噪量子线路$\widetilde{\mathcal{U}}$，和某个对应的Pauli路径$\bm{s}= (s_0, s_1, \cdots, s_L)$，初始量子态$\rho$和可观测量$O$，其贡献函数$f(\widetilde{\mathcal{U}},\bm{s},O,\rho)$定义为：
     \begin{equation}\label{eq:noise_contribution}
-        \tilde{f}(\mathcal{U},\bm{s},O,\rho)=\Tr{O\mathcal{N}^{\otimes n}(s_L)}
+        f(\widetilde{\mathcal{U}},\bm{s},O,\rho)=\Tr{O\mathcal{N}^{\otimes n}(s_L)}
         \left(\prod_{i=1}^{L}\Tr{s_i\mathcal{U}_i \mathcal{N}^{\otimes n}(s_{i-1})\mathcal{U}_i^\dagger}\right)\Tr{s_0\rho},
     \end{equation}
     其中$\mathcal{U}$表示含噪声的量子线路$\widetilde{\mathcal{U}}$的理想（无噪声）部分。
@@ -490,7 +490,7 @@ Pauli路径的定义如下：
 
 因此，含噪声的量子线路的期望值可以表示为：
 \begin{equation}\label{eq:noise_expectation}
-    \widetilde{\langle O \rangle} = \sum_{\bm{s}} \tilde{f}(\mathcal{U},\bm{s},O,\rho).
+    \widetilde{\langle O \rangle} = \sum_{\bm{s}} f(\widetilde{\mathcal{U}},\bm{s},O,\rho).
 \end{equation}
 
 假设系统中的噪声是单比特Pauli噪声，如式~\eqref{eq:pauli_noise}所示，Pauli噪声信道$\mathcal{N}$可以表示为$\mathcal{N}(\rho) = (1-p_x-p_y-p_z)\rho + p_x X\rho X + p_y Y\rho Y + p_z Z\rho Z$。将Pauli算符$X$、$Y$、$Z$和$I$是单位算符代入Pauli噪声信道$\mathcal{N}$，我们可以得到Pauli噪声信道$\mathcal{N}$对Pauli算符的作用：
@@ -511,9 +511,9 @@ Pauli路径的定义如下：
 \end{equation}
 其中$\abs{s_i}_X$、$\abs{s_i}_Y$、$\abs{s_i}_Z$分别表示Pauli算符$s_i$中$\frac{X}{2},\frac{Y}{2},\frac{Z}{2}$的数量。因此我们可以将含噪声的Pauli路径的贡献函数用以下引理表示：
 \begin{lemma}\label{lemma:noise}
-    对于一个深度为$L$的含噪声量子线路$\widetilde{\mathcal{U}}$，和某个对应的Pauli路径$\bm{s}= (s_0, s_1, \cdots, s_L)$，初始量子态$\rho$和可观测量$O$，在单比特Pauli噪声信道$\mathcal{N}$下，其含噪贡献函数$\tilde{f}(\mathcal{U},\bm{s},O,\rho)$和理想无噪声贡献函数$f(\mathcal{U},\bm{s},O,\rho)$满足：
+    对于一个深度为$L$的含噪声量子线路$\widetilde{\mathcal{U}}$，和某个对应的Pauli路径$\bm{s}= (s_0, s_1, \cdots, s_L)$，初始量子态$\rho$和可观测量$O$，在单比特Pauli噪声信道$\mathcal{N}$下，其含噪贡献函数$f(\widetilde{\mathcal{U}},\bm{s},O,\rho)$和理想无噪声贡献函数$f(\mathcal{U},\bm{s},O,\rho)$满足：
     \begin{equation}
-        \tilde{f}(\mathcal{U},\bm{s},O,\rho)=\left(1-2p_y-2p_z\right)^{\abs{\bm{s}}_X}\left(1-2p_x-2p_z\right)^{\abs{\bm{s}}_Y}\left(1-2p_x-2p_y\right)^{\abs{\bm{s}}_Z}f(\mathcal{U},\bm{s},O,\rho),
+        f(\widetilde{\mathcal{U}},\bm{s},O,\rho)=\left(1-2p_y-2p_z\right)^{\abs{\bm{s}}_X}\left(1-2p_x-2p_z\right)^{\abs{\bm{s}}_Y}\left(1-2p_x-2p_y\right)^{\abs{\bm{s}}_Z}f(\mathcal{U},\bm{s},O,\rho),
     \end{equation}
     其中$\abs{\bm{s}}_P$表示整个Pauli路径$\bm{s}$中Pauli算符$P\in \{\frac{X}{2},\frac{Y}{2},\frac{Z}{2}\}$的数量（为了简化表示，我们将Pauli算符的系数$\frac{1}{2}$省略）。即
     \begin{equation}
@@ -535,9 +535,9 @@ Pauli路径的定义如下：
     \end{equation}
 \end{definition} 
 
-设$\gamma\triangleq \min\{p|{p \in \{p_x,p_y,p_z\},p\neq 0}\}$为噪声信道$\mathcal{N}$中非零概率的最小值。由引理~\ref{lemma:noise}，我们可以得到含噪声的Pauli路径的贡献函数$\tilde{f}(\mathcal{U},\bm{s},O,\rho)$与理想无噪声的Pauli路径的贡献函数$f(\mathcal{U},\bm{s},O,\rho)$之间的关系：
+设$\gamma\triangleq \min\{p|{p \in \{p_x,p_y,p_z\},p\neq 0}\}$为噪声信道$\mathcal{N}$中非零概率的最小值。由引理~\ref{lemma:noise}，我们可以得到含噪声的Pauli路径的贡献函数$f(\widetilde{\mathcal{U}},\bm{s},O,\rho)$与理想无噪声的Pauli路径的贡献函数$f(\mathcal{U},\bm{s},O,\rho)$之间的关系：
 \begin{equation}\label{eq:noise_suppression}
-    \abs{\tilde{f}(\mathcal{U},\bm{s},O,\rho)} \leq (1-2\gamma)^{\abs{\bm{s}}_{\mathcal{N}}} \abs{f(\mathcal{U},\bm{s},O,\rho)}.
+    \abs{f(\widetilde{\mathcal{U}},\bm{s},O,\rho)} \leq (1-2\gamma)^{\abs{\bm{s}}_{\mathcal{N}}} \abs{f(\mathcal{U},\bm{s},O,\rho)}.
 \end{equation}
 
 \begin{figure}
@@ -547,27 +547,34 @@ Pauli路径的定义如下：
     \label{fig:noise}
 \end{figure}
 
-图~\ref{fig:noise}给出了噪声对Pauli路径的贡献函数$f$效应的示意图。在无噪声的理想情况下，Pauli路径的贡献函数$f$由半透明的背景区域表示。在含有噪声的情况下，Pauli路径的贡献函数$\tilde{f}$由实体的区域表示。在含有噪声的情况下，Pauli路径的贡献函数$\tilde{f}$的绝对值随着与噪声关联的Hamming Weight的增加而被指数级地抑制。因为Pauli路径的个数是$4^{L(n+1)}$，其中$n$是量子比特的数量，$L$是量子线路的深度。
+图~\ref{fig:noise}给出了噪声对Pauli路径的贡献函数$f$效应的示意图。在无噪声的理想情况下，Pauli路径的贡献函数$f$由半透明的背景区域表示。在含有噪声的情况下，Pauli路径的贡献函数$f$由实体的区域表示。在含有噪声的情况下，Pauli路径的贡献函数$f$的绝对值随着与噪声关联的Hamming Weight的增加而被指数级地抑制。
+
+因为Pauli路径的个数是$4^{L(n+1)}$，其中$n$是量子比特的数量，$L$是量子线路的深度，于是计算所有Pauli路径的贡献函数的计算复杂度是指数级的。
 为了高效的模拟量子线路的期望值，在含有噪声的情况下，我们可以通过对Pauli路径的贡献函数进行有效的截断，只保留与噪声关联的Hamming Weight较小的Pauli路径，从而减少计算量。
 截断的部分在图~\ref{fig:noise}中用灰色区域表示。
 
 具体的，我们可以定义一个与噪声关联的Hamming Weight的阈值$M$，只保留与噪声关联的Hamming Weight小于等于$M$的Pauli路径的贡献函数，即：
-\begin{equation}\label{eq:truncated_expectation}
-    \widehat{\langle O \rangle} = \sum_{\abs{\bm{s}}_{\mathcal{N}}\leq M} \tilde{f}(\mathcal{U},\bm{s},O,\rho).
+\begin{equation}\label{eq:pre_truncated_expectation}
+    \widehat{\langle O \rangle} = \sum_{\abs{\bm{s}}_{\mathcal{N}}\leq M} f(\widetilde{\mathcal{U}},\bm{s},O,\rho).
 \end{equation}
-$\widehat{\langle O \rangle}$给出了含有噪声的量子线路的期望值$\widetilde{\langle O \rangle}$的一个近似值。
+得到的$\widehat{\langle O \rangle}$给出了含有噪声的量子线路的期望值$\widetilde{\langle O \rangle}$的一个近似值。
 
 \subsection{OBPPP算法}\label{sec:obppp}
 在本节中，我们将介绍一种基于Pauli路径积分模拟的量子线路期望值计算算法——可观测量在Pauli路径下的反向传播算法（Observable's Back-Propagation on Pauli Path，OBPPP）。OBPPP算法通过计算低weight的Pauli路径的贡献函数，实现了对含有噪声的量子线路的期望值的高效计算。
 
-模拟含噪期望值算法的核心是如何高效的枚举出与噪声关联的Hamming Weight小于等于$M$的Pauli路径。对于每个给定的Pauli路径$\bm{s}$，其贡献函数$\tilde{f}(\mathcal{U},\bm{s},O,\rho)$可以通过式~\eqref{eq:pp:contribution}计算。
+模拟含噪期望值算法的核心是如何高效的枚举出与噪声关联的Hamming Weight小于等于$M$的Pauli路径。对于每个给定的Pauli路径$\bm{s}$，其贡献函数$f(\widetilde{\mathcal{U}},\bm{s},O,\rho)$可以通过式~\eqref{eq:pp:contribution}计算。
+具体地，如式~\eqref{eq:pre_truncated_expectation}所示，算法得到的期望值$\widehat{\langle O \rangle}$可以表示为：
+\begin{equation}\label{eq:truncated_expectation}
+    \widehat{\langle O \rangle} = \sum_{\abs{\bm{s}}_{\mathcal{N}}\leq M} f(\widetilde{\mathcal{U}},\bm{s},O,\rho).
+\end{equation}
 
-因此算法的计算复杂度包含两个部分：Pauli路径的枚举和每个Pauli路径的贡献函数的计算，分别记时间复杂度为$C_s$和$C_f$，空间复杂度为$S_s$和$S_f$。假设一共有$N_M$个Pauli路径的Hamming Weight小于等于$M$且拥有非平凡的贡献函数，则估计期望值算法的时间复杂度为：
+
+OBPPP算法的计算复杂度包含两个部分：Pauli路径的枚举和每个Pauli路径的贡献函数的计算，分别记时间复杂度为$C_s$和$C_f$，空间复杂度为$S_s$和$S_f$。假设一共有$N_M$个Pauli路径的Hamming Weight小于等于$M$且拥有非平凡的贡献函数（即$f(\widetilde{\mathcal{U}},\bm{s},O,\rho)\neq 0$），则估计期望值算法的时间复杂度为：
 \begin{equation}\label{eq:total_cost}
     C = C_s+N_MC_f,
 \end{equation}
 
-其中$C_f$是计算一个Pauli路径的贡献函数的时间复杂度，也可以分成三个部分：和初态相关的$\Tr{\rho s_0}$的计算、和观测量相关的$\Tr{Os_L}$的计算和中间量子门的计算$\prod\Tr{s_i\mathcal{U}_i s_{i-1}\mathcal{U}_i^\dagger}$。这三部分的时间复杂度分别记为$C_{f\rho}$、$C_{fO}$和$C_{f\mathcal{U}}$。
+其中$C_f$是计算一个给定Pauli路径的贡献函数的时间复杂度，也可以分成三个部分：和初态相关的$\Tr{\rho s_0}$的计算、和观测量相关的$\Tr{Os_L}$的计算和中间量子门的计算$\prod\Tr{s_i\mathcal{U}_i s_{i-1}\mathcal{U}_i^\dagger}$。这三部分的时间复杂度分别记为$C_{f\rho}$、$C_{fO}$和$C_{f\mathcal{U}}$。
 因此，我们有：
 \begin{equation}\label{eq:cost_f}
     C_f = C_{f\rho}+C_{fO}+C_{f\mathcal{U}}.
@@ -579,14 +586,15 @@ $\widehat{\langle O \rangle}$给出了含有噪声的量子线路的期望值$\w
 \end{equation}
 其中$S_f$也可表示为：
 \begin{equation}\label{eq:space_f}
-    S_f = S_{f\rho}+S_{fO}+S_{f\mathcal{U}},
+    S_f = \max\{S_{f\rho},S_{fO},S_{f\mathcal{U}}\},
 \end{equation}
 其中$S_{f\rho}$、$S_{fO}$和$S_{f\mathcal{U}}$分别表示计算$\Tr{\rho s_0}$、$\Tr{Os_L}$和$\prod\Tr{s_i\mathcal{U}_i s_{i-1}\mathcal{U}_i^\dagger}$的空间复杂度。
+相比时间复杂度，空间复杂度取$\max$值的原因是，计算每个Pauli路径的贡献函数时，可以通过存储中间步骤的结果来复用存储空间，因而空间复杂度不会叠加。
 
-在后续的章节中，我们将详细介绍在一些具体的线路模型中$C_{f\mathcal{U}}$和$S_{f\mathcal{U}}$的刻画。在本章中，我们将重点介绍$C_{f\rho}$、$C_{fO}$、$C_s$和$S_{f\rho}$、$S_{fO}$、$S_s$，以及$N_M$的估计。
+在后续的章节中，我们将给出一些具体的线路模型，并详细介绍在这些线路模型中$C_{f\mathcal{U}}$和$S_{f\mathcal{U}}$的刻画。在本章中，我们将重点介绍$C_{f\rho}$、$C_{fO}$、$C_s$和$S_{f\rho}$、$S_{fO}$、$S_s$，以及$N_M$的估计。
 
 \subsubsection{$C_{f\rho}$的估计}
-为了能高效的将初态$\rho$存储在计算机中，我们需要对初态$\rho$添加一些合理的假设。否则存储一个$n$量子比特的初态$\rho$需要$2^{2n}$个复数，这是不可行的。一个合理的假设是初态$\rho$是一个稀疏的密度矩阵，即：
+为了能高效的将初态$\rho$存储在经典计算机中，我们需要对初态$\rho$添加一些合理的假设。否则存储一个$n$量子比特的初态$\rho$需要$2^{2n}$个复数，这是不可行的。一个合理的假设是初态$\rho$是一个稀疏的密度矩阵，即：
 \begin{definition}\label{def:sparse_density_matrix}
     一个$n$量子比特的密度矩阵$\rho$是一个稀疏的密度矩阵，如果它的非零元素的数量是多项式级别的，即
     \begin{equation}
@@ -673,20 +681,23 @@ $\widehat{\langle O \rangle}$给出了含有噪声的量子线路的期望值$\w
 
 在本节中，我们将介绍如何高效的枚举出与噪声关联的Hamming Weight小于等于$M$且拥有非平凡贡献函数的Pauli路径，并估计满足条件的Pauli路径的个数$N_M$。具体的讲，需要枚举出以下集合：
 \begin{equation}
-    \mathcal{S}_M = \left\{ \bm{s} \mid \abs{\bm{s}}_{\mathcal{N}}\leq M, \tilde{f}(\mathcal{U},\bm{s},O,\rho)\neq 0 \right\}.
+    \mathcal{S}_M = \left\{ \bm{s} \mid \abs{\bm{s}}_{\mathcal{N}}\leq M, f(\widetilde{\mathcal{U}},\bm{s},O,\rho)\neq 0 \right\}.
 \end{equation}
 $N_M$是$\mathcal{S}_M$的元素个数。
 
 
-在此，为了方便的估计，定义在量子线路中$\mathcal{U}$中每个门的最大可分裂的Pauli算符的数量为$N_{\text{max}}$：
+在此，为了方便的估计，我们需要定义在量子线路中$\mathcal{U}$中每个门的最大可分裂的Pauli算符的数量为$N_{\text{max}}$：
 \begin{definition}
-    对于一个深度为$L$的量子线路$\mathcal{U}$，假设其门集合为$\{\mathcal{U}_{i,j}\}$。定义$\mathcal{U}$的门最大可分裂的Pauli算符的数量为$N_{\text{max}}$：
+    对于一个深度为$L$的量子线路$\mathcal{U}$，假设其门集合为$\{\mathcal{U}_{i,j}\}$。定义$\mathcal{U}$的门最大可分裂的Pauli算符的数量$N_{\text{max}}$：
     \begin{equation}
         N_{\text{max}} = \max_{i,j,s}\abs{ \left\{ s'\mid \Tr{s' U^\dagger_{i,j}s U_{i,j}}\neq 0 \right\}},
     \end{equation}
     其中$s$和$s'$是Pauli算符，$\tr$表示Pauli算符的迹。 
 \end{definition}
-除了$N_{\text{max}}$，在我们的算法中还需要对于给定的Pauli算符$s$计算出集合$\left\{ s'\mid \Tr{s' U^\dagger_{i,j}s U_{i,j}}\neq 0 \right\}$。这个集合的计算复杂度高度依赖于具体的量子线路模型，以及量子门$U_{i,j}$的具体存储形式。记这个集合的计算时间复杂度不超过$C_{\text{split}}$；空间复杂度不超过$S_{\text{split}}$。
+该定义刻画了在后续描述的反向传递算法中，Pauli算符$s$在量子门$U_{i,j}$作用后，最多可以分裂成多少个Pauli算符。$N_{\text{max}}$的值取决于具体的量子线路模型。
+
+
+除了$N_{\text{max}}$，算法还需要对于给定的Pauli算符$s$计算出集合$\left\{ s'\mid \Tr{s' U^\dagger_{i,j}s U_{i,j}}\neq 0 \right\}$。这个集合的计算复杂度高度依赖于具体的量子线路模型，以及量子门$U_{i,j}$的具体存储形式。记这个集合的计算时间复杂度不超过$C_{\text{split}}$；空间复杂度不超过$S_{\text{split}}$。
 在后续的章节中，将估计对一些具体的线路模型中$N_{\text{max}}$、$C_{\text{split}}$、$S_{\text{split}}$的值。在本章中，将假设$N_{\text{max}}$、$C_{\text{split}}$、$S_{\text{split}}$是一个常量。
 
 因为对于含有$n$个qubits，深度为$L$的量子线路$\mathcal{U}$，其Pauli路径的数量是$4^{L(n+1)}$。因此先枚举再筛选的方法会带来指数级的计算复杂度，在实际应用中是不可行的。因此，我们需要设计一种高效的枚举方法。
@@ -716,28 +727,28 @@ $N_M$是$\mathcal{S}_M$的元素个数。
 
 
 
-该方法的关键思想基于$O$的Pauli稀疏性和以下观察：对于任何Pauli路径$s$，如果$f(\mathcal{U},\bm{s},O,\rho)\neq 0$，则如果$s_{i}|_{\supp(U_{i,j})}$固定，则$s_{i-1}|_{\supp(U_{i,j})}$最多有$N_{\text{max}}$情况，这对所有$i,j$都成立。这是源自于最大可分裂的Pauli算符数量$N_{\text{max}}$的定义。因此，对于具有非零贡献的Pauli路径$\bm{s}$，$s_{i-1}$的情况数是有界的，这使得我们可以高效的枚举Pauli路径。
+该方法的关键思想基于$O$的Pauli稀疏性和以下观察：对于任何Pauli路径$s$，如果$f(\mathcal{U},\bm{s},O,\rho)\neq 0$，则如果$s_{i}|_{\supp(U_{i,j})}$固定，则$s_{i-1}|_{\supp(U_{i,j})}$最多有$N_{\text{max}}$种可能的情况，对所有$i,j$都成立。这是源自于最大可分裂的Pauli算符数量$N_{\text{max}}$的定义。因此，对于具有非零贡献的Pauli路径$\bm{s}$，在给定$s_{i}$时，$s_{i-1}$的情况数是有界的，这使得我们可以高效的枚举Pauli路径。
 
 
 
-在\textbf{情况1}中，对于任何Pauli路径$\bm{s}=(s_0,\cdots,s_L)$，与噪声关联的Hamming Weight 满足$\abs{\bm{s}}_{\mathcal{N}}=\sum_{P\in {X,Y,Z}}\abs{\bm{s}}_P$。为了与后面的情形做区分，记为$\abs{\bm{s}}_H=\abs{s_L}_H+\cdots+\abs{s_L}_H$，其中$\abs{s_i}_H$是Pauli算符$s_i$中的非单位元素的数量，$\abs{\bullet}_H$代表Hamming Weight。
+在\textbf{情况1}中，对于任何Pauli路径$\bm{s}=(s_0,\cdots,s_L)$，与噪声关联的Hamming Weight 满足$\abs{\bm{s}}_{\mathcal{N}}=\sum_{P\in {X,Y,Z}}\abs{\bm{s}}_P$。为了与后面的情形做区分，记为$\abs{\bm{s}}=\abs{s_L}+\cdots+\abs{s_L}$，其中$\abs{s_i}$是Pauli算符$s_i$中的非单位元素的数量，$\abs{\bullet}$代表Hamming Weight。
 
-对于具有非零贡献的Pauli路径$s$，可以要求$\abs{s_i}_H > 0$，对$i=0,\cdots,L$成立。
+对于具有非零贡献的Pauli路径$s$，可以要求$\abs{s_i} > 0$，对$i=0,\cdots,L$成立。
 否则在某些层$s_i$将是平凡的，这将导致$\Tr{s_{i+1} \mathcal{U}_{i+1} s_i \mathcal{U}_{i+1}^\dagger}=\Tr{s_{i+1} s_i}$。为了避免$f(\mathcal{U},\bm{s},O,\rho)=0$，必须有$s_L=\cdots=s_{i+1}=s_i=\left(\frac{\mathbb{I}}{\sqrt{2}}\right)^{\otimes n}$。
-不失一般性，可以假设$\Tr{O}=0$（或用$O-\frac{\Tr{O}}{2^n} I$替换$O$），这导致$\Tr{O s_L}=0$。因此，对于满足$\abs{\bm{s}}_H\leq M$且具有非零贡献的Pauli路径$\bm{s}$，必须有$\abs{s_{L}}_H+\cdots+\abs{s_{L-i}}_H\leq M-(L-i)$。
+不失一般性，可以假设$\Tr{O}=0$（或用$O-\frac{\Tr{O}}{2^n} I$替换$O$），这导致$\Tr{O s_L}=0$。因此，对于满足$\abs{\bm{s}}\leq M$且具有非零贡献的Pauli路径$\bm{s}$，必须有$\abs{s_{L}}+\cdots+\abs{s_{L-i}}\leq M-(L-i)$。
 
 搜索Pauli路径的反向传播过程如下：
 \begin{enumerate}
     \item 选择$s_L$，使得$\Tr{Os_L}\neq 0$。为了确保$\Tr{Os_L}\neq0$，$s_L$只能从$O$中的Pauli算符中选择。由假设可观测量$O$是至多多项式数量个Pauli算符的的线性组合，于是$s_L$最多有$\mathrm{Poly}(n)$种情况。枚举$s_L$的时间和空间复杂度均为$\order{\mathrm{Poly}(n)}$。
     \item 对于每个$s_L$，接下来的步骤是枚举所有可能的$s_{L-1}$，使得$\Tr{s_L \mathcal{U}_L s_{L-1} \mathcal{U}_L^\dagger}\neq 0$。
-    由于$\cup_j\{s_L|_{\supp(U_{L,j})}\} \cup \{s_L|_{I_L}\}$中至多有$\abs{s_L}_H$个非单位元素，其中$\supp(U_{L,j})$是第$L$层$\mathcal{U}_L$的第$j$个门$U_{L,j}$所作用的量子比特的集合；${I_L}$是第$L$层中没有门作用的量子比特的集合。
+    由于$\cup_j\{s_L|_{\supp(U_{L,j})}\} \cup \{s_L|_{I_L}\}$中至多有$\abs{s_L}$个非单位元素，其中$\supp(U_{L,j})$是第$L$层$\mathcal{U}_L$的第$j$个门$U_{L,j}$所作用的量子比特的集合；${I_L}$是第$L$层中没有门作用的量子比特的集合。
     若$s_i|_{\supp(U_{i,j})}$是单位，则有$\Tr{s_{i+1} \mathcal{U}_{i+1} s_i \mathcal{U}_{i+1}^\dagger}=\Tr{s_{i+1} s_i}$，为避免零贡献则$s_{i-1}|_{\supp(U_{i,j})}$也是单位。
-    因策这些非单位元对应于$\cup_j\{s_{L-1}|_{\supp(U_{L,j})}\}\cup \{s_{L-1}|_{I_L}\}$中至多有$\abs{s_L}_H$个非单位元素。
+    因策这些非单位元对应于$\cup_j\{s_{L-1}|_{\supp(U_{L,j})}\}\cup \{s_{L-1}|_{I_L}\}$中至多有$\abs{s_L}$个非单位元素。
 
-    此外，每个元素最多有$N_\text{max}$潜在候选者，导致$s_{L-1}$最多有$N_{\text{max}}^{\abs{s_L}_H}$种情况。根据先前的讨论，算法还需要丢弃$\abs{s_L}_H+\abs{s_{L-1}}_H> M-L$的情况。
-    在给定$s_L$的情况下，枚举$s_{L-1}$的时间复杂度为为$\order{nC_{\text{split}} N_{\text{max}}^{\abs{s_L}_H}}$，空间复杂度为$\order{\max\{S_{\text{split}},n\}}$。
+    此外，每个元素最多有$N_\text{max}$潜在候选者，导致$s_{L-1}$最多有$N_{\text{max}}^{\abs{s_L}}$种情况。根据先前的讨论，算法还需要丢弃$\abs{s_L}+\abs{s_{L-1}}> M-L$的情况。
+    在给定$s_L$的情况下，枚举$s_{L-1}$的时间复杂度为为$\order{nC_{\text{split}} N_{\text{max}}^{\abs{s_L}}}$，空间复杂度为$\order{\max\{S_{\text{split}},n\}}$。
 
-    \item 类似的，重复步骤(2)以枚举对每种$s_{L-1}$可能的$s_{L-2}$情况，并丢弃$\abs{s_L}_H+\abs{s_{L-1}}_H+\abs{s_{L-2}}_H> M-(L-1)$。我们得到$s_{L-2}$最多有$N_{\text{max}}^{\abs{s_{L-1}}_H}$种情况，给定$s_{L-1}$的情况下，枚举$s_{L-2}$的时间复杂度为$n\order{C_{\text{split}} N_{\text{max}}^{\abs{s_{L-1}}_H}}$，空间复杂度为$\order{\max\{S_{\text{split}},n\}}$。重复此过程，我们可以枚举得到所有$s_{L-2},\cdots,s_{0}$。
+    \item 类似的，重复步骤(2)以枚举对每种$s_{L-1}$可能的$s_{L-2}$情况，并丢弃$\abs{s_L}+\abs{s_{L-1}}+\abs{s_{L-2}}> M-(L-1)$。我们得到$s_{L-2}$最多有$N_{\text{max}}^{\abs{s_{L-1}}}$种情况，给定$s_{L-1}$的情况下，枚举$s_{L-2}$的时间复杂度为$n\order{C_{\text{split}} N_{\text{max}}^{\abs{s_{L-1}}}}$，空间复杂度为$\order{\max\{S_{\text{split}},n\}}$。重复此过程，我们可以枚举得到所有$s_{L-2},\cdots,s_{0}$。
 \end{enumerate}
 
 模拟算法的全过程总结在算法~\ref{ALGORITHM_HS}中。
@@ -750,16 +761,16 @@ $N_M$是$\mathcal{S}_M$的元素个数。
         \FOR{每个$s_L$使得$\Tr{Os_L}\neq 0$}
             \STATE 求解$s_{L-1}$的集合$S_{L-1}=\left\{s_{L-1}\mid \Tr{s_L \mathcal{U}_L s_{L-1} \mathcal{U}_L^\dagger}\neq 0\right\}$。
             \FOR{每个$s_{L-1}\in S_{L-1}$}
-                \IF{$\abs{s_L}_H+\abs{s_{L-1}}_H\leq M-L$}
+                \IF{$\abs{s_L}+\abs{s_{L-1}}\leq M-L$}
                     \STATE 求解$s_{L-2}$的集合$S_{L-2}=\left\{s_{L-2}\mid \Tr{s_{L-1} \mathcal{U}_{L-1} s_{L-2} \mathcal{U}_{L-1}^\dagger}\neq 0\right\}$。
                     \FOR{每个$s_{L-2}\in S_{L-2}$}
-                        \IF{$\abs{s_L}_H+\abs{s_{L-1}}_H+\abs{s_{L-2}}_H\leq M-(L-1)$}
+                        \IF{$\abs{s_L}+\abs{s_{L-1}}+\abs{s_{L-2}}\leq M-(L-1)$}
                             \STATE $\cdots$
                             \STATE 求解$s_{0}$的集合$S_{0}=\left\{s_{0}\mid \Tr{s_{1} \mathcal{U}_{1} s_{0} \mathcal{U}_{1}^\dagger}\neq 0\right\}$。
                             \FOR{每个$s_{0}\in S_{0}$}
-                                \IF{$\abs{s_L}_H+\cdots+\abs{s_{0}}_H\leq M$}
-                                    \STATE 计算$\tilde{f}(\mathcal{U},\bm{s},O,\rho)$。
-                                    \STATE $\widehat{\langle O \rangle}=\widehat{\langle O \rangle}+\tilde{f}(\mathcal{U},\bm{s},O,\rho)$。
+                                \IF{$\abs{s_L}+\cdots+\abs{s_{0}}\leq M$}
+                                    \STATE 计算$f(\widetilde{\mathcal{U}},\bm{s},O,\rho)$。
+                                    \STATE $\widehat{\langle O \rangle}=\widehat{\langle O \rangle}+f(\widetilde{\mathcal{U}},\bm{s},O,\rho)$。
                                 \ENDIF
                             \ENDFOR
                         \ENDIF
@@ -771,29 +782,29 @@ $N_M$是$\mathcal{S}_M$的元素个数。
     \end{algorithmic}
 \end{algorithm}
 
-在上述枚举过程中，给定$s_L$，输出的不同Pauli路径的数量最多为$N_{\text{max}}^{\abs{s_1}_H+\cdots+\abs{s_L}_H}\leq N_{\text{max}}^{M}$。或者，对于给定的$s_L$，我们考虑所有以$s_L$为终点元素、$\abs{\bm{s}}_H\leq M$且$f(\mathcal{U},\bm{s},O,\rho)\neq 0$的Pauli路径。可以将其视为从$s_L$开始的树，新的分支仅在$s_{i}|_{\supp(U_{i,j})}$不是单位时产生。由于$\{s_{i}|_{\supp(U_{i,j})}\}$中的非单位元素最多为$M$，且每个分支最多有$N_{\text{max}}$个可能的情况，因此叶子节点数量最多为$N_{\text{max}}^{M}$。因此，为了计算$\abs{\bm{s}}_H\leq M$的Pauli路径的所有贡献，我们需要计算最多$\mathrm{Poly}(n) N_{\text{max}}^{M}$个不同的Pauli路径。
+在上述枚举过程中，给定$s_L$，输出的不同Pauli路径的数量最多为$N_{\text{max}}^{\abs{s_1}+\cdots+\abs{s_L}}\leq N_{\text{max}}^{M}$。或者，对于给定的$s_L$，我们考虑所有以$s_L$为终点元素、$\abs{\bm{s}}\leq M$且$f(\mathcal{U},\bm{s},O,\rho)\neq 0$的Pauli路径。可以将其视为从$s_L$开始的树，新的分支仅在$s_{i}|_{\supp(U_{i,j})}$不是单位时产生。由于$\{s_{i}|_{\supp(U_{i,j})}\}$中的非单位元素最多为$M$，且每个分支最多有$N_{\text{max}}$个可能的情况，因此叶子节点数量最多为$N_{\text{max}}^{M}$。因此，为了计算$\abs{\bm{s}}\leq M$的Pauli路径的所有贡献，我们需要计算最多$\mathrm{Poly}(n) N_{\text{max}}^{M}$个不同的Pauli路径，即$N_M=\order{ \mathrm{Poly}(n) N_{\text{max}}^{M}}$。
 
-在枚举步骤(1)中，时间复杂度为$\order{\mathrm{Poly}(n)}$。在枚举步骤(2)中，考虑所有$s_L$的情况，时间成本为$\order{\sum_{s_L}nC_{\text{split}} N_{\text{max}}^{\abs{s_L}_H}}$。在枚举步骤(3)中，考虑所有$s_{L-1}$的情况，时间复杂度为$\order{\sum_{s_L}\sum_{s_{L-1}(s_L)}nC_{\text{split}} N_{\text{max}}^{\abs{s_{L-1}}_H}}$，其中$s_{L-1}(s_L)$表示枚举步骤(2)中对应给定$s_L$的输出。类似的结果适用于$s_{L-2},\cdots,s_{0}$。
+在枚举步骤(1)中，时间复杂度为$\order{\mathrm{Poly}(n)}$。在枚举步骤(2)中，考虑所有$s_L$的情况，时间成本为$\order{\sum_{s_L}nC_{\text{split}} N_{\text{max}}^{\abs{s_L}}}$。在枚举步骤(3)中，考虑所有$s_{L-1}$的情况，时间复杂度为$\order{\sum_{s_L}\sum_{s_{L-1}(s_L)}nC_{\text{split}} N_{\text{max}}^{\abs{s_{L-1}}}}$，其中$s_{L-1}(s_L)$表示枚举步骤(2)中对应给定$s_L$的输出。类似的结果适用于$s_{L-2},\cdots,s_{0}$。
 
 因此，上述枚举过程的时间复杂度为：
 \begin{equation}
     \begin{aligned}
-        \order{\mathrm{Poly}(n)+\sum_{s_L}nC_{\text{split}} N_{\text{max}}^{\abs{s_L}_H}+\sum_{s_L}\sum_{s_{L-1}(s_L)}nC_{\text{split}} N_{\text{max}}^{\abs{s_{L-1}}_H} + \cdots} \\
+        \order{\mathrm{Poly}(n)+\sum_{s_L}nC_{\text{split}} N_{\text{max}}^{\abs{s_L}}+\sum_{s_L}\sum_{s_{L-1}(s_L)}nC_{\text{split}} N_{\text{max}}^{\abs{s_{L-1}}} + \cdots} \\
         \leq \order{\mathrm{Poly}(n)L nC_{\text{split}} N_{\text{max}}^{M}}=\mathrm{Poly}(n) \order{L} C_{\text{split}} N_{\text{max}}^{M},
     \end{aligned}
 \end{equation}
 其中，不等式成立，因为：
 \begin{equation}
     \begin{aligned}
-        &\sum_{s_L}\cdots\sum_{s_{i-1}(s_L,\cdots,s_i)}nC_{\text{split}} N_{\text{max}}^{\abs{s_{i-1}(s_L,\cdots,s_i)}_H} \\
-        &=\sum_{s_L}\cdots\sum_{s_{i}(s_L,\cdots,s_{i+1})}\sum_{s_{i-1}(s_L,\cdots,s_i)}nC_{\text{split}} N_{\text{max}}^{\abs{s_{i-1}(s_L,\cdots,s_i)}_H}\\
-        &\ (\mathrm{By} \ \abs{s_{i-1}}_H+\cdots +\abs{s_L}_H\leq M) \\
-        &\leq \sum_{s_L}\cdots\sum_{s_{i}(s_L,\cdots,s_{i+1})}\sum_{s_{i-1}(s_L,\cdots,s_i)}nC_{\text{split}} N_{\text{max}}^{M-(\abs{s_{i}(s_L,\cdots,s_{i+1})}_H+\cdots+\abs{s_L}_H)}\\ 
-        &\ (\mathrm{By} \ \#s_{i-1}\leq N_{\text{max}}^{\abs{s_i}_H}) \\
-        &\leq \sum_{s_L}\cdots\sum_{s_{i}(s_L,\cdots,s_{i+1})}nC_{\text{split}} N_{\text{max}}^{M+\abs{s_{i}(s_L,\cdots,s_{i+1})}_H-(\abs{s_{i}(s_L,\cdots,s_{i+1})}_H+\cdots+\abs{s_L}_H)} \\
-        &=\sum_{s_L}\cdots\sum_{s_{i}(s_L,\cdots,s_{i+1})}nC_{\text{split}} N_{\text{max}}^{M-(\abs{s_{i+1}(s_L,\cdots,s_{i+2})}_H+\cdots+\abs{s_L}_H)} \\
+        &\sum_{s_L}\cdots\sum_{s_{i-1}(s_L,\cdots,s_i)}nC_{\text{split}} N_{\text{max}}^{\abs{s_{i-1}(s_L,\cdots,s_i)}} \\
+        &=\sum_{s_L}\cdots\sum_{s_{i}(s_L,\cdots,s_{i+1})}\sum_{s_{i-1}(s_L,\cdots,s_i)}nC_{\text{split}} N_{\text{max}}^{\abs{s_{i-1}(s_L,\cdots,s_i)}}\\
+        &\ (\mathrm{By} \ \abs{s_{i-1}}+\cdots +\abs{s_L}\leq M) \\
+        &\leq \sum_{s_L}\cdots\sum_{s_{i}(s_L,\cdots,s_{i+1})}\sum_{s_{i-1}(s_L,\cdots,s_i)}nC_{\text{split}} N_{\text{max}}^{M-(\abs{s_{i}(s_L,\cdots,s_{i+1})}+\cdots+\abs{s_L})}\\ 
+        &\ (\mathrm{By} \ \#s_{i-1}\leq N_{\text{max}}^{\abs{s_i}}) \\
+        &\leq \sum_{s_L}\cdots\sum_{s_{i}(s_L,\cdots,s_{i+1})}nC_{\text{split}} N_{\text{max}}^{M+\abs{s_{i}(s_L,\cdots,s_{i+1})}-(\abs{s_{i}(s_L,\cdots,s_{i+1})}+\cdots+\abs{s_L})} \\
+        &=\sum_{s_L}\cdots\sum_{s_{i}(s_L,\cdots,s_{i+1})}nC_{\text{split}} N_{\text{max}}^{M-(\abs{s_{i+1}(s_L,\cdots,s_{i+2})}+\cdots+\abs{s_L})} \\
         &\vdots \\
-        &\leq \sum_{s_L}\sum_{s_{L-1}(s_L)} nC_{\text{split}} N_{\text{max}}^{M-\abs{s_L}_H} \\
+        &\leq \sum_{s_L}\sum_{s_{L-1}(s_L)} nC_{\text{split}} N_{\text{max}}^{M-\abs{s_L}} \\
         &\leq \sum_{s_L} nC_{\text{split}} N_{\text{max}}^M=\mathrm{Poly}(n) C_{\text{split}} N_{\text{max}}^M.
     \end{aligned}
 \end{equation}
@@ -809,23 +820,24 @@ $N_M$是$\mathcal{S}_M$的元素个数。
 \end{equation}
 满足条件的Pauli路径的数量$N_M$最多为：
 \begin{equation}\label{eq:case1:N_M}
-    N_M=\mathrm{Poly}(n) N_{\text{max}}^{M}. \quad (\text{情况1})
+    N_M=\order{\mathrm{Poly}(n) N_{\text{max}}^{M}}. \quad (\text{情况1})
 \end{equation}
 
 
-在\textbf{情况2}中假设${p_x,p_y,p_z}$中只有$p_x$是非零的。此情况下的策略是截断$Y$、$Z$算符的数量小于$M$，形式化为$\abs{\bm{s}}_Y+\abs{\bm{s}}_Z=\abs{s_L}_Y+\abs{s_L}_Z+\cdots+\abs{s_0}_Y+\abs{s_0}_Z\leq M$。
+在\textbf{情况2}中，可以不失一般性的假设${p_x,p_y,p_z}$中只有$p_x$是非零的。与噪声关联的Hamming Weight 满足$\abs{\bm{s}}_{\mathcal{N}}=\sum_{P\in {Y,Z}}\abs{\bm{s}}_P$，此情况下的策略是截断$Y$、$Z$算符的数量小于$M$，形式化为$\abs{\bm{s}}_Y+\abs{\bm{s}}_Z=\abs{s_L}_Y+\abs{s_L}_Z+\cdots+\abs{s_0}_Y+\abs{s_0}_Z\leq M$。
 为讨论在该噪声情形下的反向传播，定义以下的条件：
 \begin{definition}
     对于一个量子线路$\mathcal{U}$，假设其门集合为$\{\mathcal{U}_{i,j}\}$。称$\mathcal{U}$是关于噪声关联的Hamming Weight $\abs{\bullet}_{\mathcal{N}}$单调增的，如果对于任意的$i,j,s$，有$\abs{\left\{s'\mid \Tr{sU_{i,j}s' U_{i,j}^\dagger}\neq 0,\ \abs{s'}_{\mathcal{N}}=0\right\}}\leq 1$，其中$s$和$s'$是Pauli算符。
 \end{definition}
 并非所有的量子线路都满足该条件。但是，对于一些特定的量子线路模型，例如由Clifford和Pauli旋转门组成的线路，这个定义是成立的。我们将讨论满足该定义的线路模型在噪声\textbf{情况2}的反向传播算法。
+一个量子线路$\mathcal{U}$如果是关于噪声关联的Hamming Weight $\abs{\bullet}_{\mathcal{N}}$单调增的，意味着在该线路的反向传播过程中，每个分岔点最多只有一条分支不增加$\abs{\bullet}_{\mathcal{N}}$，这将确保反向传播的过程的高效性。
 
 \textbf{情况2}的算法类似于\textbf{情况1}的算法。不同之处在于在第$(i+1)$步中丢弃的情况是$\abs{s_{L}}_Y+\abs{s_{L}}_Z+\abs{s_{L-1}}_Y+\abs{s_{L-1}}_Z \cdots \abs{s_{L-i}}_Y+\abs{s_{L-i}}_Z > M$。
 
-对于每种$s_L$的情况，$\cup_j\{s_L|_{\supp(U_{L,j})}\} \cup \{s_L|_{I_L}\}$中最多有$\abs{s_L}_H$个非单位元素，对应于$\cup_j\{s_{L-1}|_{\supp(U_{L,j})}\}\cup \{s_{L-1}|_{I_L}\}$中最多$\abs{s_L}_H$个非单位元素。此外，每个元素最多有$N_{\text{max}}$个潜在候选者，导致$s_{L-1}$最多有$N_{\text{max}}^{\abs{s_L}_H}$种情况。
+对于每种$s_L$的情况，$\cup_j\{s_L|_{\supp(U_{L,j})}\} \cup \{s_L|_{I_L}\}$中最多有$\abs{s_L}$个非单位元素，对应于$\cup_j\{s_{L-1}|_{\supp(U_{L,j})}\}\cup \{s_{L-1}|_{I_L}\}$中最多$\abs{s_L}$个非单位元素。此外，每个元素最多有$N_{\text{max}}$个潜在候选者，导致$s_{L-1}$最多有$N_{\text{max}}^{\abs{s_L}}$种情况。
 
 这个反向传播过程可以表示为从$s_L$开始的树，新的分支仅在$s_{i}|_{\supp(U_{i,j})}$不是单位且$\abs{\left\{s\mid \Tr{s_{i}|_{\supp(U_{i,j})}U_{i,j}s U_{i,j}^\dagger}\neq 0\right\}} \geq 2$时产生，如图~\ref{fig:bp_tree}所示。
-分叉点如图~\ref{fig:bp_tree_ele}所示，其中$s_i|_{\supp(U_{L,j})}$表示反向传播到第$i$层第$j$个门的某个$s_i$，$s_{i-1}|_{\supp(U_{L,j})}$和$s'_{i-1}|_{\supp(U_{L,j})}$分别表示$s_{i-1}$在${\supp(U_{L,j})}$可能出现的不同情况，在此为了方便只画出两种情况。
+其中的分叉点如图~\ref{fig:bp_tree_ele}所示，其中$s_i|_{\supp(U_{i,j})}$表示反向传播到第$i$层第$j$个门的某个$s_i$，$s_{i-1}|_{\supp(U_{i,j})}$和$s'_{i-1}|_{\supp(U_{i,j})}$分别表示$s_{i-1}$在${\supp(U_{i,j})}$可能出现的不同情况，在此为了方便只画出两种情况。
 
 假设量子线路$\mathcal{U}$满足对噪声关联的Hamming Weight 单调增的条件。在这种情况下，$\abs{s_{i-1}}_Y+\abs{s_{i-1}}_Z$和$\abs{s'_{i-1}}_Y+\abs{s'_{i-1}}_Z$至多只能有一个为零。
 
@@ -877,7 +889,8 @@ $N_M$是$\mathcal{S}_M$的元素个数。
 接下来，我们使用归纳法对满足 $\abs{s}_Y+\abs{s}_Z\leq M$ 且具有非平凡贡献的 Pauli 路径的数量进行上界估计，假设路径以给定的Pauli算符 $s_L$ 开始：
 \begin{enumerate}
     \item 如果我们限制 $\abs{s}_Y+\abs{s}_Z\leq 0$，那么在反向传播过程中没有产生分叉点。在该限制下，只会生成$s_L$ 开始的一条 Pauli 路径。此情况下的时间复杂度上界为 $\order{C_{\text{split}}nLN_{\text{max}}}$。
-    \item 如果我们限制 $\abs{s}_Y+\abs{s}_Z\leq 1$，并且在反向传播过程中在第 $i$ 层的第 $j$ 个门处存在一个分叉点，那么图~\ref{fig:bp_tree_ele} 中的元素 $s'_{i-1}$ 满足 $\abs{s'_{i-1}}_Y+\abs{s'_{i-1}}_Z\geq 1$。因此，$s'$ 被简化为 (1) 情况，满足 $\abs{s'_{i-2}}_Y+\abs{s'_{i-2}}_Z+\cdots \abs{s'_{0}}_Y+\abs{s'_{0}}_Z \leq 0$，并且在接下来的过程中没有分叉点，如图~\ref{fig:bp_tree_ele:2} 所示。除此之外，最多有 $nL$ 个分叉点位置。这种假设导致最多 $nLN_{\text{max}}$ 条从 $s_L$ 开始的 Pauli 路径。此情况下的时间复杂度上界为 $\order{C_{\text{split}}(nLN_{\text{max}})^2}$。
+    \item 如果我们限制 $\abs{s}_Y+\abs{s}_Z\leq 1$，并且在反向传播过程中在第 $i$ 层的第 $j$ 个门处存在一个分叉点。根据单调增的条件，可以假设图~\ref{fig:bp_tree_ele} 中的元素 $s'_{i-1}$ 满足 $\abs{s'_{i-1}}_Y+\abs{s'_{i-1}}_Z\geq 1$。因此，$s'$ 被简化为 (1) 情况，需要在后续的反向传递过程中满足 $\abs{s'_{i-2}}_Y+\abs{s'_{i-2}}_Z+\cdots \abs{s'_{0}}_Y+\abs{s'_{0}}_Z \leq 0$，因此在接下来的过程中将不会出现分叉点，如图~\ref{fig:bp_tree_ele:2} 所示。
+    除此之外，因为最多有 $nL$ 个分叉点位置。这种假设导致最多有 $nLN_{\text{max}}$ 条从 $s_L$ 开始的 满足条件的Pauli 路径。此情况下的时间复杂度上界为 $\order{C_{\text{split}}(nLN_{\text{max}})^2}$。
     
 
     \begin{figure}[htbp]
@@ -897,11 +910,12 @@ $N_M$是$\mathcal{S}_M$的元素个数。
         \caption{当设定 $\abs{s}_Y+\abs{s}_Z\leq 1$时的反向传播过程。}\label{fig:bp_tree_ele:2}
     \end{figure}
 
-    \item 如果我们限制 $\abs{s}_Y+\abs{s}_Z\leq 2$，并且在反向传播过程中在第 $i$ 层的第 $j$ 个门处存在一个分叉点，那么图~\ref{fig:bp_tree_ele} 中的元素 $s'_{i-1}$ 满足 $\abs{s'_{i-1}}_Y+\abs{s'_{i-1}}_Z\geq 1$。因此，$s'$ 被简化为 (2) 情况，满足 $\abs{s'_{i-2}}_Y+\abs{s'_{i-2}}_Z+\cdots \abs{s'_{0}}_Y+\abs{s'_{0}}_Z \leq 1$。根据 (2) 中的讨论，在接下来的过程中 $s'$ 最多有 $nLN_{\text{max}}$ 条路径。因此，从 $s_L$ 开始的 $s$ 最多有 $(nLN_{\text{max}})^2$ 条路径。此情况下的时间复杂度上界为 $\order{C_{\text{split}}(nLN_{\text{max}})^3}$。
+    \item 如果我们限制 $\abs{s}_Y+\abs{s}_Z\leq 2$，并且在反向传播过程中在第 $i$ 层的第 $j$ 个门处存在一个分叉点。
+    根据单调增的条件，可以假设图~\ref{fig:bp_tree_ele} 中的元素 $s'_{i-1}$ 满足 $\abs{s'_{i-1}}_Y+\abs{s'_{i-1}}_Z\geq 1$。因此，$s'$在后续的反向传递过程中被简化为 (2) 的情况，满足 $\abs{s'_{i-2}}_Y+\abs{s'_{i-2}}_Z+\cdots \abs{s'_{0}}_Y+\abs{s'_{0}}_Z \leq 1$。根据 (2) 中的讨论，在接下来的过程中 $s'$ 最多有 $nLN_{\text{max}}$ 条路径。因此，从 $s_L$ 开始的 $s$ 最多有 $(nLN_{\text{max}})^2$ 条路径。此情况下的时间复杂度上界为 $\order{C_{\text{split}}(nLN_{\text{max}})^3}$。
     \item 基于上述推广，对于 $\abs{s}_Y+\abs{s}_Z\leq M-1$ 的情况，假设从 $s_L$ 开始的 $s$ 最多有 $(nLN_{\text{max}})^{M-1}$ 条路径。且假设此情况下的时间复杂度上界为 $\order{C_{\text{split}}(nLN_{\text{max}})^M}$。
     
 
-    那么对于 $\abs{s}_Y+\abs{s}_Z\leq M$ 的情况，如果在反向传播过程中在第 $i$ 层的第 $j$ 个门处存在一个分叉点，那么图~\ref{fig:bp_tree_ele} 中的元素 $s'_{i-1}$ 满足 $\abs{s'_{i-1}}_Y+\abs{s'_{i-1}}_Z\geq 1$。类似地，$s'$ 被简化为 $\abs{s'_{i-2}}_Y+\abs{s'_{i-2}}_Z+\cdots \abs{s'_{0}}_Y+\abs{s'_{0}}_Z \leq M-1$ 的情况。根据假设，在接下来的过程中 $s'$ 最多有 $(nLN_{\text{max}})^{M-1}$ 条路径。因此，从 $s_L$ 开始的 $s$ 最多有 $nLN_{\text{max}}*(nLN_{\text{max}})^{M-1}=(nLN_{\text{max}})^{M}$ 条路径。此情况下的时间复杂度上界为 $\order{(nLN_{\text{max}})^{M+1}}$。
+    那么对于 $\abs{s}_Y+\abs{s}_Z\leq M$ 的情况，如果在反向传播过程中在第 $i$ 层的第 $j$ 个门处存在一个分叉点。根据单调增的条件，可以假设图~\ref{fig:bp_tree_ele} 中的元素 $s'_{i-1}$ 满足 $\abs{s'_{i-1}}_Y+\abs{s'_{i-1}}_Z\geq 1$。类似地，$s'$在后续的反向传递过程中需要满足 $\abs{s'_{i-2}}_Y+\abs{s'_{i-2}}_Z+\cdots \abs{s'_{0}}_Y+\abs{s'_{0}}_Z \leq M-1$。根据假设，在接下来的过程中 $s'$ 最多有 $(nLN_{\text{max}})^{M-1}$ 条路径。因此，从 $s_L$ 开始的 $s$ 最多有 $nLN_{\text{max}}*(nLN_{\text{max}})^{M-1}=(nLN_{\text{max}})^{M}$ 条路径。此情况下的时间复杂度上界为 $\order{(nLN_{\text{max}})^{M+1}}$。
 \end{enumerate}
 
 综上所述，对于\textbf{情况2}，枚举所有与噪声关联的Hamming Weight小于等于$M$且具有非平凡贡献函数的Pauli路径的时间复杂度为：
@@ -910,7 +924,7 @@ $N_M$是$\mathcal{S}_M$的元素个数。
 \end{equation}
 满足条件的Pauli路径的数量$N_M$最多为：
 \begin{equation}\label{eq:case2:N_M}
-    N_M=\mathrm{Poly}(n) (nLN_{\text{max}})^{M+1}. \quad (\text{情况2})
+    N_M=\order{\mathrm{Poly}(n) (nLN_{\text{max}})^{M+1}}. \quad (\text{情况2})
 \end{equation}
 
 因为在\textbf{情况1}和\textbf{情况2}中，算法的差别仅有在枚举的过程中丢弃的情况不同，因此在空间复杂度上，\textbf{情况1}和\textbf{情况2}的空间复杂度是相同的，如式~\eqref{eq:path:space_cost}所示。
@@ -973,7 +987,7 @@ SPD算法的核心思路是以贪心的策略，尝试枚举具有最大贡献�
 \begin{equation}\label{eq:spd:approximation}
     \widehat{\langle O \rangle} = \sum_{\bm{s}\in \{\bm{s}\mid g(\bm{s})\leq M\}} f(\mathcal{U},\bm{s},O,\rho),
 \end{equation}
-算法的主要过程同OBPPP算法~\ref{ALGORITHM_HS}，唯一区别是在第$i$层时，将$\abs{s_{L}}_H+\cdots+\abs{s_{L-i}}_H\leq M-(L-i)$的条件替换为：
+算法的主要过程同OBPPP算法~\ref{ALGORITHM_HS}，唯一区别是在第$i$层时，将$\abs{s_{L}}+\cdots+\abs{s_{L-i}}\leq M-(L-i)$的条件替换为：
 \begin{equation}
     \sum_{j} h(s_{L-1},L_i,U_{L,j})+\cdots+\sum_{j} h(s_{L-i-1},s_{L-i},U_{L-i,j})\leq M.
 \end{equation}
@@ -1013,19 +1027,19 @@ SPD算法的核心思路是以贪心的策略，尝试枚举具有最大贡献�
 \end{equation}
 满足条件的Pauli路径的数量$N_M$最多为：
 \begin{equation}\label{eq:spd:N_M}
-    N_M=\mathrm{Poly}(n) (nLN_{\text{max}})^{M+1}.
+    N_M=\order{\mathrm{Poly}(n) (nLN_{\text{max}})^{M+1}}.
 \end{equation}
 
 \section{本章小结}
 
 
-本章介绍了使用经典计算机模拟量子计算机的意义与应用，并介绍了部分常用的模拟方法，包括全状态和稳定子模拟方法。在介绍了这些方法的基础上，我们介绍了一种新的模拟方法，即Pauli路径方法。Pauli路径方法通过枚举所有满足条件的Pauli路径，并计算每个Pauli路径的贡献，从而计算量子线路的输出，如式~\eqref{eq:expectation}所示：
+本章介绍了使用经典计算机模拟量子计算机的意义与应用，并介绍了部分常用的模拟方法，包括全状态和稳定子模拟方法。在介绍了这些方法的基础上，我们介绍了一种新的模拟方法，即基于Pauli路径积分的模拟方法。Pauli路径方法通过枚举所有满足条件的Pauli路径，并计算每个Pauli路径的贡献，从而计算量子线路的输出，如式~\eqref{eq:expectation}所示：
 \begin{equation*}
     \langle O \rangle = \sum_{\bm{s}} f(\mathcal{U},\bm{s},O,\rho).
 \end{equation*}
 当噪声模型为Pauli类型噪声时，可以通过计算与噪声关联 Hamming Weight 较低的Pauli路径的贡献来高效近似计算量子线路的输出，如式~\eqref{eq:truncated_expectation}所示：
 \begin{equation*}
-    \widehat{\langle O \rangle} = \sum_{\abs{\bm{s}}_{\mathcal{N}}\leq M} \tilde{f}(\mathcal{U},\bm{s},O,\rho),
+    \widehat{\langle O \rangle} = \sum_{\abs{\bm{s}}_{\mathcal{N}}\leq M} f(\widetilde{\mathcal{U}},\bm{s},O,\rho),
 \end{equation*}
 其中$M$是截断参数。
 
@@ -1041,7 +1055,7 @@ SPD算法的核心思路是以贪心的策略，尝试枚举具有最大贡献�
 \begin{equation*}
     \begin{aligned}
         C_f &= C_{f\rho}+C_{fO}+C_{f\mathcal{U}},\\
-        S_f &= S_{f\rho}+S_{fO}+S_{f\mathcal{U}}.
+        S_f &= \max\{S_{f\rho},S_{fO},S_{f\mathcal{U}}\}.
     \end{aligned}
 \end{equation*}
 其中$C_{f\rho}$和$S_{f\rho}$分别是计算与初始密度矩阵$\rho$关联部分的时间和空间复杂度，$C_{fO}$和$S_{fO}$分别是计算与最终观测量$O$关联部分的时间和空间复杂度，$C_{f\mathcal{U}}$和$S_{f\mathcal{U}}$分别是计算与量子线路演化$\mathcal{U}$关联部分的时间和空间复杂度。
@@ -1064,7 +1078,7 @@ SPD算法的核心思路是以贪心的策略，尝试枚举具有最大贡献�
 \end{equation*}
 如式~\eqref{eq:case1:N_M}所示，满足条件的Pauli路径的数量$N_M$最多为：
 \begin{equation*}
-    N_M=\mathrm{Poly}(n) N_{\text{max}}^{M}.
+    N_M=\order{\mathrm{Poly}(n) N_{\text{max}}^{M}}.
 \end{equation*}
 其中$N_{\text{max}}$是在量子线路中$\mathcal{U}$中每个门的最大可分裂的Pauli算符的数量。
 
@@ -1074,7 +1088,7 @@ SPD算法的核心思路是以贪心的策略，尝试枚举具有最大贡献�
 \end{equation*}
 满足条件的Pauli路径的数量$N_M$最多为：
 \begin{equation*}
-    N_M=\mathrm{Poly}(n) (nLN_{\text{max}})^{M+1}.
+    N_M=\order{\mathrm{Poly}(n) (nLN_{\text{max}})^{M+1}}.
 \end{equation*}
 
 
@@ -1082,4 +1096,37 @@ SPD算法的核心思路是以贪心的策略，尝试枚举具有最大贡献�
 \begin{equation*}
 S_s=\order{\mathrm{Poly}(n)+\max\{S_{\text{split}},n\}L}.
 \end{equation*}
+
+最后，我们介绍了另一种基于Pauli路径积分的模拟方法——SPD算法。SPD算法通过贪心策略的方式，尝试枚举具有最大贡献函数的Pauli路径。在SPD算法中，我们定义了函数$g(\bm{s})$，并利用：
+\begin{equation*}
+    \widehat{\langle O \rangle} = \sum_{\bm{s}\in \{\bm{s}\mid g(\bm{s})\leq M\}} f(\mathcal{U},\bm{s},O,\rho)
+\end{equation*}
+来近似计算量子线路的期望值。
+在计算复杂度方面，SPD的算法的时间复杂度和空间复杂度如式~\eqref{eq:spd_cost}和式~\eqref{eq:spd_space}所示，同OBPPP算法相同，可以分别表示为：
+\begin{equation*}
+    \begin{aligned}
+        C &= C_s+N_MC_f, \\
+        S &= S_s+S_f.
+    \end{aligned}
+\end{equation*}
+其中，
+\begin{equation*}
+    \begin{aligned}
+        C_f &= C_{f\rho}+C_{fO}+C_{f\mathcal{U}},\\
+        S_f &= \max\{S_{f\rho},S_{fO},S_{f\mathcal{U}}\}.
+    \end{aligned}
+\end{equation*}
+
+在满足量子线路$\mathcal{U}$是关于噪声关联的Hamming Weight $\abs{\bullet}_{\mathcal{N}}$单调增的情况下，SPD算法的$C_s$、$S_s$和$N_M$的估计与OBPPP算法的情况2相同，如式~\eqref{eq:spd:cost_s}和式~\eqref{eq:spd:N_M}所示为：
+\begin{equation*}
+    C_s=\mathrm{Poly}(n) \order{(nL)^{M}} C_{\text{split}} N_{\text{max}}^{M}.
+\end{equation*}
+\begin{equation*}
+    N_M=\order{\mathrm{Poly}(n) (nLN_{\text{max}})^{M+1}}.
+\end{equation*}
+SPD算法的空间复杂度$S_s$与OBPPP算法的空间复杂度$S_s$相同，如式~\eqref{eq:spd:space_cost}所示为：
+\begin{equation*}
+    S_s=\order{\mathrm{Poly}(n)+\max\{S_{\text{split}},n\}L}.
+\end{equation*}
+
 

@@ -184,16 +184,16 @@
 
 误差可以用均方误差（Mean Square Error, MSE）来衡量，对于一个随机变量$X$，其均方误差定义为$\mathbb{E}[(X-\hat{X})^2]$，其中$\hat{X}$是$X$的估计值。在这里，我们考虑的是含噪声期望值模拟的误差，即真实含噪声期望值$\widetilde{\langle O\rangle}$和其估计值$\widehat{\langle O\rangle}$之间的均方误差。根据定义（式~\eqref{eq:noise_expectation}和式~\eqref{eq:truncated_expectation}），含噪声期望值模拟的误差为：
 \begin{equation}
-    \widetilde{\langle O\rangle}-\widehat{\langle O\rangle}=\sum_{\abs{\bm{s}}_{\mathcal{N}}>M}\tilde{f}(\mathcal{U},\bm{s},O,\rho),
+    \widetilde{\langle O\rangle}-\widehat{\langle O\rangle}=\sum_{\abs{\bm{s}}_{\mathcal{N}}>M}f(\widetilde{\mathcal{U}},\bm{s},O,\rho),
 \end{equation}
-其中$\abs{\bullet}_{\mathcal{N}}$定义在式~\eqref{eq:noise_hamming_weight}中，表示与噪声模型$\mathcal{N}$关联的Hamming weight，$\tilde{f}(\mathcal{U},\bm{s},O,\rho)$定义在式~\eqref{eq:noise_contribution}中，表示一个Pauli路径$\bm{s}$对含噪声期望值的贡献。
+其中$\abs{\bullet}_{\mathcal{N}}$定义在式~\eqref{eq:noise_hamming_weight}中，表示与噪声模型$\mathcal{N}$关联的Hamming weight，$f(\widetilde{\mathcal{U}},\bm{s},O,\rho)$定义在式~\eqref{eq:noise_contribution}中，表示一个Pauli路径$\bm{s}$对含噪声期望值的贡献。
 
 
 如果有式~\eqref{eq:generate}成立，有以下引理成立：
 \begin{lemma}\label{lemma:cross_items}
     对于变分量子线路，如果式~\eqref{eq:generate}成立，则对任意两个不同的Pauli路径$\bm{s}$和$\bm{s}'$，有：
     \begin{equation}\label{eq:E_cross_equals_0}
-        \mathbb{E}_{\bm{\theta}}\left[\tilde{f}(\mathcal{U},\bm{s},O,\rho)\tilde{f}(\mathcal{U},\bm{s}',O,\rho)\right]=0,
+        \mathbb{E}_{\bm{\theta}}\left[f(\widetilde{\mathcal{U}},\bm{s},O,\rho)f(\widetilde{\mathcal{U}},\bm{s}',O,\rho)\right]=0,
     \end{equation}
     其中期望是对于均匀随机选择的旋转角度$\bm{\theta}$。
 \end{lemma}
@@ -214,18 +214,18 @@
 \begin{proof}
     根据式~\eqref{eq:noise_contribution}，含噪声期望值模拟的误差为：
     \begin{equation}
-        \widetilde{\langle O\rangle}-\widehat{\langle O\rangle}=\sum_{\abs{\bm{s}}_{\mathcal{N}}>M}\tilde{f}(\mathcal{U},\bm{s},O,\rho).
+        \widetilde{\langle O\rangle}-\widehat{\langle O\rangle}=\sum_{\abs{\bm{s}}_{\mathcal{N}}>M}f(\widetilde{\mathcal{U}},\bm{s},O,\rho).
     \end{equation}
     因此，含噪声期望值模拟的均方误差为：
     \begin{equation}
         \begin{aligned}
-            \mathbb{E}_{\bm{\theta}}\left[\left(\widetilde{\langle O\rangle}-\widehat{\langle O\rangle}\right)^2\right]&=\mathbb{E}_{\bm{\theta}}\left[\left(\sum_{\abs{\bm{s}}_{\mathcal{N}}>M}\tilde{f}(\mathcal{U},\bm{s},O,\rho)\right)^2\right]\\
-            &=\sum_{\abs{\bm{s}}_{\mathcal{N}}>M}\mathbb{E}_{\bm{\theta}}\left[\tilde{f}(\mathcal{U},\bm{s},O,\rho)^2\right],
+            \mathbb{E}_{\bm{\theta}}\left[\left(\widetilde{\langle O\rangle}-\widehat{\langle O\rangle}\right)^2\right]&=\mathbb{E}_{\bm{\theta}}\left[\left(\sum_{\abs{\bm{s}}_{\mathcal{N}}>M}f(\widetilde{\mathcal{U}},\bm{s},O,\rho)\right)^2\right]\\
+            &=\sum_{\abs{\bm{s}}_{\mathcal{N}}>M}\mathbb{E}_{\bm{\theta}}\left[f(\widetilde{\mathcal{U}},\bm{s},O,\rho)^2\right],
         \end{aligned}
     \end{equation}
     其中，等号是因为根据式~\eqref{eq:E_cross_equals_0}，对于任意两个不同的Pauli路径$\bm{s}$和$\bm{s}'$，有：
     \begin{equation}
-        \mathbb{E}_{\bm{\theta}}\left[\tilde{f}(\mathcal{U},\bm{s},O,\rho)\tilde{f}(\mathcal{U},\bm{s}',O,\rho)\right]=0.
+        \mathbb{E}_{\bm{\theta}}\left[f(\widetilde{\mathcal{U}},\bm{s},O,\rho)f(\widetilde{\mathcal{U}},\bm{s}',O,\rho)\right]=0.
     \end{equation}
     
     另一方面，在无噪声的理想情况下，有：
@@ -234,12 +234,12 @@
     \end{equation}
     因此，有如下不等式：
     \begin{equation}
-        \mathbb{E}_{\bm{\theta}}\left[ \sum_{\bm{s}}\tilde{f}(\mathcal{U},\bm{s},O,\rho)\right]^2=\sum_{\bm{s}}\mathbb{E}_{\bm{\theta}}\left[f(\mathcal{U},\bm{s},O,\rho)^2\right]\leq\norm{O}_\infty^2.
+        \mathbb{E}_{\bm{\theta}}\left[ \sum_{\bm{s}}f(\widetilde{\mathcal{U}},\bm{s},O,\rho)\right]^2=\sum_{\bm{s}}\mathbb{E}_{\bm{\theta}}\left[f(\mathcal{U},\bm{s},O,\rho)^2\right]\leq\norm{O}_\infty^2.
     \end{equation}
     根据不等式~\eqref{eq:noise_suppression}，可以得到：
     \begin{equation}\label{temp:eq:noise_suppression}
         \begin{aligned}
-            \sum_{\abs{\bm{s}}_{\mathcal{N}}>M}\mathbb{E}_{\bm{\theta}}\left[\tilde{f}(\mathcal{U},\bm{s},O,\rho)^2\right] &\leq (1-2\gamma)^{2M} \sum_{\abs{\bm{s}}_{\mathcal{N}}>M}\mathbb{E}_{\bm{\theta}}\left[f(\mathcal{U},\bm{s},O,\rho)^2\right]\\
+            \sum_{\abs{\bm{s}}_{\mathcal{N}}>M}\mathbb{E}_{\bm{\theta}}\left[f(\widetilde{\mathcal{U}},\bm{s},O,\rho)^2\right] &\leq (1-2\gamma)^{2M} \sum_{\abs{\bm{s}}_{\mathcal{N}}>M}\mathbb{E}_{\bm{\theta}}\left[f(\mathcal{U},\bm{s},O,\rho)^2\right]\\
             &\leq (1-2\gamma)^{2M} \norm{O}_\infty^2\\
             &\leq \exp{-4\gamma M} \norm{O}_\infty^2.
         \end{aligned}
@@ -257,7 +257,7 @@
 \begin{remark}
     特别的，对于退极化噪声模型，有$p_x=p_y=p_z=\frac{\lambda}{4}$，因此根据引理~\ref{lemma:noise}，可以得到：
     \begin{equation}
-        \tilde{f}(\mathcal{U},\bm{s},O,\rho)=(1-\lambda)^{\abs{\bm{s}}}f(\mathcal{U},\bm{s},O,\rho).
+        f(\widetilde{\mathcal{U}},\bm{s},O,\rho)=(1-\lambda)^{\abs{\bm{s}}}f(\mathcal{U},\bm{s},O,\rho).
     \end{equation}
     类似于式~\eqref{temp:eq:noise_suppression}，可以得到：
     \begin{equation}
@@ -575,7 +575,7 @@
 
 如果截断含噪声期望值 $\abs{\bm{s}}\leq L$，估计的期望值可以表示为： 
 \begin{equation} 
-    \widehat{\langle O \rangle}=\sum_{\abs{s}\leq L} \tilde{f}(\mathcal{U},\bm{s},O,\rho)=\sum_{m=0}^L (1-\lambda)^m \sum_{\abs{s}=m} f(\mathcal{U},\bm{s},O,\rho).
+    \widehat{\langle O \rangle}=\sum_{\abs{s}\leq L} f(\widetilde{\mathcal{U}},\bm{s},O,\rho)=\sum_{m=0}^L (1-\lambda)^m \sum_{\abs{s}=m} f(\mathcal{U},\bm{s},O,\rho).
 \end{equation}
 
 在考虑 $\widetilde{\langle O \rangle}$ 和 $\widehat{\langle O \rangle}$ 之间的差异之前，我们首先考虑无噪声情况。第一个量子比特上的酉矩阵可以表示为： 
@@ -612,8 +612,8 @@
 综上所述，对于$\widetilde{\langle O \rangle}$ 和 $\widehat{\langle O \rangle}$ 之间的均方误差可以估计为： 
 \begin{equation} 
     \begin{aligned} 
-        \mathbb{E}_{\bm{\theta}}\abs{\widetilde{\langle O \rangle}-\widehat{\langle O \rangle}}^2 &=\mathbb{E}_{\bm{\theta}}\left[\sum_{\abs{s}> L}\tilde{f}(\mathcal{U},\bm{s},O,\rho)\right]^2\\
-         &=\mathbb{E}_{\bm{\theta}}\left[\sum_{\abs{s}=L+1}\tilde{f}(\mathcal{U},\bm{s},O,\rho)\right]^2\\
+        \mathbb{E}_{\bm{\theta}}\abs{\widetilde{\langle O \rangle}-\widehat{\langle O \rangle}}^2 &=\mathbb{E}_{\bm{\theta}}\left[\sum_{\abs{s}> L}f(\widetilde{\mathcal{U}},\bm{s},O,\rho)\right]^2\\
+         &=\mathbb{E}_{\bm{\theta}}\left[\sum_{\abs{s}=L+1}f(\widetilde{\mathcal{U}},\bm{s},O,\rho)\right]^2\\
         &= (1-\lambda)^{2(L+1)}\mathbb{E}_{\bm{\theta}} \left[\sum_{\abs{s}=L+1}{f}(\mathcal{U},\bm{s},O,\rho)\right]^2\\ 
         &=(1-\lambda)^{2(L+1)}.
     \end{aligned} 

@@ -111,7 +111,7 @@
 \begin{equation}
     \begin{aligned}
         \text{minimize} \quad & M,\\
-        \text{subject to} \quad & \widehat{\langle O \rangle}=\sum_{\abs{\bm{s}}\leq M}\tilde{f}(\mathcal{U},\bm{s},O,\rho),\\
+        \text{subject to} \quad & \widehat{\langle O \rangle}=\sum_{\abs{\bm{s}}\leq M}f(\widetilde{\mathcal{U}},\bm{s},O,\rho),\\
         &\max_{i}\frac{\abs{\widetilde{\langle O \rangle}(\bm{\theta^i})-\widehat{\langle O \rangle}(\bm{\theta^i})}}{\abs{\widetilde{\langle O \rangle}(\bm{\theta^i})}}\leq 0.001.
     \end{aligned}
 \end{equation}
@@ -140,7 +140,7 @@
 \begin{equation}
     \begin{aligned}
         \text{minimize} \quad & M,\\
-        \text{subject to} \quad & \widehat{\langle O \rangle}=\sum_{\abs{\bm{s}}\leq M}\tilde{f}(\mathcal{U},\bm{s},O,\rho),\\
+        \text{subject to} \quad & \widehat{\langle O \rangle}=\sum_{\abs{\bm{s}}\leq M}f(\widetilde{\mathcal{U}},\bm{s},O,\rho),\\
         &\max_{i}\frac{\abs{\widetilde{\langle O \rangle}(\bm{\theta^i})-\widehat{\langle O \rangle}(\bm{\theta^i})}}{\abs{\widetilde{\langle O \rangle}(\bm{\theta^i})}}\leq 0.1,0.05,0.01,0.001,0.0001,0.00001,
     \end{aligned}
 \end{equation}
@@ -170,7 +170,7 @@
 其中
 \begin{equation}
     \begin{aligned}
-        \widehat{\langle O \rangle}=&\sum_{\abs{\bm{s}}\leq M}\tilde{f}(\mathcal{U},\bm{s},O,\rho),\\
+        \widehat{\langle O \rangle}=&\sum_{\abs{\bm{s}}\leq M}f(\widetilde{\mathcal{U}},\bm{s},O,\rho),\\
         M=&\arg\min_{M} \left\{ \max_{i} \frac{\left|\widetilde{\langle O \rangle}(\bm{\theta^i}) - \widehat{\langle O \rangle}(\bm{\theta^i})\right|}{\left|\widetilde{\langle O \rangle}(\bm{\theta^i})\right|} \leq 0.001 \right\}.
     \end{aligned}
 \end{equation}
