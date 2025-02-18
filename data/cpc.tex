@@ -1,6 +1,12 @@
 \chapter{Clifford扰动量子线路的模拟}
 
-在过去的章节中，我们介绍了使用Stabilizer稳定子方法实现由Clifford门组成Clifford量子线路的高效模拟。在这一章中，我们将讨论如何利用SPD模拟算法模拟Clifford扰动量子线路。Clifford扰动量子线路是由接近Clifford门的门组成的量子线路。
+
+\section{背景介绍}
+在过去的章节中，我们介绍了使用Stabilizer稳定子方法实现由Clifford门组成Clifford量子线路的高效模拟。
+在基于稳定子的模拟方法中，只能高效模拟Clifford量子线路，或是只有少量的非Clifford门的由Clifford门主导的量子线路。
+但对于存在大量的非Clifford门的量子线路，即使这些Clifford门非常接近Clifford门，基于Stabilizer稳定子的方法也很难进行进行高效模拟。
+
+在这一章中，我们将讨论如何利用SPD模拟算法模拟Clifford扰动量子线路。Clifford扰动量子线路是由接近Clifford门的门组成的量子线路。
 Clifford扰动量子线路的模拟可以用于量子错误缓解等领域，通过扩展Clifford数据回归方法（Clifford Data Regression，CDR）将错误缓解的回归数据集扩展到Clifford扰动量子线路上，可以显著的提高错误缓解的效果~\cite{zhang2024clifford}，这种方法被称为Clifford扰动数据回归（Clifford Perturbation Data Regression，CPDR）。
 
 类似于第~\ref{chap:noisy_vqa}章，在我们的线路模型中Clifford扰动线路是一类特殊的变分量子线路，对于一个$L$层的Clifford扰动量子线路，我们可以表示为
@@ -50,7 +56,7 @@ Clifford扰动量子线路的模拟可以用于量子错误缓解等领域，通
 接下来，我们将讨论使用SPD算法计算$\langle O \rangle ^{(M)}$的计算复杂度，和误差估计。
 
 \section{计算复杂度分析}
-根据式~\eqref{eq:spd_cost}，我们可以看到，计算$\langle O \rangle ^{(M)}$的计算复杂度可以表示为$C = C_s+N_MC_f$，其中$C_s$是枚举所有具有非平凡贡献函数的Pauli路径的时间复杂度，$N_M$是满足条件的Pauli路径的数量，$C_f$是计算每个Pauli路径的贡献的时间复杂度。
+根据式~\eqref{eq:spd_cost}，我们可以看到，计算$\langle O \rangle ^{(M)}$的计算复杂度可以表示为$C = C_s+N_MC_f$，其中$C_s$是枚举所有满足条件的Pauli路径的时间复杂度，$N_M$是满足条件的Pauli路径的数量，$C_f$是计算每个Pauli路径的贡献的时间复杂度。
 因为Clifford扰动量子线路仍然属于变分量子线路，与第~\ref{chap:noisy_vqa}章类似，根据式~\eqref{eq:vqa:c_f}，可以得到：
 \begin{equation}
     C_f=\order{L n}+\order{n}+\order{\poly(n)}=\order{\poly(n)+L n}.
@@ -76,7 +82,7 @@ Clifford扰动量子线路的模拟可以用于量子错误缓解等领域，通
 \end{equation}
 对于计算每个Pauli路径的贡献的空间复杂度，根据式~\eqref{eq:space_f}有：
 \begin{equation}
-    S_f=\order{n}+\order{\poly(n)}+\order{\poly(n)}=\order{\poly(n)}.
+    S_f=\max\{\order{n}+\order{\poly(n)}+\order{\poly(n)}\}=\order{\poly(n)}.
 \end{equation}
 
 
