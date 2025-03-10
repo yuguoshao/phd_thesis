@@ -32,8 +32,8 @@
 \end{enumerate}
 现有的量子线路经典模拟方法主要有全状态模拟、Stabilizer模拟、张量网络模拟等，这些方法在不同的应用场景下有着各自的优势和局限性。全状态模拟方法可以精确模拟任意量子线路，但随着量子比特数的增加，其计算复杂度呈指数级增长，不适用于大规模量子线路的模拟。Stabilizer模拟方法通过维护量子态的稳定子群，可以高效模拟特定类型的量子线路~\cite{gottesman1998heisenberg,bravyi2016improved,bravyi2019simulation}，但其适用范围有限，无法模拟一般的量子线路。张量网络模拟方法通过张量网络的方式表示量子态，可以高效模拟一般的量子线路~\cite{pan2021simulating,pan2022solving,cheng2021mpdo}，但其计算复杂度随着张量网络的大小和结构的增加而增加，对于大规模量子线路的模拟仍然存在挑战。
 
-在本文中，我们主要关注基于Pauli路径积分的量子线路模拟方法。Pauli 路径积分是一种基于路径积分框架的量子线路模拟技术，该方法利用以 Pauli 算符为基的路径积分表示量子线路的演化过程，具有高效性、灵活性和可扩展性，适用于大规模量子线路的模拟。
-我们重点关注基于海森堡演化的 Pauli 路径积分方法，提出了可观测量在Pauli路径下的反向传播算法（Observable's Back-Propagation on Pauli Path，OBPPP），并推广了稀疏Pauli动力学算法（Sparse Pauli Dynamics, SPD）。
+在本文中，我们主要关注基于Pauli路径积分的量子线路模拟方法。Pauli 路径积分是一种基于路径积分框架的量子线路模拟技术，该方法利用以 Pauli 算符为基的路径积分表示量子线路的演化过程，具有高效性、灵活性和可扩展性，适用于大规模量子线路的模拟~\cite{aharonov2022polynomial,gao2018efficient}。
+我们重点关注基于海森堡演化的 Pauli 路径积分方法，提出了可观测量在Pauli路径下的反向传播算法（Observable's Back-Propagation on Pauli Path，OBPPP），并推广了稀疏Pauli动力学算法（Sparse Pauli Dynamics, SPD）~\cite{beguvsic2023simulating,beguvsic2024real}。
 我们对两种算法的误差和计算复杂度进行了分析，验证了算法的有效性和可扩展性。
 此外，通过对经典模拟算法的研究，我们严格证明了噪声对当前 NISQ 设备上广泛应用的变分量子算法（Variational Quantum Algorithm，VQA）~\cite{Cerezo2021variational,mcclean2016theory,tilly2022variational}的破坏性影响，为实现实用化量子优势提供了重要的理论参考。
 
