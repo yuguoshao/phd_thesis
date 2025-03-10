@@ -3,22 +3,22 @@
 % 中英文摘要和关键字
 
 \begin{abstract}
-  量子计算的经典模拟是验证量子硬件、优化算法设计及探索量子优势边界的重要工具。本文针对含噪声中等规模量子（NISQ）设备的模拟需求，提出基于Pauli路径积分的高效经典模拟方法，系统分析其计算复杂度与误差特性，并验证其实际应用价值。
+  量子线路的经典模拟在验证量子硬件、优化量子算法设计以及探索量子计算优势的边界等方面发挥着关键作用。针对含噪声中等规模量子（NISQ）设备的模拟需求，本文研究了两种基于 Pauli 路径积分的高效经典模拟方法，系统分析了其计算复杂度与误差特性，并验证了其在实际应用中的有效性。
 
-  大规模变分量子算法被广泛认为是实现实用量子优势的潜在途径。然而，量子噪声的存在可能会抑制并削弱这些优势，这使得经典可模拟性的界限变得模糊。为了进一步澄清这一问题，我们提出了一种基于可观测量在泡利路径上反向传播路径积分（OBPPP）的新型多项式规模方法。该方法能够在单量子比特泡利噪声存在的情况下，以有界截断误差高效近似变分量子算法中算子的期望值。理论上我们严格证明：1）当最小非零噪声率γ为常数时，OBPPP的时间与空间复杂度与量子比特数n、电路深度L呈现多项式关系；2）对于可变的γ，当存在超过两个非零噪声因子时，若γ大于1/log L则复杂度保持Poly(n, L)，但若γ低于1/L时复杂度将随L呈指数增长。数值方面，我们对IBM在127量子比特鹰处理器上进行的零噪声外推实验结果[Nature 618, 500 (2023)]进行了经典模拟。相比量子设备，我们的方法获得了更高的精度与更快的运行速度。此外，我们的方法能够模拟含噪声结果，精确复现了IBM未经误差缓解、与原始实验观测直接对应的计算结果。本研究表明噪声在经典模拟中的关键作用，所提出的方法适用于广泛量子电路的期望值计算，在量子计算机验证领域具有普适性。
+  具体而言，我们提出了可观测量反向传播算法（OBPPP），并推广了稀疏 Pauli 动力学（SPD）算法。
+  在理论方面，我们将经典模拟算法应用到变分量子算法（VQA），这一算法框架被广泛认为是在 NISQ 时代最有希望实现实用量子优势的候选方案。
+  然而，已有研究表明，NISQ设备中存在的量子噪声可能会抑制并削弱这些优势，从而模糊经典可模拟性的边界，但关于其计算复杂度的系统性理论分析仍然缺乏。
+  针对这一问题，我们严格证明了对于Pauli类型噪声，当最小非零噪声率$\gamma$为常数时，存在计算复杂度与量子比特数$n$、电路深度$L$呈多项式规模的经典算法，可以高效地模拟变分量子线路的观测期望值。
+  此外，对于可变噪声率$\gamma$的情况，当 Pauli 类型噪声包含超过两个非零噪声因子时，若最小非零噪声率$\gamma$大于$1/ log L$，则经典模拟算法的计算复杂度保持在$\poly(n, L)$；但若$\gamma$低于$1/L$，则经典模拟的计算复杂度将可能随$L$呈指数增长。
+
+  在实用性方面，我们对IBM在127量子比特Eagle处理器上进行的Ising模型演化实验[Nature 618, 500 (2023)]进行了经典模拟。相较于量子设备，我们的方法在精度和计算效率上均表现出优势。
+  此外，我们的方法能够复现含噪声的计算结果，与 IBM 设备未经误差缓解的实验观测直接对应，并据此估算了 Eagle 处理器的噪声强度。
+  本研究表明噪声在经典模拟中的关键作用，所提出的方法适用于广泛量子电路的期望值计算，在量子计算机验证领域具有普适性。
 
 
 
-  论文的摘要是对论文研究内容和成果的高度概括。
-  摘要应对论文所研究的问题及其研究目的进行描述，对研究方法和过程进行简单介绍，对研究成果和所得结论进行概括。
-  摘要应具有独立性和自明性，其内容应包含与论文全文同等量的主要信息。
-  使读者即使不阅读全文，通过摘要就能了解论文的总体内容和主要成果。
 
-  论文摘要的书写应力求精确、简明。
-  切忌写成对论文书写内容进行提要的形式，尤其要避免“第 1 章……；第 2 章……；……”这种或类似的陈述方式。
 
-  关键词是为了文献标引工作、用以表示全文主要内容信息的单词或术语。
-  关键词不超过 5 个，每个关键词中间用分号分隔。
 
   % 关键词用“英文逗号”分隔，输出时会自动处理为正确的分隔符
   \thusetup{
@@ -27,19 +27,22 @@
 \end{abstract}
 
 \begin{abstract*}
-  An abstract of a dissertation is a summary and extraction of research work and contributions.
-  Included in an abstract should be description of research topic and research objective, brief introduction to methodology and research process, and summary of conclusion and contributions of the research.
-  An abstract should be characterized by independence and clarity and carry identical information with the dissertation.
-  It should be such that the general idea and major contributions of the dissertation are conveyed without reading the dissertation.
+  Classical simulation of quantum circuits plays a crucial role in verifying quantum hardware, optimizing quantum algorithm design, and exploring the boundaries of quantum computational advantage. 
+  To address the simulation demands of Noisy Intermediate-scale Quantum (NISQ) devices, this paper investigates two efficient classical simulation methods based on Pauli path integral. We systematically analyze their computational complexity and error characteristics and validate their effectiveness in practical applications.
 
-  An abstract should be concise and to the point.
-  It is a misunderstanding to make an abstract an outline of the dissertation and words “the first chapter”, “the second chapter” and the like should be avoided in the abstract.
+  Specifically, we propose the Observable's Back-Propagation on Pauli Path (OBPPP) algorithm and extend the Sparse Pauli Dynamics (SPD) algorithm. 
 
-  Keywords are terms used in a dissertation for indexing, reflecting core information of the dissertation.
-  An abstract may contain a maximum of 5 keywords, with semi-colons used in between to separate one another.
+  On the theoretical side, we apply classical simulation algorithms to variational quantum algorithms (VQAs), a framework widely regarded as one of the most promising candidates for achieving practical quantum advantage in the NISQ era. 
+  However, previous studies have suggested that quantum noise in NISQ devices may suppress and diminish these advantages, thereby blurring the boundary of classical simulability. 
+  Yet, a systematic theoretical analysis of its computational complexity remains lacking. To address this issue, we rigorously prove that for Pauli noise, when the noise rate \(\gamma\) is a constant, there exists a classical algorithm with polynomial computational complexity in the number of qubits \(n\) and circuit depth \(L\) that can efficiently simulate the expectation values of variational quantum circuits. 
+  Furthermore, for the case of variable noise rates \(\gamma\), if Pauli noise contains more than two nonzero noise factors and the noise rate \(\gamma\) is greater than \(1/\log L\), the computational complexity of classical simulation remains within \(\poly(n, L)\); however, if \(\gamma\) falls below \(1/L\), the computational complexity of classical simulation may grow exponentially with \(L\).
+
+  On the practical side, we perform a classical simulation of the Ising model evolution experiment conducted on IBM’s 127-qubit Eagle processor [Nature 618, 500 (2023)]. Compared to quantum hardware, our method demonstrates advantages in both accuracy and computational efficiency. Additionally, our method successfully reproduces noisy computational results, directly corresponding to the raw experimental data from IBM’s device without error mitigation, allowing us to estimate the noise strength of the Eagle processor. 
+
+  This study highlights the critical role of noise in classical simulation. The proposed methods are broadly applicable to expectation value calculations in quantum circuits, making them valuable tools for quantum computer verification.
 
   % Use comma as separator when inputting
   \thusetup{
-    keywords* = {keyword 1, keyword 2, keyword 3, keyword 4, keyword 5},
+    keywords* = {quantum computation, classical simulation of quantum circuits, pauli path integral, variational quantum algorithm, quantum noise},
   }
 \end{abstract*}
