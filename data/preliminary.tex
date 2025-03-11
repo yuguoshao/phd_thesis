@@ -13,13 +13,13 @@
 量子计算的概念最早由Benioff、Manin、Feynman等人在1980年代提出~\cite{Benioff1980,Benioff1982a,Benioff1982b,Manin1980,Feynman1982}。
 其初衷源于经典计算机在模拟量子多体系统演化时面临的计算资源瓶颈——该问题通常需要指数量级的计算资源，而基于量子力学原理构建的计算机则可能在这一任务上展现出本质性的计算优势。这一利用量子力学特性模拟物理系统的构想，逐渐发展为更广义的计算范式，即量子计算。
 后续研究表明，量子计算不仅可高效模拟量子系统，还能求解某些经典计算机难以处理的问题。1994 年，Shor 提出了一种基于量子计算机的整数分解算法，即 Shor 算法~\cite{shor1994algorithms}。该算法能够在多项式时间内分解大整数，从而对现代密码学体系，特别是基于 RSA 的公钥加密算法构成直接威胁，其重要性促使密码学界对抗量子计算的安全方案展开深入研究。
-时至今日，量子计算研究已吸引广泛关注，并在多个领域衍生出丰富的应用方向，包括量子密码学、量子化学~\cite{peruzzo2014variational, kandala2017hardwarea,li2022toward}、量子机器学习~\cite{beer2020training,huang2021experimental,havlivcek2019supervised,mitarai2018quantum} 以及量子优化算法~\cite{farhi2014quantum,moll2018quantum} 等。这些进展不仅推动了量子计算理论的发展，也加速了量子硬件的工程实现，为未来计算范式的变革奠定了基础。
+时至今日，量子计算研究已吸引广泛关注，并在多个领域衍生出丰富的应用方向，包括量子密码学、量子化学~\cite{peruzzo2014variational, kandala2017hardwarea,li2022toward}、量子机器学习~\cite{beer2020training,huang2021experimental,havlivcek2019supervised,mitarai2018quantum}、量子优化算法~\cite{farhi2014quantum,moll2018quantum}以及量子信息的数学工具~\cite{liu2017quon,jaffe2018mathematical,liu2019quon,jaffe2020mathematical,huang2023quantum,liu2024alterfold,jaffe2020quantum,liu2021antisymmetric,liu2021fusion} 等。这些进展不仅推动了量子计算理论的发展，也加速了量子硬件的工程实现，为未来计算范式的变革奠定了基础。
 
 
 随着实验技术的发展，量子计算机的工程实现取得了显著进展。当前，主流物理实现方案包括超导量子比特、离子阱、光量子和中性原子等平台，这些方案已实现 50 至 400 量子比特的操控能力~\cite{blatt2008quantum,devoret2013superconducting,wallraff2004strong,loss1998quantum}。
 自 2019 年以来，研究人员相继在超导量子比特、光量子等平台上，通过随机线路采样~\cite{arute2019quantum} 和高斯波色采样~\cite{zhong2020quantum} 等基准测试任务，展现出了量子计算机在某些特定任务上超越经典计算机的"量子优势"。
 然而，量子计算的发展仍面临诸多技术挑战。量子比特极易受到外界噪声干扰，从而导致计算错误。
-为解决这一问题，研究者提出了量子纠错技术（Quantum Error Correction, QEC），其核心思想是通过特定的纠错编码保护量子信息，使其免受外界干扰~\cite{aharonov1997fault,aliferis2008fault}。
+为解决这一问题，研究者提出了量子纠错技术（Quantum Error Correction, QEC），其核心思想是通过特定的纠错编码保护量子信息，使其免受外界干扰~\cite{aharonov1997fault,aliferis2008fault,shao2024variational,huang2023quantum}。
 近期的实验研究已在光量子和超导量子平台上实现低于噪声阈值的量子纠错~\cite{ni2023beating,acharya2024quantum,sivak2023real}，标志着容错量子计算迈出关键一步。
 
 经典模拟技术是量子计算研究的重要组成部分，它利用经典计算机模拟量子系统的演化，为量子计算机的设计、验证和应用提供了关键支持。
@@ -32,7 +32,7 @@
 \end{enumerate}
 现有的量子线路经典模拟方法主要有全状态模拟、Stabilizer模拟、张量网络模拟等，这些方法在不同的应用场景下有着各自的优势和局限性。全状态模拟方法可以精确模拟任意量子线路，但随着量子比特数的增加，其计算复杂度呈指数级增长，不适用于大规模量子线路的模拟。Stabilizer模拟方法通过维护量子态的稳定子群，可以高效模拟特定类型的量子线路~\cite{gottesman1998heisenberg,bravyi2016improved,bravyi2019simulation}，但其适用范围有限，无法模拟一般的量子线路。张量网络模拟方法通过张量网络的方式表示量子态，可以高效模拟一般的量子线路~\cite{pan2021simulating,pan2022solving,cheng2021mpdo}，但其计算复杂度随着张量网络的大小和结构的增加而增加，对于大规模量子线路的模拟仍然存在挑战。
 
-在本文中，我们主要关注基于Pauli路径积分的量子线路模拟方法。Pauli 路径积分是一种基于路径积分框架的量子线路模拟技术，该方法利用以 Pauli 算符为基的路径积分表示量子线路的演化过程，具有高效性、灵活性和可扩展性，适用于大规模量子线路的模拟~\cite{aharonov2022polynomial,gao2018efficient}。
+在本文中，我们主要关注基于Pauli路径积分的量子线路模拟方法。Pauli 路径积分是一种基于路径积分框架的量子线路模拟技术，该方法利用以 Pauli 算符为基的路径积分表示量子线路的演化过程，具有高效性、灵活性和可扩展性，适用于大规模量子线路的模拟~\cite{aharonov2022polynomial,gao2018efficient,shao2024simulating}。
 我们重点关注基于海森堡演化的 Pauli 路径积分方法，提出了可观测量在Pauli路径下的反向传播算法（Observable's Back-Propagation on Pauli Path，OBPPP），并推广了稀疏Pauli动力学算法（Sparse Pauli Dynamics, SPD）~\cite{beguvsic2023simulating,beguvsic2024real}。
 我们对两种算法的误差和计算复杂度进行了分析，验证了算法的有效性和可扩展性。
 此外，通过对经典模拟算法的研究，我们严格证明了噪声对当前 NISQ 设备上广泛应用的变分量子算法（Variational Quantum Algorithm，VQA）~\cite{Cerezo2021variational,mcclean2016theory,tilly2022variational}的破坏性影响，为实现实用化量子优势提供了重要的理论参考。
