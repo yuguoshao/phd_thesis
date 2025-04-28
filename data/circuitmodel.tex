@@ -445,8 +445,8 @@
     \begin{equation}\label{ap:eq:E_cross_i-layer} 
         \begin{aligned} 
             \mathbb{E}_{\bm{\theta}_i}&\Tr{s_i\mathcal{U}_i s_{i-1}\mathcal{U}_i^\dagger}\Tr{s'_i\mathcal{U}_i s'_{i-1}\mathcal{U}_i^\dagger}\\
-            =&\Tr{(s_i s_{i-1})\big|_{I_i}}\Tr{(s'_i s'_{i-1})\big|_{I_i}}
-            \prod_{k=1}^{C_i}\Tr{\left(s_iV_{i,k} s_{i-1}V_{i,k}^{\dagger}\right)\big|_\g{V_{i,k}}}\Tr{\left(s'_iV_{i,k} s'_{i-1}V_{i,k}^{\dagger}\right)\big|_\g{V_{i,k}}}\\
+            =&\Tr{(s_i s_{i-1})\big|_{I_i}}\Tr{(s'_i s'_{i-1})\big|_{I_i}}\\
+            &\prod_{k=1}^{C_i}\Tr{\left(s_iV_{i,k} s_{i-1}V_{i,k}^{\dagger}\right)\big|_\g{V_{i,k}}}\Tr{\left(s'_iV_{i,k} s'_{i-1}V_{i,k}^{\dagger}\right)\big|_\g{V_{i,k}}}\\
             &\prod_{\sigma_{i,j}\in C(i,s_{i-1})}\Tr{(s_i s_{i-1})\big|_{\g{\sigma_{i,j}}}}\prod_{\sigma_{i,l}\in C(i,s_{i-1}')}\Tr{(s'_i s'_{i-1})\big|_{\g{\sigma_{i,l}}}}\\
             &\mathbb{E}_{\bm{\theta}_i}\left\{\prod_{\sigma_{i,j'}\in AC(i,s_{i-1})}\Bigg[ \Tr{(s_i s_{i-1})\big|_{\g{\sigma_{i,j'}}}}\cos{\theta_{i,j'}}
             - \Tr{(is_i \sigma_{i,j'}s_{i-1})\big|_{\g{\sigma_{i,j'}}}}\sin{\theta_{i,j'}}\Bigg]\right.\\
@@ -468,15 +468,15 @@
     \begin{equation}\label{ap:eq:E_cross_i-layer-rewrited}
         \begin{aligned}
         &\mathbb{E}_{\bm{\theta}_i}\Tr{s_i\mathcal{U}_i s_{i-1}\mathcal{U}_i^\dagger}\Tr{s'_i\mathcal{U}_i s'_{i-1}\mathcal{U}_i^\dagger}\\
-        =&\Tr{(s_i s_{i-1})\big|_{I_i}}\Tr{(s'_i s'_{i-1})\big|_{I_i}}
-        \prod_{k=1}^{C_i}\Tr{\left(s_iV_{i,k} s_{i-1}V_{i,k}^{\dagger}\right)\big|_\g{V_{i,k}}}\Tr{\left(s'_iV_{i,k} s'_{i-1}V_{i,k}^{\dagger}\right)\big|_\g{V_{i,k}}}\\
+        =&\Tr{(s_i s_{i-1})\big|_{I_i}}\Tr{(s'_i s'_{i-1})\big|_{I_i}}\\
+        &\prod_{k=1}^{C_i}\Tr{\left(s_iV_{i,k} s_{i-1}V_{i,k}^{\dagger}\right)\big|_\g{V_{i,k}}}\Tr{\left(s'_iV_{i,k} s'_{i-1}V_{i,k}^{\dagger}\right)\big|_\g{V_{i,k}}}\\
         &\prod_{\sigma_{i,j}\in C(i,s_{i-1})}\Tr{(s_i s_{i-1})\big|_{\g{\sigma_{i,j}}}}\Tr{(s'_i s'_{i-1})\big|_{\g{\sigma_{i,j}}}}\\
         &\prod_{\sigma_{i,j'}\in AC(i,s_{i-1})}\mathbb{E}_{\theta_{i,j'}}\left\{ \Bigg[ \Tr{(s_i s_{i-1})\big|_{\g{\sigma_{i,j'}}}}\cos{\theta_{i,j'}}
         - \Tr{(is_i \sigma_{i,j'}s_{i-1})\big|_{\g{\sigma_{i,j'}}}}\sin{\theta_{i,j'}}\Bigg]\right.\\
         &\left.\quad\quad\quad\quad\quad\Bigg[ \Tr{(s'_i s'_{i-1})\big|_{\g{\sigma_{i,j'}}}}\cos{\theta_{i,j'}}
         - \Tr{(is'_i \sigma_{i,j'}s'_{i-1})\big|_{\g{\sigma_{i,j'}}}}\sin{\theta_{i,j'}}\Bigg]\right\}\\
-        =&\Tr{(s_i s_{i-1})\big|_{I_i}}\Tr{(s'_i s'_{i-1})\big|_{I_i}}
-        \prod_{k=1}^{C_i}\Tr{\left(s_iV_{i,k} s_{i-1}V_{i,k}^{\dagger}\right)\big|_\g{V_{i,k}}}\Tr{\left(s'_iV_{i,k} s'_{i-1}V_{i,k}^{\dagger}\right)\big|_\g{V_{i,k}}}\\
+        =&\Tr{(s_i s_{i-1})\big|_{I_i}}\Tr{(s'_i s'_{i-1})\big|_{I_i}}\\
+        &\prod_{k=1}^{C_i}\Tr{\left(s_iV_{i,k} s_{i-1}V_{i,k}^{\dagger}\right)\big|_\g{V_{i,k}}}\Tr{\left(s'_iV_{i,k} s'_{i-1}V_{i,k}^{\dagger}\right)\big|_\g{V_{i,k}}}\\
         &\prod_{\sigma_{i,j}\in C(i,s_{i-1})}\Tr{(s_i s_{i-1})\big|_{\g{\sigma_{i,j}}}}\Tr{(s'_i s'_{i-1})\big|_{\g{\sigma_{i,j}}}}\\
         &\prod_{\sigma_{i,j'}\in AC(i,s_{i-1})}\Bigg[\Tr{(s_i s_{i-1})\big|_{\g{\sigma_{i,j'}}}}\Tr{(s'_i s'_{i-1})\big|_{\g{\sigma_{i,j'}}}}\mathbb{E}_{{\theta}_{i,j'}}\left(\cos{\theta_{i,j'}}\right)^2\\
         &\quad\quad\quad\quad\quad +\Tr{(is_i \sigma_{i,j'}s_{i-1})\big|_{\g{\sigma_{i,j'}}}}\Tr{(is'_i \sigma_{i,j'}s'_{i-1})\big|_{\g{\sigma_{i,j'}}}}\mathbb{E}_{{\theta}_{i,j'}}\left(\sin\theta_{i,j'}\right)^2\Bigg],
@@ -675,10 +675,11 @@
         \end{cases}
         \cdots, s_L=\begin{cases}
             Z_1 \\ \text{或} \\
-            Y_1.
+            Y_1,
         \end{cases}
     \end{aligned}
 \end{equation}
+其中，$Z_1$ 和 $Y_1$ 分别表示第一个量子比特上的 Pauli 算符 $Z$ 和 $Y$。
 
 因此，对于 $\gamma=\order{\frac{1}{L}}$，我们需要考虑所有具有非零贡献的 Pauli 路径，这将导致指数时间成本。这完成了命题~\ref{prop:lambda_and_L}的证明。
 
