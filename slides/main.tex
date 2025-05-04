@@ -1214,7 +1214,7 @@ Find a new ”easy island” in the ”hard ocean” of quantum circuits simulat
    \end{itemize}
  \end{frame}
 
- \begin{frame}[fragile]
+ \begin{frame}[fragile]{Pauli Path Integral For Noiseless Circuits}
   When the rotation parameters are located in the small angle space $\Theta=\{\bm{\theta}\mid \abs{\theta_i}\leq \theta_* ,i=1,\cdots,L \}$, the truncation error can be upper bounded, as summarized in the following theorem. 
   \begin{mdframed}
     \begin{theorem}\label{thm:truncation_error}
@@ -1232,7 +1232,13 @@ Find a new ”easy island” in the ”hard ocean” of quantum circuits simulat
   }
 \end{frame}
 
-
+\begin{frame}[fragile]{Application in Quantum Error Mitigation}
+  Clifford Perturbation Data Regression (CPDR) 
+  \begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{fig/IBM_ans_v4.pdf}
+  \end{figure}
+\end{frame}
 
 
 \section{Conclusion}
@@ -1244,6 +1250,7 @@ Find a new ”easy island” in the ”hard ocean” of quantum circuits simulat
     \item The efficiency of the algorithm is verified by IBM's 127-qubit experiments, and can be used to fit the raw experimental data.
     \item The algorithm is also efficient for the improved experimental setting proposed by \cite{anand2023classical}.
     \item The efficiency of the algorithm is irrelevant to the locality of the gates and the entanglement entropy. 
+    \item For noiseless circuits, Pauli path integral method can also be used to simulate the noiseless observable value of near-Clifford circuits.
   \end{itemize}
 \end{frame}
 \note{
