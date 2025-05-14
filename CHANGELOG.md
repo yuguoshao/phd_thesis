@@ -6,11 +6,42 @@
 
 ## [Unreleased]
 
+### Changed
+
+- `Biblatex` 的斜线不再默认使用等宽字体（[#1018](https://github.com/tuna/thuthesis/discussions/1018)）。
+
+## [v7.6.0] - 2025-03-28
+
+### Added
+
+- 同步研究生论文《写作指南》对 2025 年 3 月版本的修改：
+  - 非涉密论文的声明页中增加“不包含涉及国家秘密的内容”字样（[#1000](https://github.com/tuna/thuthesis/issues/1000)）
+  - 授权页的“《中华人民共和国学位条例暂行实施办法》”更新为“《中华人民共和国学位法》”（[#1003](https://github.com/tuna/thuthesis/issues/1003)）。
+- 根据 2025 年 1 月教务处发布的《清华大学综合论文训练写作规范（试行）》更新本科生格式。
+  - 本次格式修改幅度较大，不再一一列出。具体请参见 [#987](https://github.com/tuna/thuthesis/issues/987)、[#1002](https://github.com/tuna/thuthesis/issues/1002)。尤其感谢 @lrf21 的整理！
+
+### Changed
+
+- 研究生的声明页改为编译时默认不含页眉页脚、插入扫描页时加上页眉页脚（[#999](https://github.com/tuna/thuthesis/issues/999)）。
+
+### Deprecated
+
+- 带星号版本的 `\listoffigures*` 等命令已过时。
+- 公式索引 `\listofequations` 和相关的 `\equcaption` 命令已过时。
+- `toc-chapter-style` 选项已过时。
+
+### Removed
+
+- 移除 `statement-page-numer` 选项，请使用 `\statement` 命令的 `page-style` 参数控制行为（可参见样例文档）。
+- 移除 `degree-name` 选项，请改为 `degree-category`（包括带星号的版本）。
+
 ### Fixed
 
 - 修正目录中顶格标题的断行问题（[#963](https://github.com/tuna/thuthesis/issues/963)）。
 - 统一选题报告与学位论文的封面格式，修复信息偏移问题（[#977](https://github.com/tuna/thuthesis/issues/977)）。
 - 修正 `siunitx` 的连接符设置（[#990](https://github.com/tuna/thuthesis/issues/990)）。
+- 修正“符号和缩略语说明”的行距。
+- 修正参考文献表内容的第一项段前距离。
 
 ## [v7.5.2] - 2024-07-01
 
@@ -1005,7 +1036,8 @@
 
 
 
-[Unreleased]: https://github.com/tuna/thuthesis/compare/v7.5.2...HEAD
+[Unreleased]: https://github.com/tuna/thuthesis/compare/v7.6.0...HEAD
+[v7.6.0]:     https://github.com/tuna/thuthesis/compare/v7.5.2...v7.6.0
 [v7.5.2]:     https://github.com/tuna/thuthesis/compare/v7.5.1...v7.5.2
 [v7.5.1]:     https://github.com/tuna/thuthesis/compare/v7.5.0...v7.5.1
 [v7.5.0]:     https://github.com/tuna/thuthesis/compare/v7.4.0...v7.5.0
